@@ -5,7 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use App\Models\Outlet; // ⬅ tambahkan ini
+use App\Models\Outlet; 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class User extends Authenticatable
 {
@@ -17,6 +18,7 @@ class User extends Authenticatable
         'no_hp',
         'email',
         'password',
+        'role',
         'outlet_id',
     ];
 
@@ -33,7 +35,7 @@ class User extends Authenticatable
         ];
     }
 
-    public function outlet()
+    public function outlet(): BelongsTo
     {
         return $this->belongsTo(Outlet::class);
     }

@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\DistribusiController;
 use Illuminate\Http\Request;
 
-class DistribusiControllerController extends Controller
+class DistribusiController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -34,7 +33,7 @@ class DistribusiControllerController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(DistribusiController $distribusiController)
+    public function show(string $id)
     {
         //
     }
@@ -42,7 +41,7 @@ class DistribusiControllerController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(DistribusiController $distribusiController)
+    public function edit(string $id)
     {
         //
     }
@@ -50,7 +49,7 @@ class DistribusiControllerController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, DistribusiController $distribusiController)
+    public function update(Request $request, string $id)
     {
         //
     }
@@ -58,7 +57,7 @@ class DistribusiControllerController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(DistribusiController $distribusiController)
+    public function destroy(string $id)
     {
         //
     }
