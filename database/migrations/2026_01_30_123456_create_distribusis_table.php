@@ -10,11 +10,12 @@ return new class extends Migration
      * Run the migrations.
      */
    public function up(): void {
-    Schema::create('stok_masuks', function (Blueprint $table) {
+    Schema::create('distribusis', function (Blueprint $table) {
         $table->id();
-        // RELASI: Bahan apa yang masuk?
-        $table->foreignId('bahan_id')->constrained('bahans')->onDelete('cascade');
+        $table->foreignId('bahan_id')->constrained('bahans');
+        $table->foreignId('outlet_id')->constrained('outlets');
         $table->integer('jumlah');
+        $table->enum('status', ['dikirim', 'diterima'])->default('dikirim');
         $table->date('tanggal');
         $table->timestamps();
     });
@@ -25,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('stok_masuks');
+        Schema::dropIfExists('distribusis');
     }
 };
