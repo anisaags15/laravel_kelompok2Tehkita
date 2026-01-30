@@ -3,6 +3,10 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\StokOutletController;
+
+Route::resource('stok-outlet', StokOutletController::class)->middleware('auth');
+
 Route::get('/', function () {
     return view('welcome');
 });
