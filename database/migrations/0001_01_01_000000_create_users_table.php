@@ -6,26 +6,23 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
 
-            // DATA USER
             $table->string('name');
             $table->string('username')->unique();
+            $table->string('email')->unique();
             $table->string('no_hp', 15);
 
-            // RELASI KE OUTLET
-            $table->foreignId('outlet_id')
-                  ->constrained('outlets')
-                  ->onDelete('cascade');
+            $table->string('role')->default('user');
 
-            // LOGIN
-            $table->string('email')->unique();
+            $table->foreignId('outlet_id')
+                ->nullable()
+                ->constrained('outlets')
+                ->nullOnDelete();
+
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
 
@@ -49,9 +46,6 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('users');

@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('outlets', function (Blueprint $table) {
             $table->id();
-            $table->string('nama_outlet');     // nama outlet untuk dropdown
-            $table->text('alamat')->nullable(); // text lebih fleksibel dari string
-            $table->string('no_hp', 15)->nullable(); // batasi panjang nomor HP
+            $table->string('nama_outlet');     
+            $table->text('alamat')->nullable(); 
+            $table->string('no_hp', 15)->nullable(); 
             $table->timestamps();
         });
     }
