@@ -1,20 +1,69 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StokOutletController;
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\StokOutletController;
-
-Route::resource('stok-outlet', StokOutletController::class)->middleware('auth');
-
+/*
+|--------------------------------------------------------------------------
+| PUBLIC
+|--------------------------------------------------------------------------
+*/
 Route::get('/', function () {
     return view('welcome');
 });
 
+/*
+|--------------------------------------------------------------------------
+| DASHBOARD DEFAULT (WAJIB BUAT BREEZE)
+|--------------------------------------------------------------------------
+*/
 Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+    $user = auth()->user();
 
+    if ($user->role === 'admin') {
+        return redirect()->route('admin.dashboard');
+    }
+
+    if ($user->role === 'user') {
+        return redirect()->route('user.dashboard');
+    }
+
+    abort(403);
+})->middleware('auth')->name('dashboard');
+
+/*
+|--------------------------------------------------------------------------
+| ADMIN AREA
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:admin'])->group(function () {
+
+    Route::get('/admin/dashboard', function () {
+        return view('admin.dashboard');
+    })->name('admin.dashboard');
+
+    Route::resource('stok-outlet', StokOutletController::class);
+});
+
+/*
+|--------------------------------------------------------------------------
+| USER AREA
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:user'])->group(function () {
+
+    Route::get('/user/dashboard', function () {
+        return view('user.dashboard');
+    })->name('user.dashboard');
+
+});
+
+/*
+|--------------------------------------------------------------------------
+| PROFILE
+|--------------------------------------------------------------------------
+*/
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
