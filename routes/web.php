@@ -1,17 +1,22 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Auth\ProfileController;
 use App\Http\Controllers\OutletController;
 use App\Http\Controllers\BahanController;
 use App\Http\Controllers\StokMasukController;
 use App\Http\Controllers\DistribusiController;
-use App\Http\Controllers\PemakaianController;
 use App\Http\Controllers\StokOutletController;
+use App\Http\Controllers\PemakaianController;
+use App\Models\User;
+use App\Models\Outlet;
+use App\Models\Bahan;
+use App\Models\StokMasuk;
+use App\Models\Distribusi;
 
 /*
 |--------------------------------------------------------------------------
-| PUBLIC ROUTES
+| PUBLIC
 |--------------------------------------------------------------------------
 */
 Route::get('/', function () {
@@ -20,7 +25,7 @@ Route::get('/', function () {
 
 /*
 |--------------------------------------------------------------------------
-| DASHBOARD REDIRECT
+| DASHBOARD REDIRECT (ROLE BASED)
 |--------------------------------------------------------------------------
 */
 Route::get('/dashboard', function () {
@@ -48,11 +53,12 @@ Route::middleware(['auth', 'role:admin'])
     ->group(function () {
 
         Route::get('/dashboard', function () {
-            $totalUsers = \App\Models\User::count();
-            $totalOutlets = \App\Models\Outlet::count();
-            $totalBahan = \App\Models\Bahan::count();
-            $stokGudang = \App\Models\StokMasuk::sum('jumlah');
-            $distribusiHariIni = \App\Models\Distribusi::whereDate('created_at', now())->sum('jumlah');
+            $totalUsers   = User::count();
+            $totalOutlets = Outlet::count();
+            $totalBahan   = Bahan::count();
+            $stokGudang   = StokMasuk::sum('jumlah');
+            $distribusiHariIni = Distribusi::whereDate('created_at', now())
+                ->sum('jumlah');
 
             return view('admin.dashboard', compact(
                 'totalUsers',
@@ -68,6 +74,17 @@ Route::middleware(['auth', 'role:admin'])
         Route::resource('stok-masuk', StokMasukController::class);
         Route::resource('distribusi', DistribusiController::class);
         Route::resource('stok-outlet', StokOutletController::class);
+
+        /*
+        |--------------------------------------------------------------------------
+        | ADMIN PROFILE (ALIAS KE PROFILE GLOBAL)
+        |--------------------------------------------------------------------------
+        */
+        Route::get('/profile/edit', [ProfileController::class, 'edit'])
+            ->name('profile.edit');
+
+        Route::put('/profile', [ProfileController::class, 'update'])
+            ->name('profile.update');
     });
 
 /*
@@ -85,20 +102,32 @@ Route::middleware(['auth', 'role:user'])
         })->name('dashboard');
 
         Route::resource('pemakaian', PemakaianController::class);
-
-        Route::patch('/distribusi/{id}/terima', [DistribusiController::class, 'terima'])
-            ->name('distribusi.terima');
+        Route::resource('stok-outlet', StokOutletController::class);
     });
 
 /*
 |--------------------------------------------------------------------------
-| PROFILE ROUTES
+| PROFILE GLOBAL (UNTUK USER / AKSES LANGSUNG)
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])
+        ->name('profile.edit');
+
+    Route::put('/profile', [ProfileController::class, 'update'])
+        ->name('profile.update');
+
+    Route::delete('/profile', [ProfileController::class, 'destroy'])
+        ->name('profile.destroy');
+
+    Route::post('/profile/update-password', [ProfileController::class, 'updatePassword'])
+        ->name('profile.update-password');
 });
 
-require __DIR__.'/auth.php';
+/*
+|--------------------------------------------------------------------------
+| AUTH ROUTES
+|--------------------------------------------------------------------------
+*/
+require __DIR__ . '/auth.php';
