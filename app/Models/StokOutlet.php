@@ -12,24 +12,17 @@ class StokOutlet extends Model
 
     protected $table = 'stok_outlets';
 
-    // kolom yang boleh diisi
     protected $fillable = [
         'outlet_id',
         'bahan_id',
         'stok',
     ];
 
-    /**
-     * RELASI
-     */
-
-    // stok ini milik satu outlet
     public function outlet(): BelongsTo
     {
         return $this->belongsTo(Outlet::class);
     }
 
-    // stok ini milik satu bahan
     public function bahan(): BelongsTo
     {
         return $this->belongsTo(Bahan::class);
