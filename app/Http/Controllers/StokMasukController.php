@@ -2,63 +2,62 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\StokMasuk;
+use App\Models\Bahan;
 use Illuminate\Http\Request;
 
 class StokMasukController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Menampilkan daftar stok masuk
      */
     public function index()
     {
-        //
+        $stokMasuks = StokMasuk::with('bahan')
+            ->orderBy('tanggal', 'desc')
+            ->get();
+
+        return view('stok_masuk.index', compact('stokMasuks'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Form tambah stok masuk
      */
     public function create()
     {
-        //
+        $bahans = Bahan::all();
+        return view('stok_masuk.create', compact('bahans'));
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Simpan stok masuk
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'bahan_id' => 'required|exists:bahans,id',
+            'jumlah'   => 'required|integer|min:1',
+            'tanggal'  => 'required|date',
+        ]);
+
+        StokMasuk::create([
+            'bahan_id' => $request->bahan_id,
+            'jumlah'   => $request->jumlah,
+            'tanggal'  => $request->tanggal,
+        ]);
+
+        return redirect()->route('stok-masuk.index')
+            ->with('success', 'Stok masuk berhasil ditambahkan');
     }
 
     /**
-     * Display the specified resource.
+     * Hapus data stok masuk
      */
-    public function show(string $id)
+    public function destroy($id)
     {
-        //
-    }
+        StokMasuk::findOrFail($id)->delete();
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return redirect()->route('stok-masuk.index')
+            ->with('success', 'Data stok masuk berhasil dihapus');
     }
 }

@@ -2,63 +2,71 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Pemakaian;
+use App\Models\Bahan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PemakaianController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Menampilkan daftar pemakaian bahan (per outlet)
      */
     public function index()
     {
-        //
+        $user = Auth::user();
+
+        $pemakaians = Pemakaian::with(['bahan', 'outlet'])
+            ->where('outlet_id', $user->outlet_id)
+            ->orderBy('tanggal', 'desc')
+            ->get();
+
+        return view('pemakaian.index', compact('pemakaians'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Form input pemakaian bahan
      */
     public function create()
     {
-        //
+        $bahans = Bahan::all();
+        return view('pemakaian.create', compact('bahans'));
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Simpan data pemakaian bahan
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'bahan_id' => 'required|exists:bahans,id',
+            'jumlah'   => 'required|integer|min:1',
+            'tanggal'  => 'required|date',
+        ]);
+
+        $user = Auth::user();
+
+        Pemakaian::create([
+            'bahan_id'  => $request->bahan_id,
+            'outlet_id' => $user->outlet_id,
+            'jumlah'    => $request->jumlah,
+            'tanggal'   => $request->tanggal,
+        ]);
+
+        return redirect()->route('pemakaian.index')
+            ->with('success', 'Pemakaian bahan berhasil dicatat');
     }
 
     /**
-     * Display the specified resource.
+     * Hapus data pemakaian
      */
-    public function show(string $id)
+    public function destroy($id)
     {
-        //
-    }
+        $pemakaian = Pemakaian::findOrFail($id);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
+        $pemakaian->delete();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return redirect()->route('pemakaian.index')
+            ->with('success', 'Data pemakaian berhasil dihapus');
     }
 }

@@ -2,63 +2,67 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Distribusi;
+use App\Models\Bahan;
+use App\Models\Outlet;
+use App\Models\StokOutlet;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class DistribusiController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $distribusis = Distribusi::with(['bahan', 'outlet'])->get();
+        return view('distribusi.index', compact('distribusis'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        $bahans = Bahan::all();
+        $outlets = Outlet::all();
+        return view('distribusi.create', compact('bahans', 'outlets'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
-    }
+        $request->validate([
+            'bahan_id' => 'required|exists:bahans,id',
+            'outlet_id' => 'required|exists:outlets,id',
+            'jumlah' => 'required|integer|min:1',
+            'tanggal' => 'required|date',
+        ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+        DB::transaction(function () use ($request) {
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
+            $bahan = Bahan::findOrFail($request->bahan_id);
+            if ($bahan->stok_awal < $request->jumlah) {
+                abort(400, 'Stok gudang tidak mencukupi');
+            }
+            $bahan->stok_awal -= $request->jumlah;
+            $bahan->save();
+            $stokOutlet = StokOutlet::firstOrCreate(
+                [
+                    'outlet_id' => $request->outlet_id,
+                    'bahan_id' => $request->bahan_id,
+                ],
+                [
+                    'stok' => 0,
+                ]
+            );
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+            $stokOutlet->stok += $request->jumlah;
+            $stokOutlet->save();
+            Distribusi::create([
+                'bahan_id' => $request->bahan_id,
+                'outlet_id' => $request->outlet_id,
+                'jumlah' => $request->jumlah,
+                'tanggal' => $request->tanggal,
+                'status' => 'dikirim',
+            ]);
+        });
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return redirect()->route('distribusi.index')
+            ->with('success', 'Distribusi berhasil & stok otomatis diperbarui');
     }
 }
