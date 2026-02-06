@@ -1,0 +1,152 @@
+/* =========================================
+   LAYOUT ADMIN PUSAT - ES TEH KITA (FIXED)
+   ========================================= */
+
+:root {
+    --teh-green: #2d5a27;
+    --sidebar-width: 260px;
+    --navbar-height: 70px;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: #f8faf8;
+}
+
+/* 1. SIDEBAR: Tiang Utama (Paling Kiri, Full Atas-Bawah) */
+.sidebar {
+    width: var(--sidebar-width);
+    height: 100vh;
+    background-color: var(--teh-green);
+    color: white;
+    border-right: 1px solid #e2e8e2;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 2000;
+    overflow-y: auto;
+    transition: all 0.3s;
+}
+
+/* Sidebar logo/header */
+.sidebar .sidebar-header {
+    padding: 20px;
+    font-size: 1.3rem;
+    font-weight: 700;
+    text-align: center;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+
+/* 2. NAVBAR: Nempel di Samping Sidebar */
+.navbar {
+    height: var(--navbar-height);
+    width: calc(100% - var(--sidebar-width));
+    background-color: var(--teh-green) !important;
+    position: fixed;
+    top: 0;
+    left: var(--sidebar-width);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    padding: 0 25px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.navbar-brand {
+    color: white !important;
+    font-weight: 800;
+    text-decoration: none;
+    font-size: 1.1rem;
+}
+
+/* 3. CONTENT AREA: Area Sisa di Kanan Bawah Navbar */
+.content {
+    margin-left: var(--sidebar-width);
+    margin-top: var(--navbar-height);
+    padding: 30px;
+    min-height: calc(100vh - var(--navbar-height));
+    box-sizing: border-box;
+    /* pastiin konten nggak nabrak sidebar/navbar */
+    overflow-x: hidden;
+}
+
+/* =========================================
+   SIDEBAR MENU (UL LI) - TETAP RAPI
+   ========================================= */
+
+.sidebar ul {
+    list-style: none !important;
+    padding: 20px 0 !important;
+    margin: 0 !important;
+}
+
+.sidebar li {
+    margin: 5px 0 !important;
+}
+
+.sidebar .nav-link {
+    display: flex !important;
+    align-items: center !important;
+    padding: 12px 20px !important;
+    color: white !important;
+    text-decoration: none !important;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+.sidebar .nav-link i {
+    width: 25px;
+    margin-right: 10px;
+    text-align: center;
+}
+
+.sidebar .nav-link:hover {
+    background-color: rgba(255,255,255,0.2);
+    color: white !important;
+}
+
+.sidebar .nav-link.active {
+    background-color: white !important;
+    color: var(--teh-green) !important;
+}
+
+/* Logout Button */
+.sidebar form button.nav-link {
+    width: 100%;
+    border: none !important;
+    background: none !important;
+    cursor: pointer;
+    color: white !important;
+}
+
+/* =========================================
+   TAILWIND CARDS SUPPORT (DASHBOARD)
+   ========================================= */
+.grid { display: grid; }
+.gap-6 { gap: 1.5rem; }
+.rounded-lg { border-radius: 12px; }
+.p-6 { padding: 1.5rem; }
+.shadow { box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+.bg-green-500 { background-color: #22c55e !important; }
+.bg-blue-500 { background-color: #3b82f6 !important; }
+.bg-yellow-500 { background-color: #eab308 !important; }
+.bg-purple-500 { background-color: #a855f7 !important; }
+.text-white { color: white !important; }
+.text-2xl { font-size: 1.5rem; font-weight: 700; }
+.text-sm { font-size: 0.875rem; font-weight: 500; }
+
+/* Responsive Grid Cards */
+@media (min-width: 768px) {
+    .md\:grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1024px) {
+    .lg\:grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* tambahan supaya konten cards nggak nabrak sidebar */
+.content .grid > div {
+    min-width: 0;
+}

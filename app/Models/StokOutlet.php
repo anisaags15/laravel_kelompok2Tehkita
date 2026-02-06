@@ -9,11 +9,19 @@ class StokOutlet extends Model
 {
     use HasFactory;
 
-    protected $table = 'stok_outlet';
-
     protected $fillable = [
-        'nama_outlet',
-        'nama_barang',
-        'stok',
+        'outlet_id',
+        'bahan_id',
+        'stok'
     ];
+
+    public function outlet()
+    {
+        return $this->belongsTo(Outlet::class);
+    }
+
+    public function bahan()
+    {
+        return $this->belongsTo(Bahan::class);
+    }
 }
