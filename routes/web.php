@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StokOutletController;
+use App\Http\Controllers\StokMasukController;
+use App\Http\Controllers\PemakaianController;
+use App\Http\Controllers\DistribusiController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -44,6 +47,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     })->name('admin.dashboard');
 
     Route::resource('stok-outlet', StokOutletController::class);
+
+    Route::resource('distribusi', DistribusiController::class);
 });
 
 /*
@@ -57,8 +62,19 @@ Route::middleware(['auth', 'role:user'])->group(function () {
         return view('user.dashboard');
     })->name('user.dashboard');
 
+    Route::patch('/distribusi/{id}/terima', [DistribusiController::class, 'terima'])
+        ->name('distribusi.terima');
+
+    Route::middleware(['auth', 'role:user'])->group(function () {
+    Route::resource('pemakaian', PemakaianController::class)
+    ->except(['show', 'edit', 'update']);
+});
+    Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::resource('stok-masuk', StokMasukController::class)
+        ->except(['show', 'edit', 'update']);
 });
 
+});
 /*
 |--------------------------------------------------------------------------
 | PROFILE
@@ -69,5 +85,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+
 
 require __DIR__.'/auth.php';
