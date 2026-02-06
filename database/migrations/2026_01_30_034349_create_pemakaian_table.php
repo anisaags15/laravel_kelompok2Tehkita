@@ -9,19 +9,21 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
-    {
-        Schema::create('pemakaian', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
-    }
-
+ public function up(): void {
+    Schema::create('pemakaians', function (Blueprint $table) {
+        $table->id();
+        $table->foreignId('bahan_id')->constrained('bahans');
+        $table->foreignId('outlet_id')->constrained('outlets');
+        $table->integer('jumlah');
+        $table->date('tanggal');
+        $table->timestamps();
+    });
+}
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('pemakaian');
+        Schema::dropIfExists('pemakaians');
     }
 };
