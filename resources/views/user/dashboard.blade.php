@@ -1,15 +1,13 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Dashboard Admin Outlet
-        </h2>
-    </x-slot>
+@extends('adminlte::page')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white shadow sm:rounded-lg p-6">
-                <h2>Halo ini admin outlet 👋</h2>
-            </div>
-        </div>
-    </div>
-</x-app-layout>
+@section('title', 'Dashboard User')
+
+@section('content_header')
+    <h1>Dashboard User</h1>
+@stop
+
+@section('content')
+
+<p>Selamat datang di dashboard user</p>
+
+@stop

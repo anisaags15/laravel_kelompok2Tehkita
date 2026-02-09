@@ -1,18 +1,15 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\ProfileController;
+
+// Controllers
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OutletController;
 use App\Http\Controllers\BahanController;
 use App\Http\Controllers\StokMasukController;
 use App\Http\Controllers\DistribusiController;
 use App\Http\Controllers\StokOutletController;
 use App\Http\Controllers\PemakaianController;
-use App\Models\User;
-use App\Models\Outlet;
-use App\Models\Bahan;
-use App\Models\StokMasuk;
-use App\Models\Distribusi;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,26 +22,25 @@ Route::get('/', function () {
 
 /*
 |--------------------------------------------------------------------------
-| DASHBOARD REDIRECT (ROLE BASED)
+| DASHBOARD REDIRECT (ROLE)
 |--------------------------------------------------------------------------
 */
 Route::get('/dashboard', function () {
+
     $user = auth()->user();
 
-    if ($user->role === 'admin') {
-        return redirect()->route('admin.dashboard');
-    }
+    return match ($user->role) {
+        'admin' => redirect()->route('admin.dashboard'),
+        'user'  => redirect()->route('user.dashboard'),
+        default => abort(403),
+    };
 
-    if ($user->role === 'user') {
-        return redirect()->route('user.dashboard');
-    }
-
-    abort(403);
 })->middleware('auth')->name('dashboard');
+
 
 /*
 |--------------------------------------------------------------------------
-| ADMIN AREA
+| ADMIN PUSAT (GUDANG)
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'role:admin'])
@@ -52,44 +48,28 @@ Route::middleware(['auth', 'role:admin'])
     ->name('admin.')
     ->group(function () {
 
-        Route::get('/dashboard', function () {
-            $totalUsers   = User::count();
-            $totalOutlets = Outlet::count();
-            $totalBahan   = Bahan::count();
-            $stokGudang   = StokMasuk::sum('jumlah');
-            $distribusiHariIni = Distribusi::whereDate('created_at', now())
-                ->sum('jumlah');
+        Route::get('/dashboard', [DashboardController::class, 'admin'])
+            ->name('dashboard');
 
-            return view('admin.dashboard', compact(
-                'totalUsers',
-                'totalOutlets',
-                'totalBahan',
-                'stokGudang',
-                'distribusiHariIni'
-            ));
-        })->name('dashboard');
-
+        // Master
         Route::resource('outlet', OutletController::class);
         Route::resource('bahan', BahanController::class);
+
+        // Gudang
         Route::resource('stok-masuk', StokMasukController::class);
+
+        // Distribusi
         Route::resource('distribusi', DistribusiController::class);
-        Route::resource('stok-outlet', StokOutletController::class);
 
-        /*
-        |--------------------------------------------------------------------------
-        | ADMIN PROFILE (ALIAS KE PROFILE GLOBAL)
-        |--------------------------------------------------------------------------
-        */
-        Route::get('/profile/edit', [ProfileController::class, 'edit'])
-            ->name('profile.edit');
-
-        Route::put('/profile', [ProfileController::class, 'update'])
-            ->name('profile.update');
+        // Monitoring stok outlet
+        Route::resource('stok-outlet', StokOutletController::class)
+            ->only(['index', 'show']);
     });
+
 
 /*
 |--------------------------------------------------------------------------
-| USER AREA
+| ADMIN OUTLET
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'role:user'])
@@ -97,37 +77,28 @@ Route::middleware(['auth', 'role:user'])
     ->name('user.')
     ->group(function () {
 
-        Route::get('/dashboard', function () {
-            return view('user.dashboard');
-        })->name('dashboard');
+        Route::get('/dashboard', [DashboardController::class, 'user'])
+            ->name('dashboard');
 
+        // Pemakaian
         Route::resource('pemakaian', PemakaianController::class);
-        Route::resource('stok-outlet', StokOutletController::class);
+
+        // Stok outlet
+        Route::resource('stok-outlet', StokOutletController::class)
+            ->only(['index']);
+
+        // Terima distribusi (OUTLET)
+        Route::put(
+            '/distribusi/{id}/terima',
+            [DistribusiController::class, 'terima']
+        )->name('distribusi.terima');
+
     });
 
-/*
-|--------------------------------------------------------------------------
-| PROFILE GLOBAL (UNTUK USER / AKSES LANGSUNG)
-|--------------------------------------------------------------------------
-*/
-Route::middleware('auth')->group(function () {
-
-    Route::get('/profile/edit', [ProfileController::class, 'edit'])
-        ->name('profile.edit');
-
-    Route::put('/profile', [ProfileController::class, 'update'])
-        ->name('profile.update');
-
-    Route::delete('/profile', [ProfileController::class, 'destroy'])
-        ->name('profile.destroy');
-
-    Route::post('/profile/update-password', [ProfileController::class, 'updatePassword'])
-        ->name('profile.update-password');
-});
 
 /*
 |--------------------------------------------------------------------------
-| AUTH ROUTES
+| AUTH
 |--------------------------------------------------------------------------
 */
 require __DIR__ . '/auth.php';
