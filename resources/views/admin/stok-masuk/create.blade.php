@@ -1,94 +1,35 @@
-@extends('adminlte::page')
-
-@section('title', 'Tambah Stok Masuk')
-
-@section('content_header')
-    <h1>Tambah Stok Masuk</h1>
-@stop
+@extends('layouts.admin')
 
 @section('content')
+<h2 class="text-2xl font-bold mb-6">Tambah Stok Masuk</h2>
 
-{{-- ERROR VALIDATION --}}
-@if ($errors->any())
-<div class="alert alert-danger">
-    <ul class="mb-0">
-        @foreach ($errors->all() as $e)
-            <li>{{ $e }}</li>
-        @endforeach
-    </ul>
-</div>
-@endif
-
-<div class="card">
-
-    <div class="card-body">
-
-        <form action="{{ route('admin.stok-masuk.store') }}" method="POST">
-
-            @csrf
-
-            {{-- BAHAN --}}
-            <div class="form-group">
-                <label>Bahan</label>
-
-                <select name="bahan_id"
-                        class="form-control"
-                        required>
-
-                    <option value="">-- Pilih Bahan --</option>
-
-                    @foreach($bahans as $b)
-                        <option value="{{ $b->id }}"
-                            {{ old('bahan_id') == $b->id ? 'selected' : '' }}>
-
-                            {{ $b->nama_bahan }}
-
-                        </option>
-                    @endforeach
-
-                </select>
-            </div>
-
-            {{-- JUMLAH --}}
-            <div class="form-group">
-                <label>Jumlah</label>
-
-                <input type="number"
-                       name="jumlah"
-                       class="form-control"
-                       value="{{ old('jumlah') }}"
-                       min="1"
-                       required>
-            </div>
-
-            {{-- TANGGAL --}}
-            <div class="form-group">
-                <label>Tanggal</label>
-
-                <input type="date"
-                       name="tanggal"
-                       class="form-control"
-                       value="{{ old('tanggal') }}"
-                       required>
-            </div>
-
-            {{-- BUTTON --}}
-            <div class="form-group">
-
-                <button class="btn btn-success">
-                    Simpan
-                </button>
-
-                <a href="{{ route('admin.stok-masuk.index') }}"
-                   class="btn btn-secondary">
-                    Kembali
-                </a>
-
-            </div>
-
-        </form>
-
+<form action="{{ route('admin.stok-masuk.store') }}" method="POST" class="bg-white p-6 rounded-lg shadow max-w-md">
+    @csrf
+    <div class="mb-4">
+        <label for="tanggal" class="block mb-1 font-medium">Tanggal</label>
+        <input type="date" name="tanggal" id="tanggal" class="w-full border rounded px-3 py-2" required>
     </div>
-</div>
-
-@stop
+    <div class="mb-4">
+        <label for="bahan_id" class="block mb-1 font-medium">Bahan</label>
+        <select name="bahan_id" id="bahan_id" class="w-full border rounded px-3 py-2" required>
+            @foreach($bahans as $bahan)
+                <option value="{{ $bahan->id }}">{{ $bahan->nama }}</option>
+            @endforeach
+        </select>
+    </div>
+    <div class="mb-4">
+        <label for="jumlah" class="block mb-1 font-medium">Jumlah</label>
+        <input type="number" name="jumlah" id="jumlah" class="w-full border rounded px-3 py-2" required>
+    </div>
+    <div class="mb-4">
+        <label for="outlet_id" class="block mb-1 font-medium">Outlet</label>
+        <select name="outlet_id" id="outlet_id" class="w-full border rounded px-3 py-2" required>
+            @foreach($outlets as $outlet)
+                <option value="{{ $outlet->id }}">{{ $outlet->nama }}</option>
+            @endforeach
+        </select>
+    </div>
+    <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded shadow hover:bg-green-600">Simpan</button>
+    <a href="{{ route('admin.stok-masuk.index') }}" class="ml-2 text-gray-600 hover:underline">Batal</a>
+</form>
+@endsection

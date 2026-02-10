@@ -11,79 +11,86 @@ class OutletController extends Controller
     // tampilkan semua outlet (admin pusat)
     public function index()
     {
-        // Ambil semua outlet, bisa dengan relasi users jika nanti ingin dihubungkan
         $outlets = Outlet::with('users')->get();
-        return view('admin.outlet.index', compact('outlets'));
+        return view('outlet.index', compact('outlets'));
     }
 
     // form tambah outlet
     public function create()
     {
-        // Form hanya menampilkan nama_outlet dan alamat
-        return view('admin.outlet.create');
+        // ambil admin outlet yang belum punya outlet
+        $admins = User::where('role', 'admin_outlet')
+            ->whereNull('outlet_id')
+            ->get();
+
+        return view('outlet.create', compact('admins'));
     }
 
     // simpan outlet baru
     public function store(Request $request)
     {
-$request->validate([
-    'nama_outlet' => 'required',
-    'alamat'      => 'required',
-    'no_hp'       => 'nullable',
-]);
+        $request->validate([
+            'nama_outlet' => 'required',
+            'alamat' => 'required',
+            'no_hp' => 'required',
+            'admin_id' => 'nullable'
+        ]);
 
-Outlet::create([
-    'nama_outlet' => $request->nama_outlet,
-    'alamat'      => $request->alamat,
-    'no_hp'       => $request->no_hp, // <-- ambil dari form
-]);
+        // simpan data outlet
+        $outlet = Outlet::create([
+            'nama_outlet' => $request->nama_outlet,
+            'alamat' => $request->alamat,
+            'no_hp' => $request->no_hp,
+        ]);
 
-        return redirect()->route('admin.outlet.index')
-                         ->with('success', 'Outlet berhasil ditambahkan');
+        // hubungkan admin outlet ke outlet
+        if ($request->admin_id) {
+            User::where('id', $request->admin_id)
+                ->update([
+                    'outlet_id' => $outlet->id
+                ]);
+        }
+
+        return redirect()->route('outlet.index')
+            ->with('success', 'Outlet berhasil ditambahkan');
     }
 
-    // form edit outlet (opsional)
- public function edit(Outlet $outlet)
-{
-    // Ambil semua user (admin)
-    $admins = User::all();
-
-    // Kirim ke view
-    return view('admin.outlet.edit', compact('outlet', 'admins'));
-}
-
+    // form edit outlet
+    public function edit(Outlet $outlet)
+    {
+        $admins = User::where('role', 'admin_outlet')->get();
+        return view('outlet.edit', compact('outlet', 'admins'));
+    }
 
     // update data outlet
-public function update(Request $request, Outlet $outlet)
-{
-    $request->validate([
-        'nama_outlet' => 'required',
-        'alamat'      => 'required',
-        'no_hp'       => 'nullable',
-    ]);
+    public function update(Request $request, Outlet $outlet)
+    {
+        $request->validate([
+            'nama_outlet' => 'required',
+            'alamat' => 'required',
+            'no_hp' => 'required',
+        ]);
 
-    $outlet->update([
-        'nama_outlet' => $request->nama_outlet,
-        'alamat'      => $request->alamat,
-        'no_hp'       => $request->no_hp,
-    ]);
+        $outlet->update([
+            'nama_outlet' => $request->nama_outlet,
+            'alamat' => $request->alamat,
+            'no_hp' => $request->no_hp,
+        ]);
 
-    return redirect()->route('admin.outlet.index')
-        ->with('success', 'Outlet berhasil diupdate');
-}
-
-
+        return redirect()->route('outlet.index')
+            ->with('success', 'Outlet berhasil diupdate');
+    }
 
     // hapus outlet
     public function destroy(Outlet $outlet)
     {
-        // Jika nanti ada relasi user, bisa lepas dulu
+        // lepas user dari outlet dulu
         User::where('outlet_id', $outlet->id)
             ->update(['outlet_id' => null]);
 
         $outlet->delete();
 
-        return redirect()->route('admin.outlet.index')
-                         ->with('success', 'Outlet berhasil dihapus');
+        return redirect()->route('outlet.index')
+            ->with('success', 'Outlet berhasil dihapus');
     }
 }

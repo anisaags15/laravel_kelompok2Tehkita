@@ -15,6 +15,5 @@ class Bahan extends Model
         'nama_bahan',
         'satuan',
         'stok_awal',
-         'stok', 
     ];
 }

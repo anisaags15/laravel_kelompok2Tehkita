@@ -1,83 +1,46 @@
-@extends('adminlte::page')
-
-@section('title', 'Stok Masuk')
-
-@section('content_header')
-    <h1>Data Stok Masuk</h1>
-@stop
+@extends('layouts.admin')
 
 @section('content')
-
-{{-- ALERT SUCCESS --}}
-@if(session('success'))
-<div class="alert alert-success">
-    {{ session('success') }}
+<div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-bold">Stok Masuk</h2>
+    <a href="{{ route('admin.stok-masuk.create') }}" class="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600">Tambah Stok</a>
 </div>
-@endif
 
-<div class="card">
-
-    <div class="card-header">
-        <a href="{{ route('admin.stok-masuk.create') }}"
-           class="btn btn-primary btn-sm">
-            + Tambah Stok
-        </a>
-    </div>
-
-    <div class="card-body">
-
-        <table class="table table-bordered table-striped">
-
-            <thead>
-                <tr>
-                    <th width="50">No</th>
-                    <th>Bahan</th>
-                    <th>Jumlah</th>
-                    <th>Tanggal</th>
-                    <th width="120">Aksi</th>
-                </tr>
-            </thead>
-
-            <tbody>
-
-            @forelse($stokMasuks as $s)
-                <tr>
-                    <td>{{ $loop->iteration }}</td>
-                    <td>{{ $s->bahan->nama_bahan ?? '-' }}</td>
-                    <td>{{ $s->jumlah }}</td>
-                    <td>{{ $s->tanggal }}</td>
-
-                    <td class="text-center">
-
-                        <form action="{{ route('admin.stok-masuk.destroy',$s->id) }}"
-                              method="POST"
-                              onsubmit="return confirm('Yakin hapus data?')">
-
-                            @csrf
-                            @method('DELETE')
-
-                            <button class="btn btn-danger btn-xs">
-                                Hapus
-                            </button>
-
-                        </form>
-
-                    </td>
-                </tr>
-
+<div class="overflow-x-auto bg-white rounded-lg shadow">
+    <table class="min-w-full table-auto">
+        <thead class="bg-gray-100">
+            <tr>
+                <th class="px-4 py-2 text-left">#</th>
+                <th class="px-4 py-2 text-left">Tanggal</th>
+                <th class="px-4 py-2 text-left">Bahan</th>
+                <th class="px-4 py-2 text-left">Jumlah</th>
+                <th class="px-4 py-2 text-left">Outlet</th>
+                <th class="px-4 py-2 text-left">Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($stokMasuks as $stok)
+            <tr class="border-b">
+                <td class="px-4 py-2">{{ $loop->iteration }}</td>
+                <td class="px-4 py-2">{{ $stok->tanggal }}</td>
+                <td class="px-4 py-2">{{ $stok->bahan->nama }}</td>
+                <td class="px-4 py-2">{{ $stok->jumlah }}</td>
+                <td class="px-4 py-2">{{ $stok->outlet->nama }}</td>
+                <td class="px-4 py-2">
+                    <a href="{{ route('admin.stok-masuk.edit', $stok->id) }}" class="text-blue-500 hover:underline">Edit</a>
+                    <form action="{{ route('admin.stok-masuk.destroy', $stok->id) }}" method="POST" class="inline">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="text-red-500 hover:underline" onclick="return confirm('Yakin hapus data ini?')">Hapus</button>
+                    </form>
+                </td>
+            </tr>
             @empty
-                <tr>
-                    <td colspan="5" class="text-center text-muted">
-                        Data masih kosong
-                    </td>
-                </tr>
+            <tr>
+                <td colspan="6" class="px-4 py-2 text-center text-gray-400">Data stok belum ada.</td>
+            </tr>
             @endforelse
-
-            </tbody>
-
-        </table>
-
-    </div>
+        </tbody>
+    </table>
 </div>
-
-@stop
+@endsection
