@@ -11,40 +11,64 @@ use Illuminate\Support\Facades\DB;
 
 class DistribusiController extends Controller
 {
+    /**
+     * =========================
+     * INDEX (ADMIN)
+     * =========================
+     */
     public function index()
     {
-        $distribusis = Distribusi::with(['bahan', 'outlet'])->get();
-        return view('user.distribusi.index', compact('distribusis'));
+        $distribusis = Distribusi::with(['bahan', 'outlet'])->latest()->get();
+
+        return view('admin.distribusi.index', compact('distribusis'));
     }
 
+    /**
+     * =========================
+     * CREATE (ADMIN)
+     * =========================
+     */
     public function create()
     {
-        $bahans = Bahan::all();
+        $bahans  = Bahan::all();
         $outlets = Outlet::all();
-        return view('user.distribusi.create', compact('bahans', 'outlets'));
+
+        return view('admin.distribusi.create', compact('bahans', 'outlets'));
     }
 
+    /**
+     * =========================
+     * STORE (ADMIN)
+     * =========================
+     */
     public function store(Request $request)
     {
         $request->validate([
-            'bahan_id' => 'required|exists:bahans,id',
+            'bahan_id'  => 'required|exists:bahans,id',
             'outlet_id' => 'required|exists:outlets,id',
-            'jumlah' => 'required|integer|min:1',
-            'tanggal' => 'required|date',
+            'jumlah'    => 'required|integer|min:1',
+            'tanggal'   => 'required|date',
         ]);
 
         DB::transaction(function () use ($request) {
 
+            // Ambil bahan
             $bahan = Bahan::findOrFail($request->bahan_id);
+
+            // Cek stok gudang
             if ($bahan->stok_awal < $request->jumlah) {
                 abort(400, 'Stok gudang tidak mencukupi');
             }
+
+            // Kurangi stok gudang
             $bahan->stok_awal -= $request->jumlah;
             $bahan->save();
+
+            // Tambah / update stok outlet
             $stokOutlet = StokOutlet::firstOrCreate(
                 [
                     'outlet_id' => $request->outlet_id,
-                    'bahan_id' => $request->bahan_id,
+                    'bahan_id'  => $request->bahan_id,
                 ],
                 [
                     'stok' => 0,
@@ -53,16 +77,19 @@ class DistribusiController extends Controller
 
             $stokOutlet->stok += $request->jumlah;
             $stokOutlet->save();
+
+            // Simpan distribusi
             Distribusi::create([
-                'bahan_id' => $request->bahan_id,
+                'bahan_id'  => $request->bahan_id,
                 'outlet_id' => $request->outlet_id,
-                'jumlah' => $request->jumlah,
-                'tanggal' => $request->tanggal,
-                'status' => 'dikirim',
+                'jumlah'    => $request->jumlah,
+                'tanggal'   => $request->tanggal,
+                'status'    => 'dikirim',
             ]);
         });
 
-        return redirect()->route('distribusi.index')
+        return redirect()
+            ->route('admin.distribusi.index')
             ->with('success', 'Distribusi berhasil & stok otomatis diperbarui');
     }
 }

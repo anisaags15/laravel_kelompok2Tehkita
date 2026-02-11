@@ -80,7 +80,7 @@ class PemakaianController extends Controller
     }
 
     /**
-     * Hapus data pemakaian (opsional, bisa ditambah stok kembali)
+     * Hapus data pemakaian dan tambahkan stok kembali
      */
     public function destroy($id)
     {
