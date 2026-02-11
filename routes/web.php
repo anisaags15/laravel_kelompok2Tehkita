@@ -31,14 +31,13 @@ Route::get('/', function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->get('/dashboard', function () {
-
     return match (auth()->user()->role) {
         'admin' => redirect()->route('admin.dashboard'),
         'user'  => redirect()->route('user.dashboard'),
         default => abort(403),
     };
-
 })->name('dashboard');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -50,33 +49,31 @@ Route::middleware(['auth', 'role:admin'])
     ->name('admin.')
     ->group(function () {
 
-        // Dashboard
         Route::get('/dashboard', function () {
-
             return view('admin.dashboard', [
                 'totalUsers'        => User::count(),
                 'totalOutlets'      => Outlet::count(),
                 'totalBahan'        => Bahan::count(),
                 'stokGudang'        => StokMasuk::sum('jumlah'),
                 'distribusiHariIni' => Distribusi::whereDate('created_at', today())
-                                        ->sum('jumlah'),
+                                            ->sum('jumlah'),
             ]);
-
         })->name('dashboard');
 
-        // Master Data
+        // FULL CRUD untuk admin
         Route::resources([
-            'outlet'       => OutletController::class,
-            'bahan'        => BahanController::class,
-            'stok-masuk'   => StokMasukController::class,
-            'distribusi'   => DistribusiController::class,
-            'stok-outlet'  => StokOutletController::class,
+            'outlet'      => OutletController::class,
+            'bahan'       => BahanController::class,
+            'stok-masuk'  => StokMasukController::class,
+            'distribusi'  => DistribusiController::class,
+            'stok-outlet' => StokOutletController::class,
         ]);
     });
 
+
 /*
 |--------------------------------------------------------------------------
-| USER AREA
+| USER AREA (ADMIN OUTLET)
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'role:user'])
@@ -89,21 +86,29 @@ Route::middleware(['auth', 'role:user'])
             return view('user.dashboard');
         })->name('dashboard');
 
-        // Lihat Stok Outlet
-        Route::resource('stok-outlet', StokOutletController::class)
-            ->only(['index']);
+        // Stok Outlet (hanya index)
+        Route::get('/stok-outlet', [StokOutletController::class, 'indexUser'])
+            ->name('stok-outlet.index');
 
         // Pemakaian Bahan
-        Route::resource('pemakaian', PemakaianController::class);
+        Route::get('/pemakaian', [PemakaianController::class, 'index'])
+            ->name('pemakaian.index');
 
-        // Riwayat Distribusi
-        Route::get('/distribusi', [DistribusiController::class, 'index'])
+        Route::get('/pemakaian/create', [PemakaianController::class, 'create'])
+            ->name('pemakaian.create');
+
+        Route::post('/pemakaian', [PemakaianController::class, 'store'])
+            ->name('pemakaian.store');
+
+        // Riwayat Distribusi (khusus outlet login)
+        Route::get('/distribusi', [DistribusiController::class, 'indexUser'])
             ->name('distribusi.index');
     });
 
+
 /*
 |--------------------------------------------------------------------------
-| PROFILE (GLOBAL - ADMIN & USER)
+| PROFILE
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {
@@ -120,6 +125,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile/update-password', [ProfileController::class, 'updatePassword'])
         ->name('profile.update-password');
 });
+
 
 /*
 |--------------------------------------------------------------------------

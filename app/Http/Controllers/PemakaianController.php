@@ -10,9 +10,11 @@ use Illuminate\Support\Facades\DB;
 
 class PemakaianController extends Controller
 {
-    /**
-     * Menampilkan daftar pemakaian bahan (per outlet)
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | List Pemakaian (Per Outlet Login)
+    |--------------------------------------------------------------------------
+    */
     public function index()
     {
         $user = Auth::user();
@@ -25,18 +27,24 @@ class PemakaianController extends Controller
         return view('pemakaian.index', compact('pemakaians'));
     }
 
-    /**
-     * Form input pemakaian bahan
-     */
+
+    /*
+    |--------------------------------------------------------------------------
+    | Form Tambah Pemakaian
+    |--------------------------------------------------------------------------
+    */
     public function create()
     {
         $bahans = Bahan::all();
         return view('pemakaian.create', compact('bahans'));
     }
 
-    /**
-     * Simpan data pemakaian + kurangi stok bahan
-     */
+
+    /*
+    |--------------------------------------------------------------------------
+    | Simpan Pemakaian + Kurangi Stok
+    |--------------------------------------------------------------------------
+    */
     public function store(Request $request)
     {
         $request->validate([
@@ -49,14 +57,14 @@ class PemakaianController extends Controller
 
         DB::transaction(function () use ($request, $user) {
 
-            $bahan = Bahan::findOrFail($request->bahan_id);
+            $bahan = Bahan::lockForUpdate()->findOrFail($request->bahan_id);
 
-            // 🚨 CEGAH STOK MINUS
+            // 🚨 Cegah stok minus
             if ($bahan->stok_awal < $request->jumlah) {
-                abort(400, 'Stok bahan tidak mencukupi');
+                throw new \Exception('Stok bahan tidak mencukupi');
             }
 
-            // 1️⃣ Simpan pemakaian
+            // Simpan pemakaian
             Pemakaian::create([
                 'bahan_id'  => $request->bahan_id,
                 'outlet_id' => $user->outlet_id,
@@ -64,10 +72,12 @@ class PemakaianController extends Controller
                 'tanggal'   => $request->tanggal,
             ]);
 
-            // 2️⃣ Kurangi stok bahan
-            $bahan->stok_awal -= $request->jumlah;
-            $bahan->save();
+            // Kurangi stok
+            $bahan->decrement('stok_awal', $request->jumlah);
         });
 
         return redirect()
             ->route('pemakaian.index')
+            ->with('success', 'Pemakaian berhasil disimpan & stok otomatis berkurang');
+    }
+}

@@ -13,19 +13,21 @@ class DistribusiController extends Controller
 {
     /**
      * =========================
-     * INDEX (ADMIN)
+     * INDEX (ADMIN PUSAT)
      * =========================
      */
     public function index()
     {
-        $distribusis = Distribusi::with(['bahan', 'outlet'])->latest()->get();
+        $distribusis = Distribusi::with(['bahan', 'outlet'])
+            ->orderBy('tanggal', 'desc')
+            ->get();
 
         return view('admin.distribusi.index', compact('distribusis'));
     }
 
     /**
      * =========================
-     * CREATE (ADMIN)
+     * CREATE (ADMIN PUSAT)
      * =========================
      */
     public function create()
@@ -38,7 +40,7 @@ class DistribusiController extends Controller
 
     /**
      * =========================
-     * STORE (ADMIN)
+     * STORE (ADMIN PUSAT)
      * =========================
      */
     public function store(Request $request)
@@ -52,7 +54,7 @@ class DistribusiController extends Controller
 
         DB::transaction(function () use ($request) {
 
-            // Ambil bahan
+            // Ambil bahan (stok gudang)
             $bahan = Bahan::findOrFail($request->bahan_id);
 
             // Cek stok gudang
@@ -91,5 +93,43 @@ class DistribusiController extends Controller
         return redirect()
             ->route('admin.distribusi.index')
             ->with('success', 'Distribusi berhasil & stok otomatis diperbarui');
+    }
+
+    /**
+     * =========================
+     * INDEX (ADMIN OUTLET / USER)
+     * =========================
+     */
+    public function indexUser()
+    {
+        $outletId = auth()->user()->outlet_id;
+
+        $distribusis = Distribusi::with('bahan')
+            ->where('outlet_id', $outletId)
+            ->orderBy('tanggal', 'desc')
+            ->get();
+
+        return view('user.distribusi.index', compact('distribusis'));
+    }
+
+    /**
+     * =========================
+     * TERIMA BARANG (ADMIN OUTLET)
+     * =========================
+     */
+    public function terima($id)
+    {
+        $distribusi = Distribusi::findOrFail($id);
+
+        // Pastikan outlet milik user login
+        if ($distribusi->outlet_id !== auth()->user()->outlet_id) {
+            abort(403);
+        }
+
+        // Ubah status
+        $distribusi->status = 'diterima';
+        $distribusi->save();
+
+        return back()->with('success', 'Barang berhasil diterima');
     }
 }
