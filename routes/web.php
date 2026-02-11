@@ -81,11 +81,45 @@ Route::middleware(['auth', 'role:user'])
     ->name('user.')
     ->group(function () {
 
+<<<<<<< HEAD
+=======
         // Dashboard
+>>>>>>> 1287111ff284497ace602f212380e0c4a426a8b3
         Route::get('/dashboard', function () {
-            return view('user.dashboard');
+
+            $user = auth()->user();
+
+            $totalStok = \App\Models\StokOutlet::where('outlet_id', $user->outlet_id)
+                ->sum('stok');
+
+            $pemakaianHariIni = \App\Models\Pemakaian::where('outlet_id', $user->outlet_id)
+                ->whereDate('tanggal', now())
+                ->sum('jumlah');
+
+            $distribusiMasuk = \App\Models\Distribusi::where('outlet_id', $user->outlet_id)
+                ->sum('jumlah');
+
+            $stokOutlets = \App\Models\StokOutlet::with('bahan')
+                ->where('outlet_id', $user->outlet_id)
+                ->get();
+
+            $pemakaians = \App\Models\Pemakaian::with('bahan')
+                ->where('outlet_id', $user->outlet_id)
+                ->latest()
+                ->limit(5)
+                ->get();
+
+            return view('user.dashboard', compact(
+                'totalStok',
+                'pemakaianHariIni',
+                'distribusiMasuk',
+                'stokOutlets',
+                'pemakaians'
+            ));
+
         })->name('dashboard');
 
+<<<<<<< HEAD
         // Stok Outlet (hanya index)
         Route::get('/stok-outlet', [StokOutletController::class, 'indexUser'])
             ->name('stok-outlet.index');
@@ -106,6 +140,25 @@ Route::middleware(['auth', 'role:user'])
     });
 
 
+=======
+<<<<<<< HEAD
+=======
+        // Lihat Stok Outlet
+>>>>>>> 1287111ff284497ace602f212380e0c4a426a8b3
+        Route::resource('stok-outlet', StokOutletController::class)
+            ->only(['index']);
+
+        Route::resource('pemakaian', PemakaianController::class);
+
+        // 🔥 INI YANG KURANG
+        Route::resource('distribusi', DistribusiController::class)
+            ->only(['index']);
+
+    });
+
+
+
+>>>>>>> ea52cb0ab501bc8143a2e2ff2a2926da1a356caa
 /*
 |--------------------------------------------------------------------------
 | PROFILE
