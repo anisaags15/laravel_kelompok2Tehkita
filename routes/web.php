@@ -102,22 +102,52 @@ Route::middleware(['auth', 'role:user'])
     ->name('user.')
     ->group(function () {
 
-        // User Dashboard
         Route::get('/dashboard', function () {
-            return view('user.dashboard');
+
+            $user = auth()->user();
+
+            $totalStok = \App\Models\StokOutlet::where('outlet_id', $user->outlet_id)
+                ->sum('stok');
+
+            $pemakaianHariIni = \App\Models\Pemakaian::where('outlet_id', $user->outlet_id)
+                ->whereDate('tanggal', now())
+                ->sum('jumlah');
+
+            $distribusiMasuk = \App\Models\Distribusi::where('outlet_id', $user->outlet_id)
+                ->sum('jumlah');
+
+            $stokOutlets = \App\Models\StokOutlet::with('bahan')
+                ->where('outlet_id', $user->outlet_id)
+                ->get();
+
+            $pemakaians = \App\Models\Pemakaian::with('bahan')
+                ->where('outlet_id', $user->outlet_id)
+                ->latest()
+                ->limit(5)
+                ->get();
+
+            return view('user.dashboard', compact(
+                'totalStok',
+                'pemakaianHariIni',
+                'distribusiMasuk',
+                'stokOutlets',
+                'pemakaians'
+            ));
+
         })->name('dashboard');
 
-        // Stok Outlet
         Route::resource('stok-outlet', StokOutletController::class)
             ->only(['index']);
 
-        // Pemakaian Bahan
         Route::resource('pemakaian', PemakaianController::class);
 
-        // Riwayat Distribusi
-        Route::get('/distribusi', [DistribusiController::class, 'index'])
-            ->name('distribusi.index');
+        // 🔥 INI YANG KURANG
+        Route::resource('distribusi', DistribusiController::class)
+            ->only(['index']);
+
     });
+
+
 
 /*
 |--------------------------------------------------------------------------
