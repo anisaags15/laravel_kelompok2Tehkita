@@ -32,17 +32,11 @@ Route::get('/', function () {
 */
 Route::middleware('auth')->get('/dashboard', function () {
 
-    $user = auth()->user();
-
-    if ($user->role === 'admin') {
-        return redirect()->route('admin.dashboard');
-    }
-
-    if ($user->role === 'user') {
-        return redirect()->route('user.dashboard');
-    }
-
-    abort(403);
+    return match (auth()->user()->role) {
+        'admin' => redirect()->route('admin.dashboard'),
+        'user'  => redirect()->route('user.dashboard'),
+        default => abort(403),
+    };
 
 })->name('dashboard');
 
@@ -56,40 +50,28 @@ Route::middleware(['auth', 'role:admin'])
     ->name('admin.')
     ->group(function () {
 
-        // Admin Dashboard
+        // Dashboard
         Route::get('/dashboard', function () {
 
-            $totalUsers   = User::count();
-            $totalOutlets = Outlet::count();
-            $totalBahan   = Bahan::count();
-            $stokGudang   = StokMasuk::sum('jumlah');
-
-            $distribusiHariIni = Distribusi::whereDate('created_at', now())
-                ->sum('jumlah');
-
-            return view('admin.dashboard', compact(
-                'totalUsers',
-                'totalOutlets',
-                'totalBahan',
-                'stokGudang',
-                'distribusiHariIni'
-            ));
+            return view('admin.dashboard', [
+                'totalUsers'        => User::count(),
+                'totalOutlets'      => Outlet::count(),
+                'totalBahan'        => Bahan::count(),
+                'stokGudang'        => StokMasuk::sum('jumlah'),
+                'distribusiHariIni' => Distribusi::whereDate('created_at', today())
+                                        ->sum('jumlah'),
+            ]);
 
         })->name('dashboard');
 
         // Master Data
-        Route::resource('outlet', OutletController::class);
-        Route::resource('bahan', BahanController::class);
-        Route::resource('stok-masuk', StokMasukController::class);
-        Route::resource('distribusi', DistribusiController::class);
-        Route::resource('stok-outlet', StokOutletController::class);
-
-        // Admin Profile
-        Route::get('/profile/edit', [ProfileController::class, 'edit'])
-            ->name('profile.edit');
-
-        Route::put('/profile', [ProfileController::class, 'update'])
-            ->name('profile.update');
+        Route::resources([
+            'outlet'       => OutletController::class,
+            'bahan'        => BahanController::class,
+            'stok-masuk'   => StokMasukController::class,
+            'distribusi'   => DistribusiController::class,
+            'stok-outlet'  => StokOutletController::class,
+        ]);
     });
 
 /*
@@ -102,12 +84,12 @@ Route::middleware(['auth', 'role:user'])
     ->name('user.')
     ->group(function () {
 
-        // User Dashboard
+        // Dashboard
         Route::get('/dashboard', function () {
             return view('user.dashboard');
         })->name('dashboard');
 
-        // Stok Outlet
+        // Lihat Stok Outlet
         Route::resource('stok-outlet', StokOutletController::class)
             ->only(['index']);
 
@@ -121,7 +103,7 @@ Route::middleware(['auth', 'role:user'])
 
 /*
 |--------------------------------------------------------------------------
-| PROFILE GLOBAL
+| PROFILE (GLOBAL - ADMIN & USER)
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {

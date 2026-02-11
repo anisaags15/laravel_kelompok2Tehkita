@@ -6,6 +6,7 @@ use App\Models\Pemakaian;
 use App\Models\Bahan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PemakaianController extends Controller
 {
@@ -34,7 +35,7 @@ class PemakaianController extends Controller
     }
 
     /**
-     * Simpan data pemakaian bahan
+     * Simpan data pemakaian + kurangi stok bahan
      */
     public function store(Request $request)
     {
@@ -46,27 +47,27 @@ class PemakaianController extends Controller
 
         $user = Auth::user();
 
-        Pemakaian::create([
-            'bahan_id'  => $request->bahan_id,
-            'outlet_id' => $user->outlet_id,
-            'jumlah'    => $request->jumlah,
-            'tanggal'   => $request->tanggal,
-        ]);
+        DB::transaction(function () use ($request, $user) {
 
-        return redirect()->route('pemakaian.index')
-            ->with('success', 'Pemakaian bahan berhasil dicatat');
-    }
+            $bahan = Bahan::findOrFail($request->bahan_id);
 
-    /**
-     * Hapus data pemakaian
-     */
-    public function destroy($id)
-    {
-        $pemakaian = Pemakaian::findOrFail($id);
+            // 🚨 CEGAH STOK MINUS
+            if ($bahan->stok_awal < $request->jumlah) {
+                abort(400, 'Stok bahan tidak mencukupi');
+            }
 
-        $pemakaian->delete();
+            // 1️⃣ Simpan pemakaian
+            Pemakaian::create([
+                'bahan_id'  => $request->bahan_id,
+                'outlet_id' => $user->outlet_id,
+                'jumlah'    => $request->jumlah,
+                'tanggal'   => $request->tanggal,
+            ]);
 
-        return redirect()->route('pemakaian.index')
-            ->with('success', 'Data pemakaian berhasil dihapus');
-    }
-}
+            // 2️⃣ Kurangi stok bahan
+            $bahan->stok_awal -= $request->jumlah;
+            $bahan->save();
+        });
+
+        return redirect()
+            ->route('pemakaian.index')

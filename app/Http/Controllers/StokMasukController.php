@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\StokMasuk;
 use App\Models\Bahan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class StokMasukController extends Controller
 {
@@ -30,7 +31,7 @@ class StokMasukController extends Controller
     }
 
     /**
-     * Simpan stok masuk
+     * Simpan stok masuk + update stok bahan
      */
     public function store(Request $request)
     {
@@ -40,24 +41,44 @@ class StokMasukController extends Controller
             'tanggal'  => 'required|date',
         ]);
 
-        StokMasuk::create([
-            'bahan_id' => $request->bahan_id,
-            'jumlah'   => $request->jumlah,
-            'tanggal'  => $request->tanggal,
-        ]);
+        DB::transaction(function () use ($request) {
 
-        return redirect()->route('stok-masuk.index')
-            ->with('success', 'Stok masuk berhasil ditambahkan');
+            // 1️⃣ Simpan stok masuk
+            StokMasuk::create([
+                'bahan_id' => $request->bahan_id,
+                'jumlah'   => $request->jumlah,
+                'tanggal'  => $request->tanggal,
+            ]);
+
+            // 2️⃣ Tambahkan stok bahan
+            $bahan = Bahan::findOrFail($request->bahan_id);
+            $bahan->stok_awal += $request->jumlah;
+            $bahan->save();
+        });
+
+        return redirect()
+            ->route('admin.stok-masuk.index')
+            ->with('success', 'Stok masuk berhasil ditambahkan & stok bahan diperbarui');
     }
 
     /**
      * Hapus data stok masuk
      */
-    public function destroy($id)
+    public function destroy(StokMasuk $stok_masuk)
     {
-        StokMasuk::findOrFail($id)->delete();
+        DB::transaction(function () use ($stok_masuk) {
 
-        return redirect()->route('stok-masuk.index')
+            // kurangi stok bahan
+            $bahan = $stok_masuk->bahan;
+            $bahan->stok_awal -= $stok_masuk->jumlah;
+            $bahan->save();
+
+            // hapus stok masuk
+            $stok_masuk->delete();
+        });
+
+        return redirect()
+            ->route('admin.stok-masuk.index')
             ->with('success', 'Data stok masuk berhasil dihapus');
     }
 }
