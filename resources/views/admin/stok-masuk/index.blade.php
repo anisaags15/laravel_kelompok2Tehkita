@@ -1,46 +1,57 @@
-@extends('layouts.admin')
+@extends('layouts.main')
+
+@section('title', 'Stok Masuk')
+@section('page', 'Stok Masuk')
 
 @section('content')
-<div class="flex justify-between items-center mb-6">
-    <h2 class="text-2xl font-bold">Stok Masuk</h2>
-    <a href="{{ route('admin.stok-masuk.create') }}" class="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600">Tambah Stok</a>
+
+<div class="card">
+
+    <div class="card-header d-flex justify-content-between">
+        <h3 class="card-title">Data Stok Masuk</h3>
+
+        <a href="{{ route('admin.stok-masuk.create') }}" class="btn btn-primary btn-sm">
+            <i class="fas fa-plus"></i> Tambah Stok
+        </a>
+    </div>
+
+    <div class="card-body">
+
+        <table class="table table-bordered table-striped">
+
+            <thead>
+                <tr class="text-center">
+                    <th>No</th>
+                    <th>Nama Bahan</th>
+                    <th>Jumlah</th>
+                    <th>Tanggal</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @forelse($stokMasuks as $stok)
+                    <tr>
+                        <td class="text-center">{{ $loop->iteration }}</td>
+                        <td>{{ $stok->bahan->nama_bahan }}</td>
+                        <td class="text-center">
+                            {{ $stok->jumlah }} {{ $stok->bahan->satuan }}
+                        </td>
+                        <td class="text-center">
+                            {{ \Carbon\Carbon::parse($stok->tanggal)->format('d-m-Y') }}
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="4" class="text-center">
+                            Data stok masuk belum ada
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+
+        </table>
+
+    </div>
 </div>
 
-<div class="overflow-x-auto bg-white rounded-lg shadow">
-    <table class="min-w-full table-auto">
-        <thead class="bg-gray-100">
-            <tr>
-                <th class="px-4 py-2 text-left">#</th>
-                <th class="px-4 py-2 text-left">Tanggal</th>
-                <th class="px-4 py-2 text-left">Bahan</th>
-                <th class="px-4 py-2 text-left">Jumlah</th>
-                <th class="px-4 py-2 text-left">Outlet</th>
-                <th class="px-4 py-2 text-left">Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($stokMasuks as $stok)
-            <tr class="border-b">
-                <td class="px-4 py-2">{{ $loop->iteration }}</td>
-                <td class="px-4 py-2">{{ $stok->tanggal }}</td>
-                <td class="px-4 py-2">{{ $stok->bahan->nama }}</td>
-                <td class="px-4 py-2">{{ $stok->jumlah }}</td>
-                <td class="px-4 py-2">{{ $stok->outlet->nama }}</td>
-                <td class="px-4 py-2">
-                    <a href="{{ route('admin.stok-masuk.edit', $stok->id) }}" class="text-blue-500 hover:underline">Edit</a>
-                    <form action="{{ route('admin.stok-masuk.destroy', $stok->id) }}" method="POST" class="inline">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="text-red-500 hover:underline" onclick="return confirm('Yakin hapus data ini?')">Hapus</button>
-                    </form>
-                </td>
-            </tr>
-            @empty
-            <tr>
-                <td colspan="6" class="px-4 py-2 text-center text-gray-400">Data stok belum ada.</td>
-            </tr>
-            @endforelse
-        </tbody>
-    </table>
-</div>
 @endsection

@@ -14,14 +14,14 @@ class DistribusiController extends Controller
     public function index()
     {
         $distribusis = Distribusi::with(['bahan', 'outlet'])->get();
-        return view('distribusi.index', compact('distribusis'));
+        return view('user.distribusi.index', compact('distribusis'));
     }
 
     public function create()
     {
         $bahans = Bahan::all();
         $outlets = Outlet::all();
-        return view('distribusi.create', compact('bahans', 'outlets'));
+        return view('user.distribusi.create', compact('bahans', 'outlets'));
     }
 
     public function store(Request $request)

@@ -17,7 +17,7 @@ class StokMasukController extends Controller
             ->orderBy('tanggal', 'desc')
             ->get();
 
-        return view('stok_masuk.index', compact('stokMasuks'));
+        return view('admin.stok-masuk.index', compact('stokMasuks'));
     }
 
     /**
@@ -26,7 +26,7 @@ class StokMasukController extends Controller
     public function create()
     {
         $bahans = Bahan::all();
-        return view('stok_masuk.create', compact('bahans'));
+        return view('admin.stok-masuk.create', compact('bahans'));
     }
 
     /**

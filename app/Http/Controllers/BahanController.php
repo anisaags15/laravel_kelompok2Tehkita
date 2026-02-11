@@ -10,12 +10,12 @@ class BahanController extends Controller
     public function index()
     {
         $bahans = Bahan::all();
-        return view('bahan.index', compact('bahans'));
+        return view('admin.bahan.index', compact('bahans'));
     }
 
     public function create()
     {
-        return view('bahan.create');
+        return view('admin.bahan.create');
     }
 
     public function store(Request $request)

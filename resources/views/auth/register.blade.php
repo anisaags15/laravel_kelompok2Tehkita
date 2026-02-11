@@ -1,77 +1,176 @@
-<x-guest-layout>
-    <form method="POST" action="{{ route('register') }}">
-        @csrf
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <!-- Name -->
-        <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus />
-            <x-input-error :messages="$errors->get('name')" class="mt-2" />
-        </div>
+<title>Register | Teh Kita</title>
 
-        <!-- Email -->
-        <div class="mt-4">
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
+<link rel="stylesheet"
+href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
 
-        <!-- Username -->
-        <div class="mt-4">
-            <x-input-label for="username" :value="__('Username')" />
-            <x-text-input id="username" class="block mt-1 w-full" type="text" name="username" :value="old('username')" required />
-            <x-input-error :messages="$errors->get('username')" class="mt-2" />
-        </div>
+<link rel="stylesheet"
+href="{{ asset('templates/plugins/fontawesome-free/css/all.min.css') }}">
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-            <x-text-input id="password" class="block mt-1 w-full"
-                type="password"
-                name="password"
-                required />
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
+<link rel="stylesheet"
+href="{{ asset('templates/dist/css/adminlte.min.css') }}">
 
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
-            <x-text-input id="password_confirmation" class="block mt-1 w-full"
-                type="password"
-                name="password_confirmation"
-                required />
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
+</head>
 
-        <!-- No HP -->
-        <div class="mt-4">
-            <x-input-label for="no_hp" :value="__('No HP')" />
-            <x-text-input id="no_hp" class="block mt-1 w-full" type="text" name="no_hp" :value="old('no_hp')" required />
-            <x-input-error :messages="$errors->get('no_hp')" class="mt-2" />
-        </div>
+<body class="hold-transition register-page">
 
-        <!-- Outlet -->
-        <div class="mt-4">
-            <x-input-label for="outlet_id" :value="__('Pilih Outlet')" />
-            <select name="outlet_id" id="outlet_id"
-                class="block mt-1 w-full border-gray-300 rounded-md shadow-sm">
-                <option value="">-- Pilih Outlet --</option>
-                @foreach($outlets as $outlet)
-                    <option value="{{ $outlet->id }}">{{ $outlet->nama_outlet }}</option>
-                @endforeach
-            </select>
-            <x-input-error :messages="$errors->get('outlet_id')" class="mt-2" />
-        </div>
+<div class="register-box">
+
+<div class="register-logo">
+<b>Teh</b>Kita
+</div>
+
+<div class="card">
+<div class="card-body register-card-body">
+
+<p class="login-box-msg">Daftar Akun Baru</p>
 
 
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900" href="{{ route('login') }}">
-                {{ __('Already registered?') }}
-            </a>
+{{-- ERROR --}}
+@if($errors->any())
+<div class="alert alert-danger">
+@foreach($errors->all() as $error)
+{{ $error }} <br>
+@endforeach
+</div>
+@endif
 
-            <x-primary-button class="ms-4">
-                {{ __('Register') }}
-            </x-primary-button>
-        </div>
-    </form>
-</x-guest-layout>
+
+<form method="POST" action="{{ route('register') }}">
+@csrf
+
+
+<!-- Nama -->
+<div class="input-group mb-3">
+<input type="text" name="name" class="form-control"
+placeholder="Nama Lengkap"
+value="{{ old('name') }}" required>
+
+<div class="input-group-append">
+<div class="input-group-text">
+<i class="fas fa-user"></i>
+</div>
+</div>
+</div>
+
+
+<!-- Email -->
+<div class="input-group mb-3">
+<input type="email" name="email" class="form-control"
+placeholder="Email"
+value="{{ old('email') }}" required>
+
+<div class="input-group-append">
+<div class="input-group-text">
+<i class="fas fa-envelope"></i>
+</div>
+</div>
+</div>
+
+
+<!-- Username -->
+<div class="input-group mb-3">
+<input type="text" name="username" class="form-control"
+placeholder="Username"
+value="{{ old('username') }}" required>
+
+<div class="input-group-append">
+<div class="input-group-text">
+<i class="fas fa-user-tag"></i>
+</div>
+</div>
+</div>
+
+
+<!-- No HP -->
+<div class="input-group mb-3">
+<input type="text" name="no_hp" class="form-control"
+placeholder="No HP"
+value="{{ old('no_hp') }}" required>
+
+<div class="input-group-append">
+<div class="input-group-text">
+<i class="fas fa-phone"></i>
+</div>
+</div>
+</div>
+
+
+<!-- Outlet -->
+<div class="input-group mb-3">
+<select name="outlet_id" class="form-control" required>
+<option value="">-- Pilih Outlet --</option>
+
+@foreach($outlets as $outlet)
+<option value="{{ $outlet->id }}">
+{{ $outlet->nama_outlet }}
+</option>
+@endforeach
+
+</select>
+</div>
+
+
+<!-- Password -->
+<div class="input-group mb-3">
+<input type="password" name="password"
+class="form-control"
+placeholder="Password" required>
+
+<div class="input-group-append">
+<div class="input-group-text">
+<i class="fas fa-lock"></i>
+</div>
+</div>
+</div>
+
+
+<!-- Confirm -->
+<div class="input-group mb-3">
+<input type="password"
+name="password_confirmation"
+class="form-control"
+placeholder="Ulangi Password" required>
+
+<div class="input-group-append">
+<div class="input-group-text">
+<i class="fas fa-lock"></i>
+</div>
+</div>
+</div>
+
+
+<div class="row">
+
+<div class="col-8">
+<a href="{{ route('login') }}">
+Sudah punya akun?
+</a>
+</div>
+
+<div class="col-4">
+<button type="submit"
+class="btn btn-primary btn-block">
+Register
+</button>
+</div>
+
+</div>
+
+</form>
+
+</div>
+</div>
+</div>
+
+
+<script src="{{ asset('templates/plugins/jquery/jquery.min.js') }}"></script>
+<script src="{{ asset('templates/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+
+</body>
+</html>
