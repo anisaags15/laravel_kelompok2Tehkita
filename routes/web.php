@@ -15,6 +15,7 @@ use App\Models\Outlet;
 use App\Models\Bahan;
 use App\Models\StokMasuk;
 use App\Models\Distribusi;
+use App\Http\Controllers\ChatController;
 
 /*
 |--------------------------------------------------------------------------
@@ -171,6 +172,25 @@ Route::middleware('auth')->group(function () {
         ->name('profile.update-password');
 });
 
+
+/*
+|-------------------------------------------------------------------------- 
+| MESSAGES / CHAT
+|-------------------------------------------------------------------------- 
+*/
+
+Route::middleware(['auth'])->group(function () {
+
+    // Halaman list user untuk chat
+    Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+
+    // Halaman chat dengan user tertentu
+    Route::get('/chat/{user}', [ChatController::class, 'show'])->name('chat.show');
+
+    // Kirim pesan ke user tertentu
+    Route::post('/chat/{user}', [ChatController::class, 'store'])->name('chat.store');
+
+});
 
 /*
 |--------------------------------------------------------------------------
