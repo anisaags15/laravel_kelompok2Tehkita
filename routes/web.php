@@ -81,10 +81,7 @@ Route::middleware(['auth', 'role:user'])
     ->name('user.')
     ->group(function () {
 
-<<<<<<< HEAD
-=======
         // Dashboard
->>>>>>> 1287111ff284497ace602f212380e0c4a426a8b3
         Route::get('/dashboard', function () {
 
             $user = auth()->user();
@@ -119,7 +116,6 @@ Route::middleware(['auth', 'role:user'])
 
         })->name('dashboard');
 
-<<<<<<< HEAD
         // Stok Outlet (hanya index)
         Route::get('/stok-outlet', [StokOutletController::class, 'indexUser'])
             ->name('stok-outlet.index');
@@ -137,14 +133,10 @@ Route::middleware(['auth', 'role:user'])
         // Riwayat Distribusi (khusus outlet login)
         Route::get('/distribusi', [DistribusiController::class, 'indexUser'])
             ->name('distribusi.index');
-    });
+    
 
 
-=======
-<<<<<<< HEAD
-=======
         // Lihat Stok Outlet
->>>>>>> 1287111ff284497ace602f212380e0c4a426a8b3
         Route::resource('stok-outlet', StokOutletController::class)
             ->only(['index']);
 
@@ -158,7 +150,6 @@ Route::middleware(['auth', 'role:user'])
 
 
 
->>>>>>> ea52cb0ab501bc8143a2e2ff2a2926da1a356caa
 /*
 |--------------------------------------------------------------------------
 | PROFILE
