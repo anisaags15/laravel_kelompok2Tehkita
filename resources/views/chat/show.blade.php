@@ -21,9 +21,10 @@
                 <div class="d-flex justify-content-start mb-2">
                     <div class="bg-light p-2 rounded" style="max-width:70%;">
                         {{ $msg->message }}
-                        <div class="text-right text-muted" style="font-size:0.7rem;">
-                            {{ $msg->created_at->format('H:i') }}
-                        </div>
+                      <div class="text-right text-muted" style="font-size:0.7rem;">
+    {{ $msg->created_at->format($msg->created_at->isToday() ? 'H:i' : 'd M H:i') }}
+</div>
+
                     </div>
                 </div>
             @endif
