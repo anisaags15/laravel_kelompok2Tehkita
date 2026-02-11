@@ -49,16 +49,17 @@ Route::middleware(['auth', 'role:admin'])
     ->name('admin.')
     ->group(function () {
 
-        Route::get('/dashboard', function () {
-            return view('admin.dashboard', [
-                'totalUsers'        => User::count(),
-                'totalOutlets'      => Outlet::count(),
-                'totalBahan'        => Bahan::count(),
-                'stokGudang'        => StokMasuk::sum('jumlah'),
-                'distribusiHariIni' => Distribusi::whereDate('created_at', today())
-                                            ->sum('jumlah'),
-            ]);
-        })->name('dashboard');
+      Route::get('/dashboard', function () {
+
+    return view('admin.dashboard', [
+        'outlet'     => Outlet::count(),
+        'bahan'      => Bahan::count(),
+        'stokMasuk'  => StokMasuk::count(),
+        'distribusi' => Distribusi::count(),
+    ]);
+
+})->name('dashboard');
+
 
         // FULL CRUD untuk admin
         Route::resources([
