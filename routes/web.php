@@ -84,10 +84,7 @@ Route::middleware(['auth', 'role:user'])
     ->name('user.')
     ->group(function () {
 
-<<<<<<< HEAD
-=======
         // Dashboard
->>>>>>> 1287111ff284497ace602f212380e0c4a426a8b3
         Route::get('/dashboard', function () {
 
             $user = auth()->user();
@@ -122,10 +119,7 @@ Route::middleware(['auth', 'role:user'])
 
         })->name('dashboard');
 
-<<<<<<< HEAD
-=======
         // Lihat Stok Outlet
->>>>>>> 1287111ff284497ace602f212380e0c4a426a8b3
         Route::resource('stok-outlet', StokOutletController::class)
             ->only(['index']);
 
