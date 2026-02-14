@@ -6,172 +6,110 @@
 
     <!-- Toggle Sidebar -->
     <li class="nav-item">
-      <a class="nav-link"
-         data-widget="pushmenu"
-         href="#"
-         role="button">
-
+      <a class="nav-link" data-widget="pushmenu" href="#" role="button">
         <i class="fas fa-bars"></i>
       </a>
     </li>
 
     <!-- Home -->
     <li class="nav-item d-none d-sm-inline-block">
-      <a href="{{ route('admin.dashboard') }}" class="nav-link">
+      <a href="{{ auth()->user()->role === 'admin' ? route('admin.dashboard') : route('user.dashboard') }}" class="nav-link">
         Home
       </a>
     </li>
 
-    <!-- Contact -->
+    <!-- Contact / Chat -->
+    @php
+        $unreadCount = \App\Models\Message::where('receiver_id', auth()->id())
+            ->where('is_read', false)
+            ->count();
+    @endphp
     <li class="nav-item d-none d-sm-inline-block">
-      <a href="#" class="nav-link">
+      <a href="{{ route('chat.index') }}" class="nav-link">
         Contact
+        @if($unreadCount > 0)
+          <span class="badge badge-danger navbar-badge">{{ $unreadCount }}</span>
+        @endif
       </a>
     </li>
 
   </ul>
 
-
   <!-- Right navbar links -->
   <ul class="navbar-nav ml-auto">
 
-    <!-- Search -->
-    <li class="nav-item">
-      <a class="nav-link"
-         data-widget="navbar-search"
-         href="#"
-         role="button">
-
-        <i class="fas fa-search"></i>
-      </a>
-
-      <div class="navbar-search-block">
-
-        <form class="form-inline">
-
-          <div class="input-group input-group-sm">
-
-            <input class="form-control form-control-navbar"
-                   type="search"
-                   placeholder="Search"
-                   aria-label="Search">
-
-            <div class="input-group-append">
-
-              <button class="btn btn-navbar" type="submit">
-                <i class="fas fa-search"></i>
-              </button>
-
-              <button class="btn btn-navbar"
-                      type="button"
-                      data-widget="navbar-search">
-
-                <i class="fas fa-times"></i>
-              </button>
-
-            </div>
-
-          </div>
-
-        </form>
-
-      </div>
-    </li>
-
-
-    <!-- Messages -->
+    <!-- Messages Dropdown -->
     <li class="nav-item dropdown">
-
-      <a class="nav-link"
-         data-toggle="dropdown"
-         href="#">
-
+      <a class="nav-link" data-toggle="dropdown" href="#">
         <i class="far fa-comments"></i>
-        <span class="badge badge-danger navbar-badge">3</span>
+        @if($unreadCount > 0)
+          <span class="badge badge-danger navbar-badge">{{ $unreadCount }}</span>
+        @endif
       </a>
-
       <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-
-        <span class="dropdown-item dropdown-header">
-          3 Messages
-        </span>
-
+        <span class="dropdown-item dropdown-header">{{ $unreadCount }} Messages</span>
         <div class="dropdown-divider"></div>
-
-        <a href="#" class="dropdown-item text-center">
-          See All Messages
-        </a>
-
+        <a href="{{ route('chat.index') }}" class="dropdown-item text-center">See All Messages</a>
       </div>
-
     </li>
 
+    <!-- Notifications / Stok & Pemakaian (User Only) -->
+    @if(auth()->user()->role === 'user')
+      @php
+        // Gunakan View Composer untuk stokAlert & pemakaianHariIni
+        $stokAlert = $stokAlert ?? collect();
+        $pemakaianHariIni = $pemakaianHariIni ?? collect();
+        $totalNotif = $stokAlert->count() + $pemakaianHariIni->count();
+      @endphp
 
-    <!-- Notifications -->
-    <li class="nav-item dropdown">
-
-      <a class="nav-link"
-         data-toggle="dropdown"
-         href="#">
-
-        <i class="far fa-bell"></i>
-        <span class="badge badge-warning navbar-badge">15</span>
-      </a>
-
-      <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-
-        <span class="dropdown-item dropdown-header">
-          15 Notifications
-        </span>
-
-        <div class="dropdown-divider"></div>
-
-        <a href="#" class="dropdown-item text-center">
-          See All Notifications
+      <li class="nav-item dropdown">
+        <a class="nav-link" data-toggle="dropdown" href="#">
+          <i class="far fa-bell"></i>
+          @if($totalNotif > 0)
+            <span class="badge badge-warning navbar-badge">{{ $totalNotif }}</span>
+          @endif
         </a>
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+          <span class="dropdown-item dropdown-header">{{ $totalNotif }} Notifikasi</span>
+          <div class="dropdown-divider"></div>
 
-      </div>
+          @foreach($stokAlert as $item)
+            <a href="{{ route('user.stok-outlet.index') }}" class="dropdown-item">
+              Stok <strong>{{ $item->bahan->nama ?? 'Bahan' }}</strong> tersisa {{ $item->stok }}
+            </a>
+            <div class="dropdown-divider"></div>
+          @endforeach
 
-    </li>
+          @foreach($pemakaianHariIni as $item)
+            <a href="{{ route('user.pemakaian.index') }}" class="dropdown-item">
+              Pemakaian <strong>{{ $item->bahan->nama ?? 'Bahan' }}</strong>: {{ $item->jumlah }}
+            </a>
+            <div class="dropdown-divider"></div>
+          @endforeach
 
+          <a href="{{ route('notifikasi') }}" class="dropdown-item text-center">Lihat Semua Notifikasi</a>
+        </div>
+      </li>
+    @endif
 
     <!-- Fullscreen -->
     <li class="nav-item">
-
-      <a class="nav-link"
-         data-widget="fullscreen"
-         href="#"
-         role="button">
-
+      <a class="nav-link" data-widget="fullscreen" href="#" role="button">
         <i class="fas fa-expand-arrows-alt"></i>
       </a>
-
     </li>
-
 
     <!-- Logout -->
     <li class="nav-item">
-
-      <a class="nav-link text-danger"
-         href="{{ route('logout') }}"
-         onclick="event.preventDefault();
-         document.getElementById('logout-form').submit();">
-
+      <a class="nav-link text-danger" href="{{ route('logout') }}"
+         onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
         <i class="fas fa-sign-out-alt"></i>
       </a>
-
-      <form id="logout-form"
-            action="{{ route('logout') }}"
-            method="POST"
-            class="d-none">
-
+      <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
         @csrf
-
       </form>
-
     </li>
 
   </ul>
 
 </nav>
-<!-- /.navbar -->

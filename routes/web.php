@@ -9,8 +9,9 @@ use App\Http\Controllers\StokMasukController;
 use App\Http\Controllers\DistribusiController;
 use App\Http\Controllers\StokOutletController;
 use App\Http\Controllers\PemakaianController;
+use App\Http\Controllers\ChatController;
+use App\Http\Controllers\NotifikasiController;
 
-use App\Models\User;
 use App\Models\Outlet;
 use App\Models\Bahan;
 use App\Models\StokMasuk;
@@ -31,13 +32,11 @@ Route::get('/', function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->get('/dashboard', function () {
-
     return match (auth()->user()->role) {
         'admin' => redirect()->route('admin.dashboard'),
         'user'  => redirect()->route('user.dashboard'),
         default => abort(403),
     };
-
 })->name('dashboard');
 
 /*
@@ -50,33 +49,27 @@ Route::middleware(['auth', 'role:admin'])
     ->name('admin.')
     ->group(function () {
 
-        // Dashboard
         Route::get('/dashboard', function () {
-
             return view('admin.dashboard', [
-                'totalUsers'        => User::count(),
-                'totalOutlets'      => Outlet::count(),
-                'totalBahan'        => Bahan::count(),
-                'stokGudang'        => StokMasuk::sum('jumlah'),
-                'distribusiHariIni' => Distribusi::whereDate('created_at', today())
-                                        ->sum('jumlah'),
+                'outlet'     => Outlet::count(),
+                'bahan'      => Bahan::count(),
+                'stokMasuk'  => StokMasuk::count(),
+                'distribusi' => Distribusi::count(),
             ]);
-
         })->name('dashboard');
 
-        // Master Data
         Route::resources([
-            'outlet'       => OutletController::class,
-            'bahan'        => BahanController::class,
-            'stok-masuk'   => StokMasukController::class,
-            'distribusi'   => DistribusiController::class,
-            'stok-outlet'  => StokOutletController::class,
+            'outlet'      => OutletController::class,
+            'bahan'       => BahanController::class,
+            'stok-masuk'  => StokMasukController::class,
+            'distribusi'  => DistribusiController::class,
+            'stok-outlet' => StokOutletController::class,
         ]);
     });
 
 /*
 |--------------------------------------------------------------------------
-| USER AREA
+| USER AREA (ADMIN OUTLET)
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'role:user'])
@@ -84,7 +77,6 @@ Route::middleware(['auth', 'role:user'])
     ->name('user.')
     ->group(function () {
 
-        // Dashboard
         Route::get('/dashboard', function () {
 
             $user = auth()->user();
@@ -119,23 +111,40 @@ Route::middleware(['auth', 'role:user'])
 
         })->name('dashboard');
 
-        // Lihat Stok Outlet
-        Route::resource('stok-outlet', StokOutletController::class)
-            ->only(['index']);
+        /*
+        |--------------------------------------------------------------------------
+        | PEMAKAIAN
+        |--------------------------------------------------------------------------
+        */
+        Route::get('/pemakaian', [PemakaianController::class, 'index'])
+            ->name('pemakaian.index');
 
-        Route::resource('pemakaian', PemakaianController::class);
+        Route::get('/pemakaian/create', [PemakaianController::class, 'create'])
+            ->name('pemakaian.create');
 
-        // 🔥 INI YANG KURANG
-        Route::resource('distribusi', DistribusiController::class)
-            ->only(['index']);
+        Route::post('/pemakaian', [PemakaianController::class, 'store'])
+            ->name('pemakaian.store');
 
+        /*
+        |--------------------------------------------------------------------------
+        | DISTRIBUSI
+        |--------------------------------------------------------------------------
+        */
+        Route::get('/distribusi', [DistribusiController::class, 'indexUser'])
+            ->name('distribusi.index');
+
+        /*
+        |--------------------------------------------------------------------------
+        | NOTIFIKASI USER
+        |--------------------------------------------------------------------------
+        */
+        Route::get('/notifikasi', [NotifikasiController::class, 'index'])
+            ->name('notifikasi');
     });
-
-
 
 /*
 |--------------------------------------------------------------------------
-| PROFILE (GLOBAL - ADMIN & USER)
+| PROFILE
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {
@@ -151,6 +160,23 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/profile/update-password', [ProfileController::class, 'updatePassword'])
         ->name('profile.update-password');
+});
+
+/*
+|--------------------------------------------------------------------------
+| CHAT / MESSAGES
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->group(function () {
+
+    Route::get('/chat', [ChatController::class, 'index'])
+        ->name('chat.index');
+
+    Route::get('/chat/{user}', [ChatController::class, 'show'])
+        ->name('chat.show');
+
+    Route::post('/chat/{user}', [ChatController::class, 'store'])
+        ->name('chat.store');
 });
 
 /*
