@@ -87,7 +87,11 @@
             <div class="dropdown-divider"></div>
           @endforeach
 
-          <a href="{{ route('notifikasi') }}" class="dropdown-item text-center">Lihat Semua Notifikasi</a>
+{{-- 
+<a href="{{ route('notifikasi') }}" class="dropdown-item text-center">
+    Lihat Semua Notifikasi
+</a>
+--}}
         </div>
       </li>
     @endif

@@ -25,7 +25,7 @@
 
         <!-- Stok Outlet -->
         <li class="nav-item">
-          <a href="{{ route('user.stok-outlet.index') }}" class="nav-link">
+<a href="/user/stok-outlet" class="nav-link">
             <i class="nav-icon fas fa-box"></i>
             <p>Stok Outlet</p>
           </a>
@@ -33,7 +33,7 @@
 
         <!-- Pemakaian Bahan -->
         <li class="nav-item">
-          <a href="{{ route('user.pemakaian.create') }}" class="nav-link">
+<a href="/user/pemakaian/create" class="nav-link">
             <i class="nav-icon fas fa-edit"></i>
             <p>Pemakaian Bahan</p>
           </a>
