@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Auth\ProfileController;
+use App\Http\Controllers\Admin\DashboardController; // ✅ FIXED (ADMIN)
 use App\Http\Controllers\OutletController;
 use App\Http\Controllers\BahanController;
 use App\Http\Controllers\StokMasukController;
@@ -11,11 +12,6 @@ use App\Http\Controllers\StokOutletController;
 use App\Http\Controllers\PemakaianController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\NotifikasiController;
-
-use App\Models\Outlet;
-use App\Models\Bahan;
-use App\Models\StokMasuk;
-use App\Models\Distribusi;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,14 +45,9 @@ Route::middleware(['auth', 'role:admin'])
     ->name('admin.')
     ->group(function () {
 
-        Route::get('/dashboard', function () {
-            return view('admin.dashboard', [
-                'outlet'     => Outlet::count(),
-                'bahan'      => Bahan::count(),
-                'stokMasuk'  => StokMasuk::count(),
-                'distribusi' => Distribusi::count(),
-            ]);
-        })->name('dashboard');
+        // ✅ DASHBOARD CONTROLLER (SUDAH BENAR)
+        Route::get('/dashboard', [DashboardController::class, 'dashboard'])
+            ->name('dashboard');
 
         Route::resources([
             'outlet'      => OutletController::class,
@@ -69,7 +60,7 @@ Route::middleware(['auth', 'role:admin'])
 
 /*
 |--------------------------------------------------------------------------
-| USER AREA (ADMIN OUTLET)
+| USER AREA
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'role:user'])
@@ -111,11 +102,6 @@ Route::middleware(['auth', 'role:user'])
 
         })->name('dashboard');
 
-        /*
-        |--------------------------------------------------------------------------
-        | PEMAKAIAN
-        |--------------------------------------------------------------------------
-        */
         Route::get('/pemakaian', [PemakaianController::class, 'index'])
             ->name('pemakaian.index');
 
@@ -125,19 +111,9 @@ Route::middleware(['auth', 'role:user'])
         Route::post('/pemakaian', [PemakaianController::class, 'store'])
             ->name('pemakaian.store');
 
-        /*
-        |--------------------------------------------------------------------------
-        | DISTRIBUSI
-        |--------------------------------------------------------------------------
-        */
         Route::get('/distribusi', [DistribusiController::class, 'indexUser'])
             ->name('distribusi.index');
 
-        /*
-        |--------------------------------------------------------------------------
-        | NOTIFIKASI USER
-        |--------------------------------------------------------------------------
-        */
         Route::get('/notifikasi', [NotifikasiController::class, 'index'])
             ->name('notifikasi');
     });
@@ -164,7 +140,7 @@ Route::middleware('auth')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| CHAT / MESSAGES
+| CHAT
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {

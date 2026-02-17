@@ -1,119 +1,65 @@
-<!-- Navbar -->
-<nav class="main-header navbar navbar-expand navbar-white navbar-light">
+<nav class="main-header navbar navbar-expand navbar-light shadow-sm">
 
-  <!-- Left navbar links -->
-  <ul class="navbar-nav">
+    <!-- LEFT SECTION -->
+    <ul class="navbar-nav align-items-center">
 
-    <!-- Toggle Sidebar -->
-    <li class="nav-item">
-      <a class="nav-link" data-widget="pushmenu" href="#" role="button">
-        <i class="fas fa-bars"></i>
-      </a>
-    </li>
-
-    <!-- Home -->
-    <li class="nav-item d-none d-sm-inline-block">
-      <a href="{{ auth()->user()->role === 'admin' ? route('admin.dashboard') : route('user.dashboard') }}" class="nav-link">
-        Home
-      </a>
-    </li>
-
-    <!-- Contact / Chat -->
-    @php
-        $unreadCount = \App\Models\Message::where('receiver_id', auth()->id())
-            ->where('is_read', false)
-            ->count();
-    @endphp
-    <li class="nav-item d-none d-sm-inline-block">
-      <a href="{{ route('chat.index') }}" class="nav-link">
-        Contact
-        @if($unreadCount > 0)
-          <span class="badge badge-danger navbar-badge">{{ $unreadCount }}</span>
-        @endif
-      </a>
-    </li>
-
-  </ul>
-
-  <!-- Right navbar links -->
-  <ul class="navbar-nav ml-auto">
-
-    <!-- Messages Dropdown -->
-    <li class="nav-item dropdown">
-      <a class="nav-link" data-toggle="dropdown" href="#">
-        <i class="far fa-comments"></i>
-        @if($unreadCount > 0)
-          <span class="badge badge-danger navbar-badge">{{ $unreadCount }}</span>
-        @endif
-      </a>
-      <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-        <span class="dropdown-item dropdown-header">{{ $unreadCount }} Messages</span>
-        <div class="dropdown-divider"></div>
-        <a href="{{ route('chat.index') }}" class="dropdown-item text-center">See All Messages</a>
-      </div>
-    </li>
-
-    <!-- Notifications / Stok & Pemakaian (User Only) -->
-    @if(auth()->user()->role === 'user')
-      @php
-        // Gunakan View Composer untuk stokAlert & pemakaianHariIni
-        $stokAlert = $stokAlert ?? collect();
-        $pemakaianHariIni = $pemakaianHariIni ?? collect();
-        $totalNotif = $stokAlert->count() + $pemakaianHariIni->count();
-      @endphp
-
-      <li class="nav-item dropdown">
-        <a class="nav-link" data-toggle="dropdown" href="#">
-          <i class="far fa-bell"></i>
-          @if($totalNotif > 0)
-            <span class="badge badge-warning navbar-badge">{{ $totalNotif }}</span>
-          @endif
-        </a>
-        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-          <span class="dropdown-item dropdown-header">{{ $totalNotif }} Notifikasi</span>
-          <div class="dropdown-divider"></div>
-
-          @foreach($stokAlert as $item)
-            <a href="{{ route('user.stok-outlet.index') }}" class="dropdown-item">
-              Stok <strong>{{ $item->bahan->nama ?? 'Bahan' }}</strong> tersisa {{ $item->stok }}
+        <!-- Sidebar Toggle -->
+        <li class="nav-item">
+            <a class="nav-link text-success" data-widget="pushmenu" href="#">
+                <i class="fas fa-bars"></i>
             </a>
-            <div class="dropdown-divider"></div>
-          @endforeach
+        </li>
 
-          @foreach($pemakaianHariIni as $item)
-            <a href="{{ route('user.pemakaian.index') }}" class="dropdown-item">
-              Pemakaian <strong>{{ $item->bahan->nama ?? 'Bahan' }}</strong>: {{ $item->jumlah }}
-            </a>
-            <div class="dropdown-divider"></div>
-          @endforeach
+        <!-- Brand Small -->
+        <li class="nav-item d-none d-sm-inline-block ml-2">
+            <span class="navbar-brand font-weight-bold text-success"
+                  style="letter-spacing:1px;">
+                Dashboard Admin
+            </span>
+        </li>
 
-{{-- 
-<a href="{{ route('notifikasi') }}" class="dropdown-item text-center">
-    Lihat Semua Notifikasi
-</a>
---}}
+    </ul>
+
+
+    <!-- CENTER SEARCH -->
+    <form class="form-inline mx-auto" style="width: 40%;">
+        <div class="input-group input-group-sm w-100">
+            <input class="form-control border-0 shadow-sm"
+                   type="search"
+                   placeholder="Cari data..."
+                   style="border-radius:20px 0 0 20px;">
+            <div class="input-group-append">
+                <button class="btn btn-success"
+                        style="border-radius:0 20px 20px 0;">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
         </div>
-      </li>
-    @endif
+    </form>
 
-    <!-- Fullscreen -->
-    <li class="nav-item">
-      <a class="nav-link" data-widget="fullscreen" href="#" role="button">
-        <i class="fas fa-expand-arrows-alt"></i>
-      </a>
-    </li>
 
-    <!-- Logout -->
-    <li class="nav-item">
-      <a class="nav-link text-danger" href="{{ route('logout') }}"
-         onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-        <i class="fas fa-sign-out-alt"></i>
-      </a>
-      <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-        @csrf
-      </form>
-    </li>
+    <!-- RIGHT SECTION -->
+    <ul class="navbar-nav align-items-center">
 
-  </ul>
+        <!-- Notifications -->
+        <li class="nav-item dropdown">
+            <a class="nav-link position-relative text-dark"
+               data-toggle="dropdown"
+               href="#">
+                <i class="far fa-bell"></i>
+
+                <!-- Badge example -->
+                <span class="badge badge-success navbar-badge">3</span>
+            </a>
+        </li>
+
+        <!-- Divider -->
+        <li class="nav-item mx-2">
+            <span style="width:1px;height:25px;background:#ddd;display:inline-block;"></span>
+        </li>
+
+       
+
+    </ul>
 
 </nav>
