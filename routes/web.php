@@ -18,6 +18,7 @@ use App\Http\Controllers\StokOutletController;
 use App\Http\Controllers\PemakaianController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\NotifikasiController;
+use App\Http\Controllers\User\DashboardController as UserDashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,10 +38,14 @@ Route::get('/', function () {
 */
 
 Route::middleware('auth')->get('/dashboard', function () {
+<<<<<<< Updated upstream
 
     return match (auth()->user()->role) {
+=======
+    return match(auth()->user()->role) {
+>>>>>>> Stashed changes
         'admin' => redirect()->route('admin.dashboard'),
-        'user'  => redirect()->route('user.dashboard'),
+        'user' => redirect()->route('user.dashboard'),
         default => abort(403),
     };
 
@@ -58,6 +63,7 @@ Route::middleware(['auth', 'role:admin'])
     ->name('admin.')
     ->group(function () {
 
+<<<<<<< Updated upstream
         // Dashboard
         Route::get('/dashboard', [DashboardController::class, 'dashboard'])
             ->name('dashboard');
@@ -68,6 +74,18 @@ Route::middleware(['auth', 'role:admin'])
         Route::resource('stok-masuk', StokMasukController::class);
         Route::resource('distribusi', DistribusiController::class);
         Route::resource('stok-outlet', StokOutletController::class);
+=======
+        Route::get('/dashboard', [DashboardController::class, 'dashboard'])
+            ->name('dashboard');
+
+        Route::resources([
+            'outlet' => OutletController::class,
+            'bahan' => BahanController::class,
+            'stok-masuk' => StokMasukController::class,
+            'distribusi' => DistribusiController::class,
+            'stok-outlet' => StokOutletController::class,
+        ]);
+>>>>>>> Stashed changes
     });
 
 
@@ -82,46 +100,35 @@ Route::middleware(['auth', 'role:user'])
     ->name('user.')
     ->group(function () {
 
+<<<<<<< Updated upstream
         // Dashboard
         Route::get('/dashboard', function () {
+=======
+        // Dashboard User
+        Route::get('/dashboard', [UserDashboardController::class, 'index'])
+            ->name('dashboard');
+>>>>>>> Stashed changes
 
-            $user = auth()->user();
-
-            $totalStok = \App\Models\StokOutlet::where('outlet_id', $user->outlet_id)
-                ->sum('stok');
-
-            $pemakaianHariIni = \App\Models\Pemakaian::where('outlet_id', $user->outlet_id)
-                ->whereDate('tanggal', now())
-                ->sum('jumlah');
-
-            $distribusiMasuk = \App\Models\Distribusi::where('outlet_id', $user->outlet_id)
-                ->sum('jumlah');
-
-            $stokOutlets = \App\Models\StokOutlet::with('bahan')
-                ->where('outlet_id', $user->outlet_id)
-                ->get();
-
-            $pemakaians = \App\Models\Pemakaian::with('bahan')
-                ->where('outlet_id', $user->outlet_id)
-                ->latest()
-                ->limit(5)
-                ->get();
-
-            return view('user.dashboard', compact(
-                'totalStok',
-                'pemakaianHariIni',
-                'distribusiMasuk',
-                'stokOutlets',
-                'pemakaians'
-            ));
-
-        })->name('dashboard');
+        // Resource Stok Outlet (user hanya bisa lihat index/show)
+        Route::resource('stok-outlet', StokOutletController::class)
+            ->only(['index', 'show']);
 
         // Pemakaian
+<<<<<<< Updated upstream
         Route::resource('pemakaian', PemakaianController::class)
             ->only(['index', 'create', 'store']);
 
         // Distribusi (user view)
+=======
+        Route::get('/pemakaian', [PemakaianController::class, 'index'])
+            ->name('pemakaian.index');
+        Route::get('/pemakaian/create', [PemakaianController::class, 'create'])
+            ->name('pemakaian.create');
+        Route::post('/pemakaian', [PemakaianController::class, 'store'])
+            ->name('pemakaian.store');
+
+        // Distribusi
+>>>>>>> Stashed changes
         Route::get('/distribusi', [DistribusiController::class, 'indexUser'])
             ->name('distribusi.index');
 
@@ -139,15 +146,13 @@ Route::middleware(['auth', 'role:user'])
 
 Route::middleware('auth')->group(function () {
 
+    // Admin & User (role-aware bisa dipisah kalau mau)
     Route::get('/profile/edit', [ProfileController::class, 'edit'])
         ->name('profile.edit');
-
     Route::put('/profile', [ProfileController::class, 'update'])
         ->name('profile.update');
-
     Route::delete('/profile', [ProfileController::class, 'destroy'])
         ->name('profile.destroy');
-
     Route::post('/profile/update-password', [ProfileController::class, 'updatePassword'])
         ->name('profile.update-password');
 });
@@ -160,15 +165,9 @@ Route::middleware('auth')->group(function () {
 */
 
 Route::middleware('auth')->group(function () {
-
-    Route::get('/chat', [ChatController::class, 'index'])
-        ->name('chat.index');
-
-    Route::get('/chat/{user}', [ChatController::class, 'show'])
-        ->name('chat.show');
-
-    Route::post('/chat/{user}', [ChatController::class, 'store'])
-        ->name('chat.store');
+    Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+    Route::get('/chat/{user}', [ChatController::class, 'show'])->name('chat.show');
+    Route::post('/chat/{user}', [ChatController::class, 'store'])->name('chat.store');
 });
 
 
@@ -177,5 +176,9 @@ Route::middleware('auth')->group(function () {
 | AUTH
 |--------------------------------------------------------------------------
 */
+<<<<<<< Updated upstream
 
 require __DIR__.'/auth.php';
+=======
+require __DIR__ . '/auth.php';
+>>>>>>> Stashed changes
