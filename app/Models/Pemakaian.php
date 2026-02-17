@@ -10,8 +10,6 @@ class Pemakaian extends Model
 {
     use HasFactory;
 
-    protected $table = 'pemakaian';
-
     protected $fillable = [
         'bahan_id',
         'outlet_id',
@@ -22,12 +20,6 @@ class Pemakaian extends Model
     protected $casts = [
         'tanggal' => 'date',
     ];
-
-    /*
-    |--------------------------------------------------------------------------
-    | Relasi
-    |--------------------------------------------------------------------------
-    */
 
     public function bahan(): BelongsTo
     {
