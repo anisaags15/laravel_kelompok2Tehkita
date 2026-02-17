@@ -1,0 +1,140 @@
+/* ===============================
+   GLOBAL
+=================================*/
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f3faf5;
+}
+
+.content-wrapper {
+    background-color: #f3faf5;
+    padding: 20px;
+}
+
+/* ===============================
+   NAVBAR
+=================================*/
+.main-header {
+    background: #ffffff;
+    padding: 10px 20px;
+    border-bottom: 1px solid #e5e5e5;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+}
+
+.navbar .form-control {
+    border-radius: 20px 0 0 20px;
+}
+
+.navbar .btn-success {
+    border-radius: 0 20px 20px 0;
+}
+
+.navbar .form-control:focus {
+    box-shadow: none;
+}
+
+.navbar-badge {
+    font-size: 10px;
+    padding: 3px 6px;
+}
+
+.navbar .btn-outline-success {
+    border-radius: 20px;
+    transition: 0.3s;
+}
+
+.navbar .btn-outline-success:hover {
+    background-color: #198754;
+    color: #fff;
+}
+
+/* ===============================
+   SIDEBAR
+=================================*/
+.main-sidebar {
+    background: linear-gradient(180deg, #e8f5e9, #d7f2e3);
+    transition: all 0.3s ease-in-out;
+}
+
+.brand-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px 10px;
+}
+
+.brand-text {
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: 1px;
+    color: #198754 !important;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.nav-sidebar .nav-link {
+    color: #2f3e46;
+    border-radius: 12px;
+    margin: 4px 10px;
+    padding: 10px 15px;
+    transition: all 0.2s ease-in-out;
+}
+
+.nav-sidebar .nav-link:hover {
+    background-color: rgba(25,135,84,0.1);
+}
+
+.nav-sidebar .nav-link.active {
+    background-color: #198754 !important;
+    color: #fff !important;
+}
+
+/* PROFILE IMAGE */
+.img-circle {
+    border: 2px solid #198754;
+}
+
+/* ===============================
+   CARD DASHBOARD
+=================================*/
+.small-box {
+    border-radius: 18px;
+    position: relative;
+    display: block;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+    color: #fff;
+}
+
+.small-box > .inner {
+    padding: 20px;
+}
+
+.small-box h3 {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 10px 0;
+}
+
+.small-box p {
+    font-size: 16px;
+}
+
+.small-box .icon {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 45px;
+    opacity: 0.3;
+}
+
+/* Background Colors */
+.bg-info { background-color: #0dcaf0 !important; }
+.bg-success { background-color: #198754 !important; }
+.bg-warning { background-color: #ffc107 !important; color:#2f3e46 !important; }
+
+/* Hover Effects */
+.small-box:hover {
+    transform: translateY(-6px);
+    transition: 0.3s;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+}
