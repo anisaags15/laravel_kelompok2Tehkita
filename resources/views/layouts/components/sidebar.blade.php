@@ -4,14 +4,12 @@
     <a href="{{ route('admin.dashboard') }}" 
        class="brand-link d-flex align-items-center px-3">
 
-        <!-- Logo Bundar -->
         <div class="brand-image d-flex align-items-center justify-content-center"
              style="width:40px;height:40px;border-radius:50%;
                     background:#28a745;color:white;font-weight:bold;">
             TK
         </div>
 
-        <!-- Text -->
         <span class="brand-text font-weight-bold ml-3"
               style="font-size:18px; letter-spacing:1px;">
             Teh Kita
@@ -21,39 +19,40 @@
     <div class="sidebar">
 
         <!-- USER PANEL -->
-        <div class="user-panel mt-4 pb-3 mb-3 d-flex align-items-center px-3">
+   <div class="user-panel mt-4 pb-3 mb-3 d-flex align-items-center px-3">
 
-            <div class="image">
-                <img src="https://i.pravatar.cc/45"
-                     class="img-circle elevation-2"
-                     alt="User Image">
-            </div>
+    <div class="image">
+        <img src="{{ auth()->user()->photo 
+                    ? asset('uploads/profile/' . auth()->user()->photo) 
+                    : asset('templates/dist/img/user2-160x160.jpg') }}"
+             class="img-circle elevation-2"
+             style="width:45px;height:45px;object-fit:cover;"
+             alt="User Image">
+    </div>
 
-            <div class="info ml-3">
-                <div class="font-weight-bold">
-                    {{ auth()->user()->name }}
-                </div>
-                <small class="text-muted d-block">
-                    Admin Pusat
-                </small>
-
-                <!-- LINK PROFIL -->
-                <a href="{{ route('profile.edit') }}"
-                   class="text-success small d-block mt-1">
-                    <i class="fas fa-user-circle mr-1"></i>
-                    Lihat Profil
-                </a>
-            </div>
-
+    <div class="info ml-3">
+        <div class="font-weight-bold">
+            {{ auth()->user()->name }}
         </div>
 
+        <small class="text-muted d-block">
+            {{ ucfirst(auth()->user()->role) }}
+        </small>
+
+        <a href="{{ route('profile.edit') }}"
+           class="text-success small d-block mt-1">
+            <i class="fas fa-user-circle mr-1"></i>
+            Lihat Profil
+        </a>
+    </div>
+
+</div>
         <!-- MENU -->
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column"
                 data-widget="treeview"
                 role="menu">
 
-                <!-- DASHBOARD -->
                 <li class="nav-item">
                     <a href="{{ route('admin.dashboard') }}"
                        class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active bg-success' : '' }}">
@@ -66,7 +65,6 @@
                     Master Data
                 </li>
 
-                <!-- OUTLET -->
                 <li class="nav-item">
                     <a href="{{ route('admin.outlet.index') }}"
                        class="nav-link {{ request()->routeIs('admin.outlet.*') ? 'active bg-success' : '' }}">
@@ -75,7 +73,6 @@
                     </a>
                 </li>
 
-                <!-- BAHAN -->
                 <li class="nav-item">
                     <a href="{{ route('admin.bahan.index') }}"
                        class="nav-link {{ request()->routeIs('admin.bahan.*') ? 'active bg-success' : '' }}">
@@ -88,7 +85,6 @@
                     Transaksi
                 </li>
 
-                <!-- STOK MASUK -->
                 <li class="nav-item">
                     <a href="{{ route('admin.stok-masuk.index') }}"
                        class="nav-link {{ request()->routeIs('admin.stok-masuk.*') ? 'active bg-success' : '' }}">
@@ -97,7 +93,6 @@
                     </a>
                 </li>
 
-                <!-- DISTRIBUSI -->
                 <li class="nav-item">
                     <a href="{{ route('admin.distribusi.index') }}"
                        class="nav-link {{ request()->routeIs('admin.distribusi.*') ? 'active bg-success' : '' }}">
@@ -110,7 +105,6 @@
                     Komunikasi
                 </li>
 
-                <!-- CHAT -->
                 <li class="nav-item">
                     <a href="{{ route('chat.index') }}"
                        class="nav-link {{ request()->routeIs('chat.*') ? 'active bg-success' : '' }}">
@@ -123,7 +117,6 @@
                     Akun
                 </li>
 
-                <!-- LOGOUT -->
                 <li class="nav-item">
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
