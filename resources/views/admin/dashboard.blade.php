@@ -225,20 +225,45 @@
                             <th>Waktu</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @forelse($latestChats as $chat)
-                        <tr>
-                            <td class="fw-semibold">{{ $chat->sender->name ?? '-' }}</td>
-                            <td>{{ \Illuminate\Support\Str::limit($chat->message, 40) }}</td>
-                            <td><small class="text-muted">{{ $chat->created_at->diffForHumans() }}</small></td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="3" class="text-center text-muted">Belum ada chat</td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+<tbody>
+@forelse($latestChats as $chat)
+
+@php
+    // Tentukan lawan chat
+    $isSenderMe = $chat->sender_id == auth()->id();
+    $targetUser = $isSenderMe ? $chat->receiver : $chat->sender;
+@endphp
+
+<tr onclick="window.location='{{ route('chat.show', $targetUser->id) }}'"
+    style="cursor:pointer; transition:0.2s;"
+    onmouseover="this.style.backgroundColor='#f8f9fa'"
+    onmouseout="this.style.backgroundColor=''">
+
+    <td class="fw-semibold">
+        {{ $targetUser->outlet->nama_outlet ?? $targetUser->name }}
+    </td>
+
+    <td>
+        {{ \Illuminate\Support\Str::limit($chat->message, 40) }}
+    </td>
+
+    <td>
+        <small class="text-muted">
+            {{ $chat->created_at->diffForHumans() }}
+        </small>
+    </td>
+
+</tr>
+
+@empty
+<tr>
+    <td colspan="3" class="text-center text-muted">
+        Belum ada chat
+    </td>
+</tr>
+@endforelse
+</tbody>             
+</table>
             </div>
         </div>
     </div>

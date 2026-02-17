@@ -8,7 +8,7 @@ use App\Models\Bahan;
 use App\Models\StokMasuk;
 use App\Models\Distribusi;
 use App\Models\Pemakaian;
-use App\Models\Chat;
+use App\Models\Message;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
@@ -55,19 +55,24 @@ class DashboardController extends Controller
         $unreadCount = 0;
         $latestChats = collect();
 
-        if (class_exists(Chat::class)) {
+        if (class_exists(Message::class)) {
 
-            $unreadCount = Chat::where('receiver_id', Auth::id())
+            $unreadCount = Message::where('receiver_id', Auth::id())
                 ->where('is_read', 0)
                 ->count();
 
-            $latestChats = Chat::with('sender')
-                ->latest()
-                ->take(5)
-                ->get();
+$latestChats = Message::with([
+        'sender.outlet',
+        'receiver.outlet'
+    ])
+    ->where(function ($query) {
+        $query->where('sender_id', Auth::id())
+              ->orWhere('receiver_id', Auth::id());
+    })
+    ->latest()
+    ->take(10)
+    ->get();
         }
-
-
         /*
         |--------------------------------------------------------------------------
         | 4️⃣ DATA GRAFIK PEMAKAIAN

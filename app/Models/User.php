@@ -40,8 +40,8 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function outlet(): BelongsTo
-    {
-        return $this->belongsTo(Outlet::class);
-    }
+public function outlet()
+{
+    return $this->belongsTo(\App\Models\Outlet::class, 'outlet_id');
+}
 }

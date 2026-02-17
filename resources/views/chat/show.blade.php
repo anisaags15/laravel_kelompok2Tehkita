@@ -2,8 +2,10 @@
 
 @section('content')
 <div class="container mt-4">
-    <h3>Chat dengan {{ $user->name }}</h3>
-
+<h3>
+    Chat dengan 
+    {{ $user->outlet ? $user->outlet->nama_outlet : $user->name }}
+</h3>
     <div class="chat-box border rounded p-3 mb-3" style="height:400px; overflow-y:auto;">
         @foreach($messages as $msg)
             @if($msg->sender_id === auth()->id())
