@@ -1,0 +1,424 @@
+/* ===============================
+   GLOBAL
+================================ */
+* {
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background: #f8fafc;
+    color: #334155;
+    scroll-behavior: smooth;
+}
+
+/* BRAND */
+.teh { color: #16a34a; }
+.kita { color: #ca8a04; }
+
+/* ===============================
+   NAVBAR
+================================ */
+.navbar .nav-link {
+    font-weight: 500;
+    color: #334155;
+    transition: .3s;
+}
+
+.navbar .nav-link:hover {
+    color: #16a34a;
+}
+
+/* ===============================
+   HERO – PREMIUM VERSION
+================================ */
+
+.hero-img {
+    height: 100vh;
+    object-fit: cover;
+    filter: brightness(65%) saturate(105%);
+}
+
+/* overlay lebih soft & elegan */
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to bottom,
+        rgba(2, 6, 23, 0.25),
+        rgba(2, 6, 23, 0.7)
+    );
+}
+
+.hero-content {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 0 20px;
+    animation: fadeUp 1.2s ease;
+}
+
+/* ===== TITLE (INI ANDALANNYA) ===== */
+.hero-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 3.4rem;
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: 0.6px;
+
+    background: linear-gradient(
+        90deg,
+        #f8fafc,
+        #99f6e4,
+        #7dd3fc
+    );
+
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    text-shadow:
+        0 8px 30px rgba(0,0,0,.35);
+}
+
+/* subtitle lebih tenang */
+.hero-sub {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 500;
+    color: #e2e8f0;
+    margin-top: 14px;
+    max-width: 600px;
+}
+
+/* alamat */
+.hero-address {
+    font-size: .95rem;
+    color: #cbd5e1;
+    margin-top: 12px;
+}
+
+/* button */
+.hero-btn {
+    margin-top: 32px;
+}
+
+.hero-btn .btn {
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    padding: 10px 28px;
+}
+
+/* responsive */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.4rem;
+    }
+
+    .hero-sub {
+        font-size: 1rem;
+    }
+}
+
+/* ===============================
+   WELCOME
+================================ */
+.welcome-section {
+    background: linear-gradient(180deg, #ffffff, #f8fafc);
+}
+
+.welcome-title {
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: #166534;
+    margin-bottom: 10px;
+}
+
+.welcome-subtitle {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #ca8a04;
+    margin-bottom: 25px;
+}
+
+.welcome-text {
+    font-size: 1rem;
+    color: #475569;
+    line-height: 1.8;
+    margin-bottom: 14px;
+}
+
+.welcome-divider {
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(to right, #22c55e, #fde047);
+    margin: 30px auto;
+    border-radius: 10px;
+}
+
+.welcome-note {
+    font-size: .95rem;
+    color: #64748b;
+    font-style: italic;
+}
+
+/* ===============================
+   SECTION
+================================ */
+.section {
+    padding: 90px 20px;
+}
+
+.section-title {
+    text-align: center;
+    font-weight: 700;
+    color: #166534;
+    margin-bottom: 40px;
+}
+
+/* ===============================
+   INFO CARD (FIX GEDE SEBELAH)
+================================ */
+.info-card {
+    background: #ffffff;
+    padding: 32px 24px;
+    border-radius: 18px;
+    text-align: center;
+    box-shadow: 0 12px 30px rgba(0,0,0,.06);
+    transition: all .4s ease;
+    position: relative;
+    overflow: hidden;
+
+    /* 🔥 PENTING: SAMAIN TINGGI */
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    animation: fadeScale .8s ease both;
+}
+
+/* icon */
+.info-card i {
+    font-size: 2.3rem;
+    color: #22c55e;
+    margin-bottom: 12px;
+    transition: .4s;
+}
+
+/* hover hidup */
+.info-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0,0,0,.12);
+}
+
+.info-card:hover i {
+    transform: scale(1.15) rotate(5deg);
+}
+
+/* garis bawah animasi */
+.info-card::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    width: 100%;
+    background: linear-gradient(to right, #22c55e, #fde047);
+    transform: scaleX(0);
+    transition: .4s;
+}
+
+.info-card:hover::after {
+    transform: scaleX(1);
+}
+
+/* ===============================
+   JAM OPERASIONAL (HIGHLIGHT RAPiH)
+================================ */
+.info-card.highlight {
+    background: linear-gradient(135deg, #ecfdf5, #f0fdf4);
+    border: 2px solid #22c55e;
+    padding: 30px 24px;
+}
+
+.info-card.highlight i {
+    color: #16a34a;
+}
+
+.info-card.highlight strong {
+    color: #ca8a04;
+    font-size: 1.15rem;
+}
+
+.info-card.highlight p {
+    margin-bottom: 6px;
+    line-height: 1.6;
+}
+
+/* denyut halus */
+.info-card.highlight {
+    animation: pulseSoft 3s infinite;
+}
+
+/* ===============================
+   CABANG
+================================ */
+.cabang-list {
+    list-style: none;
+    max-width: 650px;
+    margin: auto;
+    padding: 0;
+}
+
+.cabang-list li {
+    margin-bottom: 14px;
+}
+
+.cabang-list a {
+    color: #166534;
+    text-decoration: none;
+    font-weight: 500;
+    transition: .3s;
+}
+
+.cabang-list a:hover {
+    color: #ca8a04;
+    padding-left: 6px;
+}
+
+/* ===============================
+   SOP
+================================ */
+.sop-list {
+    list-style: none;
+    max-width: 650px;
+    margin: auto;
+    padding: 0;
+}
+
+.sop-list li {
+    margin-bottom: 14px;
+    font-size: .95rem;
+}
+
+.sop-list i {
+    color: #22c55e;
+    margin-right: 8px;
+}
+
+/* ===============================
+   FOOTER
+================================ */
+.footer {
+    background: #022c22;
+    color: #e5e7eb;
+    padding: 35px 0;
+}
+
+.footer .social a {
+    font-size: 1.4rem;
+    color: #e5e7eb;
+    transition: .3s;
+}
+
+.footer .social a:hover {
+    color: #22c55e;
+}
+
+/* ===============================
+   ANIMATIONS
+================================ */
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeScale {
+    from {
+        opacity: 0;
+        transform: scale(.92);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes pulseSoft {
+    0% {
+        box-shadow: 0 0 0 0 rgba(34,197,94,.35);
+    }
+    70% {
+        box-shadow: 0 0 0 14px rgba(34,197,94,0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(34,197,94,0);
+    }
+}
+
+/* =========================
+   FOOTER
+========================= */
+.footer {
+    background-color: #111;
+    color: #ccc;
+    padding: 30px 0;
+    margin-top: 60px;
+}
+
+.footer p {
+    margin: 0;
+    font-size: 14px;
+}
+
+/* Email */
+.footer-email {
+    color: #f1f1f1;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.footer-email:hover {
+    color: #25d366; /* hijau soft */
+    text-decoration: underline;
+}
+
+/* Social Icons */
+.footer .social {
+    margin-top: 10px;
+}
+
+.footer .social a {
+    color: #ccc;
+    font-size: 22px;
+    margin: 0 8px;
+    display: inline-block;
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.footer .social a:hover {
+    color: #25d366;
+    transform: scale(1.2);
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+    .footer {
+        padding: 25px 10px;
+    }
+
+    .footer .social a {
+        font-size: 20px;
+        margin: 0 6px;
+    }
+}

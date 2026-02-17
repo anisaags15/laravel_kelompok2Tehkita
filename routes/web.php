@@ -2,8 +2,14 @@
 
 use Illuminate\Support\Facades\Route;
 
+/*
+|--------------------------------------------------------------------------
+| CONTROLLERS
+|--------------------------------------------------------------------------
+*/
+
 use App\Http\Controllers\Auth\ProfileController;
-use App\Http\Controllers\Admin\DashboardController; // ✅ FIXED (ADMIN)
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\OutletController;
 use App\Http\Controllers\BahanController;
 use App\Http\Controllers\StokMasukController;
@@ -15,59 +21,68 @@ use App\Http\Controllers\NotifikasiController;
 
 /*
 |--------------------------------------------------------------------------
-| PUBLIC
+| PUBLIC AREA
 |--------------------------------------------------------------------------
 */
+
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('home');
+
 
 /*
 |--------------------------------------------------------------------------
 | DASHBOARD REDIRECT (ROLE BASED)
 |--------------------------------------------------------------------------
 */
+
 Route::middleware('auth')->get('/dashboard', function () {
+
     return match (auth()->user()->role) {
         'admin' => redirect()->route('admin.dashboard'),
         'user'  => redirect()->route('user.dashboard'),
         default => abort(403),
     };
+
 })->name('dashboard');
+
 
 /*
 |--------------------------------------------------------------------------
 | ADMIN AREA
 |--------------------------------------------------------------------------
 */
+
 Route::middleware(['auth', 'role:admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
 
-        // ✅ DASHBOARD CONTROLLER (SUDAH BENAR)
+        // Dashboard
         Route::get('/dashboard', [DashboardController::class, 'dashboard'])
             ->name('dashboard');
 
-        Route::resources([
-            'outlet'      => OutletController::class,
-            'bahan'       => BahanController::class,
-            'stok-masuk'  => StokMasukController::class,
-            'distribusi'  => DistribusiController::class,
-            'stok-outlet' => StokOutletController::class,
-        ]);
+        // Resource Controllers
+        Route::resource('outlet', OutletController::class);
+        Route::resource('bahan', BahanController::class);
+        Route::resource('stok-masuk', StokMasukController::class);
+        Route::resource('distribusi', DistribusiController::class);
+        Route::resource('stok-outlet', StokOutletController::class);
     });
+
 
 /*
 |--------------------------------------------------------------------------
 | USER AREA
 |--------------------------------------------------------------------------
 */
+
 Route::middleware(['auth', 'role:user'])
     ->prefix('user')
     ->name('user.')
     ->group(function () {
 
+        // Dashboard
         Route::get('/dashboard', function () {
 
             $user = auth()->user();
@@ -102,27 +117,26 @@ Route::middleware(['auth', 'role:user'])
 
         })->name('dashboard');
 
-        Route::get('/pemakaian', [PemakaianController::class, 'index'])
-            ->name('pemakaian.index');
+        // Pemakaian
+        Route::resource('pemakaian', PemakaianController::class)
+            ->only(['index', 'create', 'store']);
 
-        Route::get('/pemakaian/create', [PemakaianController::class, 'create'])
-            ->name('pemakaian.create');
-
-        Route::post('/pemakaian', [PemakaianController::class, 'store'])
-            ->name('pemakaian.store');
-
+        // Distribusi (user view)
         Route::get('/distribusi', [DistribusiController::class, 'indexUser'])
             ->name('distribusi.index');
 
+        // Notifikasi
         Route::get('/notifikasi', [NotifikasiController::class, 'index'])
             ->name('notifikasi');
     });
+
 
 /*
 |--------------------------------------------------------------------------
 | PROFILE
 |--------------------------------------------------------------------------
 */
+
 Route::middleware('auth')->group(function () {
 
     Route::get('/profile/edit', [ProfileController::class, 'edit'])
@@ -138,11 +152,13 @@ Route::middleware('auth')->group(function () {
         ->name('profile.update-password');
 });
 
+
 /*
 |--------------------------------------------------------------------------
 | CHAT
 |--------------------------------------------------------------------------
 */
+
 Route::middleware('auth')->group(function () {
 
     Route::get('/chat', [ChatController::class, 'index'])
@@ -155,9 +171,11 @@ Route::middleware('auth')->group(function () {
         ->name('chat.store');
 });
 
+
 /*
 |--------------------------------------------------------------------------
 | AUTH
 |--------------------------------------------------------------------------
 */
-require __DIR__ . '/auth.php';
+
+require __DIR__.'/auth.php';
