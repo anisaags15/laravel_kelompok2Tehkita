@@ -1,27 +1,48 @@
-.profile-user-card {
-    border-radius: 12px;
+/* Container Utama Kartu */
+.profile-card, .profile-right-card {
+    border-radius: 12px !important;
+    border: none !important;
+    background-color: #fff !important;
 }
 
-.profile-user-avatar {
-    width: 130px;
-    height: 130px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 4px solid #28a745;
+/* KANDANG PENGUNCI (Sangat Penting) */
+.profile-avatar-container {
+    width: 150px !important;
+    height: 150px !important;
+    max-width: 150px !important;
+    max-height: 150px !important;
+    margin: 0 auto 15px auto !important;
+    border-radius: 50% !important;
+    border: 4px solid #28a745 !important;
+    overflow: hidden !important; /* Memotong gambar raksasa */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-color: #f8f9fa !important;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
 }
 
-.profile-user-section-title {
-    font-weight: 600;
-    margin-bottom: 15px;
-    color: #28a745;
+/* FOTO (Harus Nurut Kandang) */
+.profile-avatar {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important; /* Biar wajah tetap proporsional */
+    display: block !important;
 }
 
-.profile-user-right-card {
-    border-radius: 12px;
+/* Judul Section */
+.profile-section-title {
+    font-weight: 600 !important;
+    margin-bottom: 20px !important;
+    color: #28a745 !important;
+    border-bottom: 1px solid #eee !important;
+    padding-bottom: 10px !important;
 }
 
-.profile-user-right-card .nav-tabs .nav-link.active {
-    border-bottom: 3px solid #28a745;
-    color: #28a745;
-    font-weight: 600;
+/* Navigasi Tab */
+.nav-tabs .nav-link.active {
+    border: none !important;
+    border-bottom: 3px solid #28a745 !important;
+    color: #28a745 !important;
+    font-weight: 600 !important;
 }

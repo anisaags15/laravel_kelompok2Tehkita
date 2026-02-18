@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
@@ -11,36 +10,67 @@ use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
-    /**
-     * Display the user's profile form.
-     */
+    // Tampilkan form profile sesuai role
     public function edit(Request $request): View
     {
-        return view('profile.edit', [
-            'user' => $request->user(),
-        ]);
+        $user = $request->user();
+
+        return match($user->role) {
+            'admin' => view('admin.profile.edit', compact('user')),
+            'user'  => view('user.profile.edit', compact('user')),
+            default => abort(403, 'Kamu tidak punya akses ke halaman ini'),
+        };
     }
 
-    /**
-     * Update the user's profile information.
-     */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    // Update profile info
+    public function update(ProfileUpdateRequest $request)
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
+        $data = $request->validated();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        // Handle foto profile
+        if ($request->hasFile('photo')) {
+            $file = $request->file('photo');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads/profile'), $filename);
+
+            // Hapus foto lama jika ada
+            if ($user->photo && file_exists(public_path('uploads/profile/'.$user->photo))) {
+                @unlink(public_path('uploads/profile/'.$user->photo));
+            }
+
+            $data['photo'] = $filename;
         }
 
-        $request->user()->save();
+        // Reset email verification jika email berubah
+        if ($user->email !== $data['email']) {
+            $data['email_verified_at'] = null;
+        }
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        $user->update($data);
+
+        // Redirect ke halaman profil sesuai role
+        $route = $user->role === 'admin' ? 'admin.profile.edit' : 'user.profile.edit';
+        return redirect()->route($route)->with('success', 'Profile berhasil diperbarui');
     }
 
-    /**
-     * Delete the user's account.
-     */
-    public function destroy(Request $request): RedirectResponse
+    // Update password
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'password' => ['required', 'confirmed', 'min:8'],
+        ]);
+
+        $user = $request->user();
+        $user->password = bcrypt($request->password);
+        $user->save();
+
+        $route = $user->role === 'admin' ? 'admin.profile.edit' : 'user.profile.edit';
+        return redirect()->route($route)->with('success', 'Password berhasil diperbarui');
+    }
+
+    // Hapus akun
+    public function destroy(Request $request)
     {
         $request->validateWithBag('userDeletion', [
             'password' => ['required', 'current_password'],
@@ -48,13 +78,17 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
-        Auth::logout();
+        // Hapus foto jika ada
+        if ($user->photo && file_exists(public_path('uploads/profile/'.$user->photo))) {
+            @unlink(public_path('uploads/profile/'.$user->photo));
+        }
 
+        Auth::logout();
         $user->delete();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return Redirect::to('/');
+        return redirect('/')->with('success', 'Akun berhasil dihapus');
     }
 }

@@ -3,11 +3,8 @@
     <!-- LEFT -->
     <ul class="navbar-nav align-items-center">
         <li class="nav-item">
-            <a class="nav-link text-success" data-widget="pushmenu" href="#">
-                <i class="fas fa-bars"></i>
-            </a>
+            <a class="nav-link text-success" data-widget="pushmenu" href="#"><i class="fas fa-bars"></i></a>
         </li>
-
         <li class="nav-item d-none d-sm-inline-block ml-2">
             <span class="navbar-brand font-weight-bold text-success" style="letter-spacing:1px;">
                 @if(auth()->user()->role === 'admin')
@@ -20,7 +17,7 @@
     </ul>
 
     <!-- SEARCH -->
-    <form class="form-inline mx-auto d-none d-md-flex" style="width: 40%;">
+    <form class="form-inline mx-auto d-none d-md-flex" style="width:40%;">
         <div class="input-group input-group-sm w-100">
             <input class="form-control border-0 shadow-sm" type="search" name="search" placeholder="Cari data..." style="border-radius:20px 0 0 20px;">
             <div class="input-group-append">
@@ -33,7 +30,6 @@
 
     <!-- RIGHT -->
     <ul class="navbar-nav align-items-center">
-
         @auth
         <li class="nav-item dropdown user-menu">
             <a href="#" class="nav-link dropdown-toggle d-flex align-items-center" data-toggle="dropdown">
@@ -53,9 +49,12 @@
                 <div class="dropdown-divider"></div>
 
                 {{-- PROFILE LINK SESUAI ROLE --}}
-                <a href="{{ route('profile.edit') }}" class="dropdown-item text-success">
-                    <i class="fas fa-user mr-2"></i> Profile
-                </a>
+                <<a href="{{ auth()->user()->role === 'admin' 
+            ? route('admin.profile.edit') 
+            : route('user.profile.edit') }}"
+   class="dropdown-item text-success">
+    <i class="fas fa-user mr-2"></i> Profile
+</a>
 
                 <div class="dropdown-divider"></div>
 
@@ -66,6 +65,5 @@
             </div>
         </li>
         @endauth
-
     </ul>
 </nav>

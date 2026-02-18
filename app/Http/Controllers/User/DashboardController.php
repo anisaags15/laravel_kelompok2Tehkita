@@ -15,33 +15,41 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
+        if (!$user || !$user->outlet_id) {
+            abort(403, 'Outlet tidak ditemukan untuk user ini.');
+        }
+
+        $outletId = $user->outlet_id;
+
         // TOTAL STOK OUTLET
-        $totalStok = StokOutlet::where('outlet_id', $user->outlet_id)
+        $totalStok = StokOutlet::where('outlet_id', $outletId)
             ->sum('stok');
 
-        // PEMAKAIAN BAHAN HARI INI
-        $pemakaian = Pemakaian::where('outlet_id', $user->outlet_id)
+        // PEMAKAIAN HARI INI
+        $pemakaianHariIni = Pemakaian::where('outlet_id', $outletId)
             ->whereDate('tanggal', now())
             ->sum('jumlah');
 
         // TOTAL DISTRIBUSI
-        $distribusi = Distribusi::where('outlet_id', $user->outlet_id)
+        $distribusi = Distribusi::where('outlet_id', $outletId)
             ->sum('jumlah');
 
-        // OPTIONAL: data detail terakhir 5 stok dan pemakaian
+        // DETAIL TERBARU
         $stokOutlets = StokOutlet::with('bahan')
-            ->where('outlet_id', $user->outlet_id)
+            ->where('outlet_id', $outletId)
+            ->latest()
+            ->take(5)
             ->get();
 
         $pemakaians = Pemakaian::with('bahan')
-            ->where('outlet_id', $user->outlet_id)
+            ->where('outlet_id', $outletId)
             ->latest()
-            ->limit(5)
+            ->take(5)
             ->get();
 
         return view('user.dashboard', compact(
             'totalStok',
-            'pemakaian',
+            'pemakaianHariIni',
             'distribusi',
             'stokOutlets',
             'pemakaians'
