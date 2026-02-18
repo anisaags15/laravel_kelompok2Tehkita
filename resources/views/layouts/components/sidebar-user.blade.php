@@ -1,5 +1,4 @@
 <aside class="main-sidebar sidebar-light-success elevation-3">
-
     <a href="{{ route('user.dashboard') }}" class="brand-link d-flex align-items-center px-3">
         <div class="brand-image d-flex align-items-center justify-content-center"
              style="width:40px;height:40px;border-radius:50%;background:#28a745;color:white;font-weight:bold;box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
@@ -11,7 +10,6 @@
     <div class="sidebar">
         <div class="user-panel mt-4 pb-3 mb-3 d-flex align-items-center px-3 border-bottom-0">
             <div class="image">
-                {{-- Container Foto Sidebar --}}
                 <div style="width:45px; height:45px; border-radius:50%; overflow:hidden; border: 2px solid #28a745;">
                     <img src="{{ auth()->user()->photo ? asset('uploads/profile/' . auth()->user()->photo) : 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->name) . '&background=28a745&color=fff' }}"
                          style="width:100%; height:100%; object-fit:cover;" 
@@ -23,7 +21,6 @@
                 <a href="{{ route('user.profile.edit') }}" class="text-success small">
                     <i class="fas fa-circle text-success mr-1" style="font-size: 8px;"></i> Online
                 </a>
-                    <!-- LINK PROFILE HARUS SESUAI ROLE ADMIN -->
                 <a href="{{ route('user.profile.edit') }}" class="text-success small d-block mt-1">
                     <i class="fas fa-user-circle mr-1"></i> Lihat Profil
                 </a>
@@ -65,6 +62,14 @@
 
                 <li class="nav-header text-uppercase small font-weight-bold text-muted">Sistem</li>
 
+                {{-- MENU CHAT (DITAMBAHKAN DISINI) --}}
+                <li class="nav-item">
+                    <a href="{{ route('chat.index') }}" class="nav-link {{ request()->routeIs('chat.*') ? 'active bg-success' : '' }}">
+                        <i class="nav-icon fas fa-comments"></i>
+                        <p>Chat Pusat</p>
+                    </a>
+                </li>
+
                 <li class="nav-item">
                     <a href="{{ route('user.notifikasi') }}" class="nav-link {{ request()->routeIs('user.notifikasi') ? 'active bg-success' : '' }}">
                         <i class="nav-icon fas fa-bell"></i>
@@ -72,7 +77,7 @@
                     </a>
                 </li>
 
-                <li class="nav-item">
+                <li class="nav-item mt-3">
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
                         <button type="submit" class="nav-link btn btn-link text-left w-100 text-danger border-0">
