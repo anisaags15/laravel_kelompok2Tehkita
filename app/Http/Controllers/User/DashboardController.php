@@ -8,6 +8,7 @@ use App\Models\StokOutlet;
 use App\Models\Pemakaian;
 use App\Models\Distribusi;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -20,30 +21,35 @@ class DashboardController extends Controller
         }
 
         $outletId = $user->outlet_id;
+        $hariIni = Carbon::today();
+        $awalBulan = Carbon::now()->startOfMonth();
 
-        // TOTAL STOK OUTLET
+        // 1. TOTAL JENIS BAHAN (Menghitung berapa macam barang yang ada stoknya)
         $totalStok = StokOutlet::where('outlet_id', $outletId)
-            ->sum('stok');
+            ->where('stok', '>', 0)
+            ->count(); 
 
-        // PEMAKAIAN HARI INI
+        // 2. PEMAKAIAN HARI INI (Total unit yang dipakai hari ini)
         $pemakaianHariIni = Pemakaian::where('outlet_id', $outletId)
-            ->whereDate('tanggal', now())
+            ->whereDate('tanggal', $hariIni)
             ->sum('jumlah');
 
-        // TOTAL DISTRIBUSI
+        // 3. DISTRIBUSI BULAN INI (Hanya hitung barang masuk dari tanggal 1 sampai sekarang)
+        // Ini solusi supaya angka '100' tadi tidak muncul terus kalau datanya data lama
         $distribusi = Distribusi::where('outlet_id', $outletId)
+            ->whereBetween('created_at', [$awalBulan, Carbon::now()])
             ->sum('jumlah');
 
-        // DETAIL TERBARU
+        // 4. DATA TABEL STOK (Kiri)
         $stokOutlets = StokOutlet::with('bahan')
             ->where('outlet_id', $outletId)
-            ->latest()
-            ->take(5)
             ->get();
 
+        // 5. DATA TABEL PEMAKAIAN (Kanan)
         $pemakaians = Pemakaian::with('bahan')
             ->where('outlet_id', $outletId)
-            ->latest()
+            ->latest('tanggal')
+            ->latest('created_at')
             ->take(5)
             ->get();
 

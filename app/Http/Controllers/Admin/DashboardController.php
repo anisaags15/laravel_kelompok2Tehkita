@@ -9,7 +9,10 @@ use App\Models\StokMasuk;
 use App\Models\Distribusi;
 use App\Models\Pemakaian;
 use App\Models\Message;
+use App\Models\StokOutlet; // <--- WAJIB ADA INI
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -20,19 +23,27 @@ class DashboardController extends Controller
         | 1️⃣ STATISTIK UTAMA
         |--------------------------------------------------------------------------
         */
-
         $outlet     = Outlet::count();
         $bahan      = Bahan::count();
         $stokMasuk  = StokMasuk::count();
         $distribusi = Distribusi::count();
 
+        /*
+        |--------------------------------------------------------------------------
+        | 2️⃣ RADAR STOK KRITIS (EARLY WARNING SYSTEM) - NEW! 🚨
+        |--------------------------------------------------------------------------
+        | Mencari bahan di outlet yang sisa stoknya 5 atau kurang.
+        */
+        $stokKritis = StokOutlet::with(['outlet', 'bahan'])
+            ->where('stok', '<=', 5)
+            ->orderBy('stok', 'asc') // Urutkan dari yang paling sedikit
+            ->get();
 
         /*
         |--------------------------------------------------------------------------
-        | 2️⃣ DATA TERBARU
+        | 3️⃣ DATA TERBARU
         |--------------------------------------------------------------------------
         */
-
         $outlets = Outlet::latest()->take(5)->get();
 
         $latestDistribusi = Distribusi::with(['outlet', 'bahan'])
@@ -45,42 +56,37 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-
         /*
         |--------------------------------------------------------------------------
-        | 3️⃣ DATA CHAT
+        | 4️⃣ DATA CHAT
         |--------------------------------------------------------------------------
         */
-
         $unreadCount = 0;
         $latestChats = collect();
 
+        // Cek standar apakah model Message ada (untuk safety)
         if (class_exists(Message::class)) {
-
             $unreadCount = Message::where('receiver_id', Auth::id())
                 ->where('is_read', 0)
                 ->count();
 
-$latestChats = Message::with([
-        'sender.outlet',
-        'receiver.outlet'
-    ])
-    ->where(function ($query) {
-        $query->where('sender_id', Auth::id())
-              ->orWhere('receiver_id', Auth::id());
-    })
-    ->latest()
-    ->take(10)
-    ->get();
+            $latestChats = Message::with(['sender.outlet', 'receiver.outlet'])
+                ->where(function ($query) {
+                    $query->where('sender_id', Auth::id())
+                          ->orWhere('receiver_id', Auth::id());
+                })
+                ->latest()
+                ->take(10)
+                ->get();
         }
+
         /*
         |--------------------------------------------------------------------------
-        | 4️⃣ DATA GRAFIK PEMAKAIAN
+        | 5️⃣ DATA GRAFIK PEMAKAIAN
         |--------------------------------------------------------------------------
         */
-
         $outletList = Outlet::take(5)->get();
-
+        
         $labels = Pemakaian::select('tanggal')
             ->distinct()
             ->orderBy('tanggal')
@@ -90,72 +96,63 @@ $latestChats = Message::with([
         $datasets = [];
 
         foreach ($outletList as $o) {
-
             $dataPemakaian = Pemakaian::where('outlet_id', $o->id)
                 ->orderBy('tanggal')
                 ->pluck('jumlah')
                 ->toArray();
 
+            // Handle jika data kosong/tidak sinkron tanggalnya (opsional, tapi biar aman)
+            // Di sini kita pakai raw data dulu sesuai kodemu yang lama
+            
             $datasets[] = [
-                'label' => $o->nama_outlet,
-                'data' => $dataPemakaian,
-                'borderColor' => '#' . substr(md5($o->id), 0, 6),
+                'label'           => $o->nama_outlet,
+                'data'            => $dataPemakaian,
+                'borderColor'     => '#' . substr(md5($o->id), 0, 6),
                 'backgroundColor' => 'transparent',
-                'tension' => 0.4,
-                'fill' => false,
+                'tension'         => 0.4,
+                'fill'            => false,
             ];
         }
 
         $pemakaianChart = [
-            'labels' => $labels,
+            'labels'   => $labels,
             'datasets' => $datasets
         ];
 
-/*
-|--------------------------------------------------------------------------
-| 5️⃣ DATA KALENDER DISTRIBUSI (PREMIUM)
-|--------------------------------------------------------------------------
-*/
-
-$calendarEvents = Distribusi::with('outlet')
-    ->get()
-    ->map(function ($item) {
-
-        // generate warna unik tiap outlet
-        $color = '#' . substr(md5($item->outlet_id), 0, 6);
-
-        return [
-            'title' => $item->outlet->nama_outlet,
-            'start' => \Carbon\Carbon::parse($item->tanggal)->format('Y-m-d'),
-            'backgroundColor' => $color,
-            'borderColor' => $color,
-            'extendedProps' => [
-                'jumlah' => $item->jumlah,
-                'url' => route('admin.distribusi.index'),
-            ],
-        ];
-    })
-    ->values()
-    ->toArray();
+        /*
+        |--------------------------------------------------------------------------
+        | 6️⃣ DATA KALENDER DISTRIBUSI
+        |--------------------------------------------------------------------------
+        */
+        $calendarEvents = Distribusi::with('outlet')
+            ->get()
+            ->map(function ($item) {
+                $color = '#' . substr(md5($item->outlet_id), 0, 6);
+                return [
+                    'title'           => $item->outlet->nama_outlet ?? 'Outlet Hapus',
+                    'start'           => Carbon::parse($item->tanggal)->format('Y-m-d'),
+                    'backgroundColor' => $color,
+                    'borderColor'     => $color,
+                    'extendedProps'   => [
+                        'jumlah' => $item->jumlah,
+                        'url'    => route('admin.distribusi.index'),
+                    ],
+                ];
+            })
+            ->values()
+            ->toArray();
 
         /*
         |--------------------------------------------------------------------------
-        | 6️⃣ RETURN VIEW
+        | 7️⃣ RETURN VIEW
         |--------------------------------------------------------------------------
         */
-
         return view('admin.dashboard', compact(
-            'outlet',
-            'bahan',
-            'stokMasuk',
-            'distribusi',
-            'outlets',
-            'latestDistribusi',
-            'latestStokMasuk',
-            'unreadCount',
-            'latestChats',
-            'pemakaianChart',
-            'calendarEvents'
+            'outlet', 'bahan', 'stokMasuk', 'distribusi', // Stats
+            'stokKritis', // <--- Variabel Baru
+            'outlets', 'latestDistribusi', 'latestStokMasuk', // Tables
+            'unreadCount', 'latestChats', // Chat
+            'pemakaianChart', 'calendarEvents' // Charts
         ));
     }
 }

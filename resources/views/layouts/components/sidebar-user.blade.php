@@ -70,13 +70,13 @@
                     </a>
                 </li>
 
-                <li class="nav-item">
-                    <a href="{{ route('user.notifikasi') }}" class="nav-link {{ request()->routeIs('user.notifikasi') ? 'active bg-success' : '' }}">
-                        <i class="nav-icon fas fa-bell"></i>
-                        <p>Notifikasi</p>
-                    </a>
-                </li>
-
+{{-- Ganti baris 74 menjadi seperti ini --}}
+<li class="nav-item">
+    <a href="{{ route('user.notifikasi.index') }}" class="nav-link {{ request()->routeIs('user.notifikasi.index') ? 'active bg-success' : '' }}">
+        <i class="nav-icon fas fa-bell"></i>
+        <p>Notifikasi</p>
+    </a>
+</li>
                 <li class="nav-item mt-3">
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
