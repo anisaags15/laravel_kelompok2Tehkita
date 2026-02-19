@@ -80,45 +80,55 @@ class DashboardController extends Controller
                 ->get();
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | 5️⃣ DATA GRAFIK PEMAKAIAN
-        |--------------------------------------------------------------------------
-        */
-        $outletList = Outlet::take(5)->get();
+/*
+/*
+|--------------------------------------------------------------------------
+| 5️⃣ DATA GRAFIK PEMAKAIAN (REVISI DINAMIS)
+|--------------------------------------------------------------------------
+*/
+// Ambil 7 tanggal terakhir secara berurutan
+$labels = Pemakaian::select('tanggal')
+    ->distinct()
+    ->orderBy('tanggal', 'asc')
+    ->take(7) 
+    ->pluck('tanggal')
+    ->toArray();
+
+$outletList = Outlet::take(5)->get();
+$datasets = [];
+
+foreach ($outletList as $index => $o) {
+    $dataPemakaian = [];
+    
+    foreach ($labels as $tgl) {
+        $total = Pemakaian::where('outlet_id', $o->id)
+            ->where('tanggal', $tgl)
+            ->sum('jumlah'); 
         
-        $labels = Pemakaian::select('tanggal')
-            ->distinct()
-            ->orderBy('tanggal')
-            ->pluck('tanggal')
-            ->toArray();
+        $dataPemakaian[] = $total;
+    }
 
-        $datasets = [];
+    $colors = ['#198754', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'];
+    $color = $colors[$index] ?? '#' . substr(md5($o->id), 0, 6);
 
-        foreach ($outletList as $o) {
-            $dataPemakaian = Pemakaian::where('outlet_id', $o->id)
-                ->orderBy('tanggal')
-                ->pluck('jumlah')
-                ->toArray();
+    $datasets[] = [
+        'label'           => $o->nama_outlet,
+        'data'            => $dataPemakaian,
+        'borderColor'     => $color,
+        'backgroundColor' => $color . '15', // Efek bayangan halus (lebih tipis)
+        'tension'         => 0.4,
+        'fill'            => true,
+        'pointRadius'     => 4,
+        'pointHoverRadius'=> 6,
+    ];
+}
 
-            // Handle jika data kosong/tidak sinkron tanggalnya (opsional, tapi biar aman)
-            // Di sini kita pakai raw data dulu sesuai kodemu yang lama
-            
-            $datasets[] = [
-                'label'           => $o->nama_outlet,
-                'data'            => $dataPemakaian,
-                'borderColor'     => '#' . substr(md5($o->id), 0, 6),
-                'backgroundColor' => 'transparent',
-                'tension'         => 0.4,
-                'fill'            => false,
-            ];
-        }
-
-        $pemakaianChart = [
-            'labels'   => $labels,
-            'datasets' => $datasets
-        ];
-
+$pemakaianChart = [
+    'labels'   => array_map(function($tgl) { 
+        return \Carbon\Carbon::parse($tgl)->format('d M'); 
+    }, $labels),
+    'datasets' => $datasets
+];
         /*
         |--------------------------------------------------------------------------
         | 6️⃣ DATA KALENDER DISTRIBUSI

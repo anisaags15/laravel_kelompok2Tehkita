@@ -77,31 +77,32 @@
 
 {{-- ================= GRAFIK & KALENDER ================= --}}
 <div class="row">
-
     <div class="col-lg-8 mb-4">
         <div class="card shadow-sm border-0 h-100">
-            <div class="card-header bg-white border-0">
+            <div class="card-header bg-white border-0 py-3">
                 <h5 class="fw-semibold mb-0">Grafik Pemakaian 5 Outlet</h5>
             </div>
             <div class="card-body">
-                <canvas id="pemakaianChart" height="100"></canvas>
+                <div style="position: relative; height: 400px; width: 100%;">
+                    <canvas id="pemakaianChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="col-lg-4 mb-4">
         <div class="card shadow-sm border-0 h-100">
-            <div class="card-header bg-white border-0">
+            <div class="card-header bg-white border-0 py-3">
                 <h5 class="fw-semibold mb-0">Kalender Distribusi</h5>
             </div>
             <div class="card-body">
-                <div id="calendar"></div>
+                <div id="calendar-container" style="height: 400px;">
+                    <div id="calendar"></div>
+                </div>
             </div>
         </div>
     </div>
-
 </div>
-
 
 {{-- ================= TABLE SECTION ================= --}}
 <div class="row">
@@ -276,8 +277,7 @@
 @push('js')
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-
-    // ================= CHART =================
+    // --- 1. INISIALISASI GRAFIK ---
     const ctx = document.getElementById('pemakaianChart');
     if (ctx) {
         new Chart(ctx, {
@@ -285,47 +285,42 @@ document.addEventListener("DOMContentLoaded", function () {
             data: @json($pemakaianChart ?? []),
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
-                    legend: { position: 'bottom' }
+                    legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true } }
                 },
-                interaction: {
-                    mode: 'index',
-                    intersect: false,
-                },
-                tension: 0.4
+                scales: {
+                    y: { beginAtZero: true, grid: { color: '#f0f0f0' } },
+                    x: { grid: { display: false } }
+                }
             }
         });
     }
 
-    // ================= FULLCALENDAR PREMIUM =================
+    // --- 2. INISIALISASI KALENDER (CALENDER CANTIKMU) ---
     const calendarEl = document.getElementById('calendar');
-
     if (calendarEl) {
-
         const calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
-            height: 500,
-            events: @json($calendarEvents ?? []),
-
-            eventDidMount: function(info) {
-                // Tooltip hover
-                info.el.setAttribute(
-                    "title",
-                    "Jumlah Distribusi: " + info.event.extendedProps.jumlah
-                );
+            height: '100%', // Mengikuti container 400px
+            headerToolbar: {
+                left: 'prev,next',
+                center: 'title',
+                right: 'today'
             },
-
+            events: @json($calendarEvents ?? []),
+            eventDidMount: function(info) {
+                info.el.style.cursor = 'pointer';
+                info.el.setAttribute("title", "Jumlah: " + info.event.extendedProps.jumlah);
+            },
             eventClick: function(info) {
                 if (info.event.extendedProps.url) {
                     window.location.href = info.event.extendedProps.url;
                 }
             }
         });
-
         calendar.render();
     }
-
 });
 </script>
 @endpush
-
