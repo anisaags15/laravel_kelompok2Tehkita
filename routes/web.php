@@ -43,15 +43,23 @@ Route::prefix('admin')->middleware(['auth','role:admin'])->name('admin.')->group
 
 /* --- USER AREA (OUTLET) --- */
 Route::prefix('user')->middleware(['auth','role:user'])->name('user.')->group(function() {
+    // Halaman Utama/Ringkasan
     Route::get('/dashboard', [UserDashboardController::class,'index'])->name('dashboard');
+    
+    // Riwayat Pemakaian (index), Form Tambah (create), dan Proses Simpan (store)
+    // Route ini otomatis menciptakan nama: user.pemakaian.index, user.pemakaian.create, dll.
     Route::resource('pemakaian', PemakaianController::class)->only(['index','create','store']);
+    
+    // Stok dan Distribusi
     Route::get('/distribusi', [DistribusiController::class,'indexUser'])->name('distribusi.index');
     Route::get('/stok-outlet', [StokOutletController::class,'indexUser'])->name('stok-outlet.index');
 
+    // Pengaturan Profil
     Route::get('/profile/edit', [ProfileController::class,'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class,'update'])->name('profile.update');
     Route::post('/profile/update-password', [ProfileController::class,'updatePassword'])->name('profile.update-password');
 
+    // Sistem Notifikasi
     Route::get('/notifikasi', [NotifikasiController::class,'index'])->name('notifikasi.index');
 });
 

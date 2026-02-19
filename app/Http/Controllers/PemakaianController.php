@@ -11,16 +11,18 @@ use Illuminate\Support\Facades\Auth;
 class PemakaianController extends Controller
 {
     /**
-     * Tampilkan daftar pemakaian (user/outlet)
+     * Tampilkan daftar pemakaian lengkap dengan Pagination
      */
     public function index()
     {
         $user = Auth::user();
 
+        // Menggunakan paginate agar halaman riwayat tidak terlalu panjang
         $pemakaians = Pemakaian::with('bahan')
             ->where('outlet_id', $user->outlet_id)
-            ->orderBy('tanggal', 'desc')
-            ->get();
+            ->latest('tanggal')
+            ->latest('created_at')
+            ->paginate(10); 
 
         return view('user.pemakaian.index', compact('pemakaians'));
     }
@@ -32,9 +34,10 @@ class PemakaianController extends Controller
     {
         $user = Auth::user();
 
-        // Ambil stok bahan yang ada di outlet user
+        // Hanya ambil bahan yang stoknya lebih dari 0 untuk ditampilkan di form
         $stokOutlets = StokOutlet::with('bahan')
             ->where('outlet_id', $user->outlet_id)
+            ->where('stok', '>', 0)
             ->get();
 
         return view('user.pemakaian.create', compact('stokOutlets'));
@@ -53,17 +56,18 @@ class PemakaianController extends Controller
 
         $user = Auth::user();
 
-        // Ambil stok outlet terkait
+        // Ambil data stok outlet
         $stokOutlet = StokOutlet::where('outlet_id', $user->outlet_id)
             ->where('bahan_id', $request->bahan_id)
             ->first();
 
+        // Validasi kecukupan stok sebelum menyimpan
         if (!$stokOutlet || $stokOutlet->stok < $request->jumlah) {
             return redirect()->back()
-                ->with('error', 'Stok bahan tidak cukup atau belum tersedia.');
+                ->with('error', 'Maaf, stok bahan tidak mencukupi untuk jumlah tersebut.');
         }
 
-        // Simpan pemakaian
+        // Simpan transaksi pemakaian
         Pemakaian::create([
             'bahan_id'  => $request->bahan_id,
             'outlet_id' => $user->outlet_id,
@@ -71,34 +75,32 @@ class PemakaianController extends Controller
             'tanggal'   => $request->tanggal,
         ]);
 
-        // Kurangi stok di outlet
-        $stokOutlet->stok -= $request->jumlah;
-        $stokOutlet->save();
+        // Kurangi jumlah stok di tabel stok_outlets
+        $stokOutlet->decrement('stok', $request->jumlah);
 
         return redirect()->route('user.pemakaian.index')
-            ->with('success', 'Pemakaian bahan berhasil dicatat');
+            ->with('success', 'Pemakaian bahan berhasil dicatat dan stok telah diperbarui.');
     }
 
     /**
-     * Hapus data pemakaian dan tambahkan stok kembali
+     * Hapus data pemakaian dan kembalikan stoknya
      */
     public function destroy($id)
     {
         $pemakaian = Pemakaian::findOrFail($id);
 
-        // Tambah stok kembali
+        // Cari stok terkait untuk mengembalikan jumlah yang dihapus
         $stokOutlet = StokOutlet::where('outlet_id', $pemakaian->outlet_id)
             ->where('bahan_id', $pemakaian->bahan_id)
             ->first();
 
         if ($stokOutlet) {
-            $stokOutlet->stok += $pemakaian->jumlah;
-            $stokOutlet->save();
+            $stokOutlet->increment('stok', $pemakaian->jumlah);
         }
 
         $pemakaian->delete();
 
         return redirect()->route('user.pemakaian.index')
-            ->with('success', 'Data pemakaian berhasil dihapus');
+            ->with('success', 'Data pemakaian berhasil dihapus dan stok telah dikembalikan.');
     }
 }
