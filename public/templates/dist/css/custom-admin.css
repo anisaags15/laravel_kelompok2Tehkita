@@ -1,5 +1,5 @@
 /* ===============================
-   GLOBAL
+    GLOBAL
 =================================*/
 body {
     font-family: 'Poppins', sans-serif;
@@ -12,7 +12,7 @@ body {
 }
 
 /* ===============================
-   NAVBAR
+    NAVBAR
 =================================*/
 .main-header {
     background: #ffffff;
@@ -49,7 +49,7 @@ body {
 }
 
 /* ===============================
-   SIDEBAR
+    SIDEBAR
 =================================*/
 .main-sidebar {
     background: linear-gradient(180deg, #e8f5e9, #d7f2e3);
@@ -107,12 +107,13 @@ body {
 }
 
 /* ===============================
-   CARD
+    CARD
 =================================*/
 .card {
     border: none;
     border-radius: 18px;
     box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+    overflow: hidden; /* Added: Biar border-radius card memotong isi tabel */
 }
 
 .card-header {
@@ -122,7 +123,7 @@ body {
 }
 
 /* ===============================
-   TABLE
+    TABLE
 =================================*/
 .table {
     border-radius: 14px;
@@ -134,8 +135,12 @@ body {
     background-color: #e8f5e9;
 }
 
+.table td {
+    vertical-align: middle !important; /* Added: Biar konten tabel rata tengah secara vertikal */
+}
+
 /* ===============================
-   FOOTER
+    FOOTER
 =================================*/
 .main-footer {
     background: #ffffff;
@@ -164,7 +169,21 @@ body {
     font-size: 22px;
 }
 
+/* ================= UTILITY & NOTIF COLORS ================= */
 .bg-soft-success { background: rgba(25,135,84,.1); color:#198754; }
 .bg-soft-info { background: rgba(13,202,240,.1); color:#0dcaf0; }
 .bg-soft-warning { background: rgba(255,193,7,.1); color:#ffc107; }
 .bg-soft-danger { background: rgba(220,53,69,.1); color:#dc3545; }
+
+/* Message item hover effect */
+.message-item {
+    transition: 0.3s;
+    background-color: #f8f9fa;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.message-item:hover {
+    background-color: #eef2f7 !important;
+    transform: translateX(5px);
+}
