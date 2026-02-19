@@ -10,6 +10,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             OutletSeeder::class,
+            AdminSeeder::class, // Tambahkan ini agar adminnya otomatis dibuat
         ]);
     }
 }
