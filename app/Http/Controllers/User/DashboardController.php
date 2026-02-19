@@ -9,6 +9,7 @@ use App\Models\Pemakaian;
 use App\Models\Distribusi;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -16,6 +17,7 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
+        // Safety check
         if (!$user || !$user->outlet_id) {
             abort(403, 'Outlet tidak ditemukan untuk user ini.');
         }
@@ -25,42 +27,44 @@ class DashboardController extends Controller
         $awalBulan = Carbon::now()->startOfMonth();
 
         // 1. STATISTIK UTAMA
-        $totalStok = StokOutlet::where('outlet_id', $outletId)
-            ->where('stok', '>', 0)
-            ->count(); 
+        $totalStok = StokOutlet::where('outlet_id', $outletId)->where('stok', '>', 0)->count();
+        $pemakaianHariIni = Pemakaian::where('outlet_id', $outletId)->whereDate('tanggal', $hariIni)->sum('jumlah');
+        $distribusiTotal = Distribusi::where('outlet_id', $outletId)->whereBetween('created_at', [$awalBulan, Carbon::now()])->sum('jumlah');
 
-        $pemakaianHariIni = Pemakaian::where('outlet_id', $outletId)
-            ->whereDate('tanggal', $hariIni)
-            ->sum('jumlah');
+        // --- LOGIKA TARGET VS REALISASI ---
+        $target = $user->outlet->target_pemakaian_harian ?? 100;
+        $persentaseTarget = ($target > 0) ? ($pemakaianHariIni / $target) * 100 : 0;
+        
+        $warnaProgress = 'bg-success';
+        if ($persentaseTarget >= 90) {
+            $warnaProgress = 'bg-danger';
+        } elseif ($persentaseTarget >= 70) {
+            $warnaProgress = 'bg-warning';
+        }
 
-        $distribusi = Distribusi::where('outlet_id', $outletId)
-            ->whereBetween('created_at', [$awalBulan, Carbon::now()])
-            ->sum('jumlah');
+        // 2. DATA TABEL & FEED
+        $stokOutlets = StokOutlet::with('bahan')->where('outlet_id', $outletId)->get();
+        $pemakaians = Pemakaian::with('bahan')->where('outlet_id', $outletId)->latest()->take(5)->get();
+        
+        $feedPemakaian = Pemakaian::with('bahan', 'outlet')->where('outlet_id', $outletId)
+            ->select('*', DB::raw("'pemakaian' as tipe_aktivitas"))->latest()->take(5)->get();
+        
+        $feedDistribusi = Distribusi::with('bahan', 'outlet')->where('outlet_id', $outletId)
+            ->select('*', DB::raw("'distribusi' as tipe_aktivitas"))->latest()->take(5)->get();
+            
+        $activityFeeds = $feedPemakaian->concat($feedDistribusi)->sortByDesc('created_at')->take(6);
 
-        // 2. DATA TABEL STOK (Hanya stok yang tersedia)
-        $stokOutlets = StokOutlet::with('bahan')
-            ->where('outlet_id', $outletId)
-            ->get();
-
-        // 3. DATA TABEL PEMAKAIAN (Tampilkan 5 transaksi terakhir saja untuk ringkasan)
-        $pemakaians = Pemakaian::with('bahan')
-            ->where('outlet_id', $outletId)
-            ->latest('tanggal')
-            ->latest('created_at')
-            ->take(5)
-            ->get();
-
-        // 4. LOGIKA CHART.JS (7 Hari Terakhir)
+        // 3. LOGIKA CHART.JS (7 HARI TERAKHIR) - INI YANG TADI HILANG!
         $chartLabels = [];
         $chartData = [];
 
         for ($i = 6; $i >= 0; $i--) {
             $date = Carbon::today()->subDays($i);
             
-            // Nama hari dalam Bahasa Indonesia (Sen, Sel, Rab, dst)
+            // Nama hari (Sen, Sel, Rab, dst)
             $chartLabels[] = $date->translatedFormat('D'); 
             
-            // Hitung total pemakaian gabungan semua bahan per tanggal tersebut
+            // Total pemakaian per tanggal
             $total = Pemakaian::where('outlet_id', $outletId)
                 ->whereDate('tanggal', $date)
                 ->sum('jumlah');
@@ -68,14 +72,19 @@ class DashboardController extends Controller
             $chartData[] = (int) $total;
         }
 
+        // Sekarang semua variabel sudah siap dikirim ke view
         return view('user.dashboard', compact(
-            'totalStok',
-            'pemakaianHariIni',
-            'distribusi',
-            'stokOutlets',
-            'pemakaians',
-            'chartLabels',
-            'chartData'
+            'totalStok', 
+            'pemakaianHariIni', 
+            'distribusiTotal', 
+            'stokOutlets', 
+            'pemakaians', 
+            'chartLabels', 
+            'chartData', 
+            'activityFeeds', 
+            'persentaseTarget', 
+            'target', 
+            'warnaProgress'
         ));
     }
 }

@@ -12,7 +12,8 @@ class Outlet extends Model
     protected $fillable = [
         'nama_outlet',
         'alamat',
-        'no_hp'
+        'no_hp',
+        'target_pemakaian_harian'
     ];
 
     // admin outlet (user)
