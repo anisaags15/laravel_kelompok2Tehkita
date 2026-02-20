@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\LaporanController;
 use App\Http\Controllers\User\DashboardController as UserDashboardController;
 use App\Http\Controllers\OutletController;
 use App\Http\Controllers\BahanController;
@@ -13,8 +14,10 @@ use App\Http\Controllers\PemakaianController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\NotifikasiController;
 
+/* --- HOME --- */
 Route::get('/', fn() => view('welcome'))->name('home');
 
+/* --- DASHBOARD REDIRECT BERDASARKAN ROLE --- */
 Route::middleware('auth')->get('/dashboard', function () {
     return match(auth()->user()->role) {
         'admin' => redirect()->route('admin.dashboard'),
@@ -23,19 +26,32 @@ Route::middleware('auth')->get('/dashboard', function () {
     };
 })->name('dashboard');
 
-/* --- ADMIN AREA --- */
 Route::prefix('admin')->middleware(['auth','role:admin'])->name('admin.')->group(function() {
+
+    // Dashboard
     Route::get('/dashboard', [AdminDashboardController::class,'dashboard'])->name('dashboard');
-    
-    // Notifikasi Khusus Admin (Penting!)
+
+    // LAPORAN ADMIN
+    Route::prefix('laporan')->group(function() {
+        Route::get('/stok-masuk', [LaporanController::class,'stokMasuk'])->name('laporan.stok-masuk');
+        Route::get('/distribusi', [LaporanController::class,'distribusi'])->name('laporan.distribusi');
+        Route::get('/pemakaian', [LaporanController::class,'pemakaian'])->name('laporan.pemakaian');
+        
+        // Laporan Lengkap (gabungan semua)
+        Route::get('/lengkap', [LaporanController::class,'cetakPDF'])->name('laporan.lengkap');
+    });
+
+    // Notifikasi Admin
     Route::get('/notifikasi', [NotifikasiController::class, 'indexAdmin'])->name('notifikasi.index');
 
+    // CRUD
     Route::resource('outlet', OutletController::class);
     Route::resource('bahan', BahanController::class);
     Route::resource('stok-masuk', StokMasukController::class);
     Route::resource('distribusi', DistribusiController::class);
     Route::resource('stok-outlet', StokOutletController::class);
 
+    // Profil Admin
     Route::get('/profile/edit', [ProfileController::class,'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class,'update'])->name('profile.update');
     Route::post('/profile/update-password', [ProfileController::class,'updatePassword'])->name('profile.update-password');
@@ -43,24 +59,29 @@ Route::prefix('admin')->middleware(['auth','role:admin'])->name('admin.')->group
 
 /* --- USER AREA (OUTLET) --- */
 Route::prefix('user')->middleware(['auth','role:user'])->name('user.')->group(function() {
-    // Halaman Utama/Ringkasan
+
+    // Dashboard User
     Route::get('/dashboard', [UserDashboardController::class,'index'])->name('dashboard');
-    
-    // Riwayat Pemakaian (index), Form Tambah (create), dan Proses Simpan (store)
-    // Route ini otomatis menciptakan nama: user.pemakaian.index, user.pemakaian.create, dll.
+
+    // Pemakaian
     Route::resource('pemakaian', PemakaianController::class)->only(['index','create','store']);
-    
-    // Stok dan Distribusi
+
+    // Stok & Distribusi
     Route::get('/distribusi', [DistribusiController::class,'indexUser'])->name('distribusi.index');
     Route::get('/stok-outlet', [StokOutletController::class,'indexUser'])->name('stok-outlet.index');
 
-    // Pengaturan Profil
+    // Profil User
     Route::get('/profile/edit', [ProfileController::class,'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class,'update'])->name('profile.update');
     Route::post('/profile/update-password', [ProfileController::class,'updatePassword'])->name('profile.update-password');
 
-    // Sistem Notifikasi
+    // Notifikasi
     Route::get('/notifikasi', [NotifikasiController::class,'index'])->name('notifikasi.index');
+
+    // LAPORAN USER
+    Route::prefix('laporan')->group(function() {
+        Route::get('/pemakaian', [PemakaianController::class,'laporanUser'])->name('laporan.pemakaian');
+    });
 });
 
 /* --- GLOBAL CHAT --- */
@@ -70,4 +91,5 @@ Route::middleware('auth')->group(function() {
     Route::post('/chat/{user}', [ChatController::class,'store'])->name('chat.store');
 });
 
+/* --- AUTH --- */
 require __DIR__.'/auth.php';

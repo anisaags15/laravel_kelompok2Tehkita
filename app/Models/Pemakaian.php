@@ -10,6 +10,8 @@ class Pemakaian extends Model
 {
     use HasFactory;
 
+    protected $table = 'pemakaian'; // ✅ TAMBAHKAN INI
+
     protected $fillable = [
         'bahan_id',
         'outlet_id',
