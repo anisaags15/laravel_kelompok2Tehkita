@@ -11,27 +11,18 @@
     <div class="sidebar">
 
         <!-- USER PANEL -->
-        <div class="user-panel">
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
             <div class="image">
                 <img src="{{ auth()->user()->photo 
                     ? asset('uploads/profile/' . auth()->user()->photo) 
                     : asset('templates/dist/img/user2-160x160.jpg') }}"
-                     alt="User Image">
+                     class="img-circle elevation-2" alt="User Image">
             </div>
-
             <div class="info">
-                <span class="d-block font-weight-bold">
+                <a href="{{ route('admin.profile.edit') }}" class="d-block text-success">
                     {{ auth()->user()->name }}
-                </span>
-
-                <small class="text-muted d-block">
-                    {{ ucfirst(auth()->user()->role) }}
-                </small>
-
-                <a href="{{ route('admin.profile.edit') }}" 
-                   class="text-success small d-block mt-1">
-                    <i class="fas fa-user-circle mr-1"></i> Lihat Profil
                 </a>
+                <small class="text-muted">{{ ucfirst(auth()->user()->role) }}</small>
             </div>
         </div>
 
@@ -42,6 +33,7 @@
                 role="menu"
                 data-accordion="false">
 
+                <!-- DASHBOARD -->
                 <li class="nav-item">
                     <a href="{{ route('admin.dashboard') }}"
                        class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
@@ -83,6 +75,17 @@
                        class="nav-link {{ request()->routeIs('admin.distribusi.*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-truck-moving"></i>
                         <p>Distribusi</p>
+                    </a>
+                </li>
+
+                <li class="nav-header">LAPORAN</li>
+
+                <!-- **PERBAIKAN ROUTE** -->
+                <li class="nav-item">
+                    <a href="{{ route('admin.laporan.lengkap') }}"
+                       class="nav-link {{ request()->routeIs('admin.laporan.lengkap') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-file-pdf"></i>
+                        <p>Cetak Laporan Lengkap</p>
                     </a>
                 </li>
 

@@ -174,39 +174,42 @@
     </div>
 
     {{-- DISTRIBUSI --}}
-    <div class="col-lg-6 mb-4">
-        <div class="card shadow-sm border-0 h-100">
-            <div class="card-header bg-white border-0">
-                <h5 class="fw-semibold mb-0">Distribusi Terbaru</h5>
-            </div>
-            <div class="card-body table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Tanggal</th>
-                            <th>Outlet</th>
-                            <th>Bahan</th>
-                            <th>Jumlah</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($latestDistribusi as $d)
-                        <tr>
-                            <td>{{ $d->tanggal }}</td>
-                            <td>{{ $d->outlet->nama_outlet }}</td>
-                            <td>{{ $d->bahan->nama_bahan }}</td>
-                            <td><span class="badge bg-primary">{{ $d->jumlah }}</span></td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="4" class="text-center text-muted">Belum ada data</td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+ <div class="col-lg-6 mb-4">
+    <div class="card shadow-sm border-0 h-100">
+        <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+            <h5 class="fw-semibold mb-0">Distribusi Terbaru</h5>
+<a href="{{ route('admin.laporan.lengkap') }}" class="btn btn-danger btn-sm">
+    <i class="fas fa-file-pdf me-1"></i> Cetak PDF
+</a>
+        </div>
+        <div class="card-body table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Tanggal</th>
+                        <th>Outlet</th>
+                        <th>Bahan</th>
+                        <th>Jumlah</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($latestDistribusi as $d)
+                    <tr>
+                        <td>{{ $d->tanggal }}</td>
+                        <td>{{ $d->outlet->nama_outlet }}</td>
+                        <td>{{ $d->bahan->nama_bahan }}</td>
+                        <td><span class="badge bg-primary">{{ $d->jumlah }}</span></td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">Belum ada data</td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
+</div>
 
     {{-- CHAT --}}
     <div class="col-lg-6 mb-4">
