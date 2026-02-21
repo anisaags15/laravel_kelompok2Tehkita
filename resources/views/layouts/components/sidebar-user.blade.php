@@ -1,11 +1,10 @@
 <aside class="main-sidebar sidebar-light-success elevation-3">
-      <a href="{{ route('admin.dashboard') }}" class="brand-link">
+    <a href="{{ route('user.dashboard') }}" class="brand-link">
         <img src="{{ asset('images/logo teh kita.png') }}" 
              alt="Logo" 
              class="brand-image">
-        <span class="brand-text">Teh Kita</span>
+        <span class="brand-text font-weight-light">Teh Kita</span>
     </a>
-
 
     <div class="sidebar">
         <div class="user-panel mt-4 pb-3 mb-3 d-flex align-items-center px-3 border-bottom-0">
@@ -21,9 +20,6 @@
                 <a href="{{ route('user.profile.edit') }}" class="text-success small">
                     <i class="fas fa-circle text-success mr-1" style="font-size: 8px;"></i> Online
                 </a>
-                <a href="{{ route('user.profile.edit') }}" class="text-success small d-block mt-1">
-                    <i class="fas fa-user-circle mr-1"></i> Lihat Profil
-                </a>
             </div>
         </div>
 
@@ -37,32 +33,56 @@
                     </a>
                 </li>
 
-                <li class="nav-header text-uppercase small font-weight-bold text-muted">Manajemen Stok</li>
+                <li class="nav-header text-uppercase small font-weight-bold text-muted">Operasional Outlet</li>
 
                 <li class="nav-item">
                     <a href="{{ route('user.stok-outlet.index') }}" class="nav-link {{ request()->routeIs('user.stok-outlet.*') ? 'active bg-success' : '' }}">
                         <i class="nav-icon fas fa-box"></i>
-                        <p>Stok Outlet</p>
+                        <p>Stok Tersedia</p>
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a href="{{ route('user.pemakaian.create') }}" class="nav-link {{ request()->routeIs('user.pemakaian.*') ? 'active bg-success' : '' }}">
-                        <i class="nav-icon fas fa-edit"></i>
-                        <p>Pemakaian Bahan</p>
+                    <a href="{{ route('user.pemakaian.create') }}" class="nav-link {{ request()->routeIs('user.pemakaian.create') ? 'active bg-success' : '' }}">
+                        <i class="nav-icon fas fa-plus-circle"></i>
+                        <p>Input Pemakaian</p>
                     </a>
                 </li>
 
+                {{-- FITUR BARU: WASTE MANAGEMENT --}}
                 <li class="nav-item">
-                    <a href="{{ route('user.distribusi.index') }}" class="nav-link {{ request()->routeIs('user.distribusi.*') ? 'active bg-success' : '' }}">
+                    <a href="{{ route('user.waste.create') }}" class="nav-link {{ request()->routeIs('user.waste.create') ? 'active bg-danger text-white' : '' }}">
+                        <i class="nav-icon fas fa-trash-alt"></i>
+                        <p>Lapor Bahan Rusak</p>
+                    </a>
+                </li>
+
+                <li class="nav-item {{ request()->routeIs('user.riwayat*') || request()->routeIs('user.distribusi.*') ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ request()->routeIs('user.riwayat*') || request()->routeIs('user.distribusi.*') ? 'active bg-success' : '' }}">
                         <i class="nav-icon fas fa-history"></i>
-                        <p>Riwayat Distribusi</p>
+                        <p>
+                            Riwayat Data
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
                     </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('user.riwayat_pemakaian') }}" class="nav-link {{ request()->routeIs('user.riwayat_pemakaian') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon text-warning"></i>
+                                <p>Log Pemakaian</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('user.distribusi.index') }}" class="nav-link {{ request()->routeIs('user.distribusi.*') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon text-info"></i>
+                                <p>Log Distribusi</p>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
 
-                <li class="nav-header text-uppercase small font-weight-bold text-muted">Sistem</li>
+                <li class="nav-header text-uppercase small font-weight-bold text-muted">Komunikasi & Info</li>
 
-                {{-- MENU CHAT (DITAMBAHKAN DISINI) --}}
                 <li class="nav-item">
                     <a href="{{ route('chat.index') }}" class="nav-link {{ request()->routeIs('chat.*') ? 'active bg-success' : '' }}">
                         <i class="nav-icon fas fa-comments"></i>
@@ -70,19 +90,19 @@
                     </a>
                 </li>
 
-{{-- Ganti baris 74 menjadi seperti ini --}}
-<li class="nav-item">
-    <a href="{{ route('user.notifikasi.index') }}" class="nav-link {{ request()->routeIs('user.notifikasi.index') ? 'active bg-success' : '' }}">
-        <i class="nav-icon fas fa-bell"></i>
-        <p>Notifikasi</p>
-    </a>
-</li>
-                <li class="nav-item mt-3">
+                <li class="nav-item">
+                    <a href="{{ route('user.notifikasi.index') }}" class="nav-link {{ request()->routeIs('user.notifikasi.index') ? 'active bg-success' : '' }}">
+                        <i class="nav-icon fas fa-bell"></i>
+                        <p>Notifikasi</p>
+                    </a>
+                </li>
+
+                <li class="nav-item mt-3 border-top pt-2">
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
                         <button type="submit" class="nav-link btn btn-link text-left w-100 text-danger border-0">
                             <i class="nav-icon fas fa-sign-out-alt"></i>
-                            <p>Logout</p>
+                            <p>Keluar Aplikasi</p>
                         </button>
                     </form>
                 </li>

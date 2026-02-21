@@ -63,8 +63,17 @@ Route::prefix('user')->middleware(['auth','role:user'])->name('user.')->group(fu
     // Dashboard User
     Route::get('/dashboard', [UserDashboardController::class,'index'])->name('dashboard');
 
-    // Pemakaian
-    Route::resource('pemakaian', PemakaianController::class)->only(['index','create','store']);
+    // Riwayat Khusus (Untuk di-klik dari Dashboard)
+    Route::get('/riwayat/pemakaian', [UserDashboardController::class, 'riwayatPemakaian'])->name('riwayat_pemakaian');
+    Route::get('/riwayat/distribusi', [UserDashboardController::class, 'riwayatDistribusi'])->name('riwayat.distribusi');
+
+    // Pemakaian & Waste (REVISI DI SINI)
+    // 1. Tambahkan 'destroy' agar bisa hapus log pemakaian/waste
+    Route::resource('pemakaian', PemakaianController::class)->only(['index','create','store', 'destroy']); 
+    
+    // 2. Tambahkan Rute Khusus Waste Management
+    Route::get('/waste/lapor', [PemakaianController::class, 'createWaste'])->name('waste.create');
+    Route::post('/waste/simpan', [PemakaianController::class, 'storeWaste'])->name('waste.store');
 
     // Stok & Distribusi
     Route::get('/distribusi', [DistribusiController::class,'indexUser'])->name('distribusi.index');
