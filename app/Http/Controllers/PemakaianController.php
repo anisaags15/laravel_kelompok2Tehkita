@@ -11,13 +11,12 @@ use Illuminate\Support\Facades\Auth;
 class PemakaianController extends Controller
 {
     /**
-     * Tampilkan daftar pemakaian lengkap dengan Pagination
+     * Tampilkan daftar riwayat (Campuran Rutin & Waste)
      */
     public function index()
     {
         $user = Auth::user();
 
-        // Menggunakan paginate agar halaman riwayat tidak terlalu panjang
         $pemakaians = Pemakaian::with('bahan')
             ->where('outlet_id', $user->outlet_id)
             ->latest('tanggal')
@@ -28,13 +27,11 @@ class PemakaianController extends Controller
     }
 
     /**
-     * Form input pemakaian bahan
+     * FORM 1: Input Pemakaian Rutin (Jualan)
      */
     public function create()
     {
         $user = Auth::user();
-
-        // Hanya ambil bahan yang stoknya lebih dari 0 untuk ditampilkan di form
         $stokOutlets = StokOutlet::with('bahan')
             ->where('outlet_id', $user->outlet_id)
             ->where('stok', '>', 0)
@@ -44,7 +41,7 @@ class PemakaianController extends Controller
     }
 
     /**
-     * Simpan data pemakaian dan kurangi stok
+     * SIMPAN 1: Logika Pemakaian Rutin
      */
     public function store(Request $request)
     {
@@ -55,41 +52,83 @@ class PemakaianController extends Controller
         ]);
 
         $user = Auth::user();
-
-        // Ambil data stok outlet
         $stokOutlet = StokOutlet::where('outlet_id', $user->outlet_id)
             ->where('bahan_id', $request->bahan_id)
             ->first();
 
-        // Validasi kecukupan stok sebelum menyimpan
         if (!$stokOutlet || $stokOutlet->stok < $request->jumlah) {
-            return redirect()->back()
-                ->with('error', 'Maaf, stok bahan tidak mencukupi untuk jumlah tersebut.');
+            return redirect()->back()->with('error', 'Maaf, stok bahan tidak mencukupi.');
         }
 
-        // Simpan transaksi pemakaian
         Pemakaian::create([
             'bahan_id'  => $request->bahan_id,
             'outlet_id' => $user->outlet_id,
             'jumlah'    => $request->jumlah,
             'tanggal'   => $request->tanggal,
+            'tipe'      => 'rutin', // Penanda jualan normal
         ]);
 
-        // Kurangi jumlah stok di tabel stok_outlets
         $stokOutlet->decrement('stok', $request->jumlah);
 
         return redirect()->route('user.pemakaian.index')
-            ->with('success', 'Pemakaian bahan berhasil dicatat dan stok telah diperbarui.');
+            ->with('success', 'Pemakaian rutin berhasil dicatat.');
     }
 
     /**
-     * Hapus data pemakaian dan kembalikan stoknya
+     * FORM 2: Input Waste (Bahan Rusak/Basi)
+     */
+    public function createWaste()
+    {
+        $user = Auth::user();
+        $stokOutlets = StokOutlet::with('bahan')
+            ->where('outlet_id', $user->outlet_id)
+            ->where('stok', '>', 0)
+            ->get();
+
+        return view('user.pemakaian.create_waste', compact('stokOutlets'));
+    }
+
+    /**
+     * SIMPAN 2: Logika Waste Management
+     */
+    public function storeWaste(Request $request)
+    {
+        $request->validate([
+            'bahan_id'   => 'required|exists:bahans,id',
+            'jumlah'     => 'required|integer|min:1',
+            'keterangan' => 'required|string', // Alasan rusak
+        ]);
+
+        $user = Auth::user();
+        $stokOutlet = StokOutlet::where('outlet_id', $user->outlet_id)
+            ->where('bahan_id', $request->bahan_id)
+            ->first();
+
+        if (!$stokOutlet || $stokOutlet->stok < $request->jumlah) {
+            return redirect()->back()->with('error', 'Stok tidak cukup untuk dilaporkan rusak.');
+        }
+
+        Pemakaian::create([
+            'bahan_id'   => $request->bahan_id,
+            'outlet_id'  => $user->outlet_id,
+            'jumlah'     => $request->jumlah,
+            'tanggal'    => now(),
+            'tipe'       => 'waste',      // Penanda kerusakan
+            'keterangan' => $request->keterangan, 
+        ]);
+
+        $stokOutlet->decrement('stok', $request->jumlah);
+
+        return redirect()->route('user.pemakaian.index')
+            ->with('success', 'Laporan bahan rusak berhasil disimpan.');
+    }
+
+    /**
+     * Hapus data pemakaian (Kembalikan stok apapun tipenya)
      */
     public function destroy($id)
     {
         $pemakaian = Pemakaian::findOrFail($id);
-
-        // Cari stok terkait untuk mengembalikan jumlah yang dihapus
         $stokOutlet = StokOutlet::where('outlet_id', $pemakaian->outlet_id)
             ->where('bahan_id', $pemakaian->bahan_id)
             ->first();
@@ -101,6 +140,6 @@ class PemakaianController extends Controller
         $pemakaian->delete();
 
         return redirect()->route('user.pemakaian.index')
-            ->with('success', 'Data pemakaian berhasil dihapus dan stok telah dikembalikan.');
+            ->with('success', 'Data berhasil dihapus dan stok dikembalikan.');
     }
 }

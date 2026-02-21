@@ -6,10 +6,10 @@ body {
     background-color: #f3faf5 !important;
 }
 
-/* Pastikan transisi sidebar halus */
+/* Wrapper yang lebih fleksibel */
 .content-wrapper {
     background-color: #f3faf5 !important;
-    padding: 1.5rem !important;
+    padding: 1rem !important; /* Dikurangi sedikit agar tidak sesak di layar kecil */
     transition: all 0.3s ease-in-out;
 }
 
@@ -46,50 +46,57 @@ body {
 }
 
 /* =================================
-    CLEAN STATISTIC CARDS
+    REVISI CARD & TABLE (BIAR SEJAJAR)
 =================================*/
-.stat-card {
-    border: none !important;
+
+/* Pastikan card selalu mengikuti grid Bootstrap */
+.card {
     border-radius: 15px !important;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.03) !important;
-    background: #fff !important;
-    padding: 1.25rem !important;
+    border: none !important;
     margin-bottom: 1rem;
+    overflow: hidden; /* Supaya header rounded nggak kepotong table */
 }
 
-/* Ukuran Ikon yang Pas (50px agar tidak menabrak teks) */
+/* Ukuran Ikon Box agar pas */
 .icon-box {
-    width: 50px !important;
-    height: 50px !important;
-    min-width: 50px !important;
+    width: 55px !important;
+    height: 55px !important;
+    min-width: 55px !important;
     border-radius: 12px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    margin-right: 15px;
 }
 
-.stat-value {
-    font-size: 1.4rem !important;
-    font-weight: 700 !important;
-    color: #2d3436 !important;
-    display: block;
+/* Warna Soft Background untuk Badge/Status */
+.bg-soft-success { background: rgba(40, 167, 69, 0.1) !important; color: #28a745 !important; }
+.bg-soft-warning { background: rgba(255, 193, 7, 0.1) !important; color: #ffc107 !important; }
+.bg-soft-info { background: rgba(23, 162, 184, 0.1) !important; color: #17a2b8 !important; }
+
+/* Table Styling agar rapi mampus */
+.table thead th {
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border-top: none !important;
 }
 
-.stat-label {
-    font-size: 0.85rem !important;
-    color: #636e72 !important;
-    margin: 0;
+.table td {
+    border-color: #f8faf9 !important;
 }
 
-/* Warna Soft Background Ikon */
-.bg-soft-success { background: rgba(25,135,84,.1) !important; color:#198754 !important; }
-.bg-soft-info { background: rgba(13,202,240,.1) !important; color:#0dcaf0 !important; }
-.bg-soft-warning { background: rgba(255,193,7,.1) !important; color:#ffc107 !important; }
+/* Hover effect untuk baris tabel */
+.table-hover tbody tr:hover {
+    background-color: #f9fdfa !important;
+    transition: 0.2s;
+}
 
-/* Progress Bar Minimalis */
-.progress {
-    height: 6px !important;
-    border-radius: 10px !important;
-    background-color: #f0f0f0 !important;
+/* Scrollbar halus untuk activity feed */
+.timeline-simple::-webkit-scrollbar {
+    width: 4px;
+}
+.timeline-simple::-webkit-scrollbar-thumb {
+    background: #e0eee0;
+    border-radius: 10px;
 }
