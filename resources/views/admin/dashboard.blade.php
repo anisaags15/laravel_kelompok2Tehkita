@@ -5,9 +5,8 @@
 
 @section('content')
 
-{{-- ================= STATISTIC CARDS ================= --}}
+{{-- 1. STATISTIC CARDS --}}
 <div class="row">
-    {{-- Card Total Outlet --}}
     <div class="col-lg-3 col-md-6 mb-4">
         <a href="{{ route('admin.outlet.index') }}" class="text-decoration-none">
             <div class="card dashboard-card shadow-sm border-0 h-100">
@@ -24,7 +23,6 @@
         </a>
     </div>
 
-    {{-- Card Total Bahan --}}
     <div class="col-lg-3 col-md-6 mb-4">
         <a href="{{ route('admin.bahan.index') }}" class="text-decoration-none">
             <div class="card dashboard-card shadow-sm border-0 h-100">
@@ -41,7 +39,6 @@
         </a>
     </div>
 
-    {{-- Card Stok Masuk --}}
     <div class="col-lg-3 col-md-6 mb-4">
         <a href="{{ route('admin.stok-masuk.index') }}" class="text-decoration-none">
             <div class="card dashboard-card shadow-sm border-0 h-100">
@@ -58,7 +55,6 @@
         </a>
     </div>
 
-    {{-- Card Distribusi --}}
     <div class="col-lg-3 col-md-6 mb-4">
         <a href="{{ route('admin.distribusi.index') }}" class="text-decoration-none">
             <div class="card dashboard-card shadow-sm border-0 h-100">
@@ -76,7 +72,7 @@
     </div>
 </div>
 
-{{-- ================= NEW: MONITORING REAL-TIME OUTLET ================= --}}
+{{-- 2. MONITORING REAL-TIME --}}
 <div class="row mb-4">
     <div class="col-12">
         <div class="card shadow-sm border-0">
@@ -119,9 +115,7 @@
                             </td>
                         </tr>
                         @empty
-                        <tr>
-                            <td colspan="4" class="text-center text-muted">Belum ada aktivitas outlet hari ini</td>
-                        </tr>
+                        <tr><td colspan="4" class="text-center text-muted">Belum ada aktivitas hari ini</td></tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -129,8 +123,7 @@
         </div>
     </div>
 </div>
-
-{{-- ================= GRAFIK & KALENDER ================= --}}
+{{-- 4. GRAFIK & KALENDER --}}
 <div class="row">
     <div class="col-lg-8 mb-4">
         <div class="card shadow-sm border-0 h-100">
@@ -138,7 +131,7 @@
                 <h5 class="fw-semibold mb-0">Grafik Pemakaian 5 Outlet</h5>
             </div>
             <div class="card-body">
-                <div style="position: relative; height: 400px; width: 100%;">
+                <div style="position: relative; height: 350px; width: 100%;">
                     <canvas id="pemakaianChart"></canvas>
                 </div>
             </div>
@@ -151,7 +144,7 @@
                 <h5 class="fw-semibold mb-0">Kalender Distribusi</h5>
             </div>
             <div class="card-body">
-                <div id="calendar-container" style="height: 400px;">
+                <div id="calendar-container" style="height: 350px;">
                     <div id="calendar"></div>
                 </div>
             </div>
@@ -159,30 +152,76 @@
     </div>
 </div>
 
-{{-- ================= TABLE SECTION ================= --}}
+{{-- 5. TABLE SECTION --}}
 <div class="row">
-    {{-- DATA OUTLET --}}
     <div class="col-lg-6 mb-4">
-        <div class="card shadow-sm border-0 h-100 text-sm">
-            <div class="card-header bg-white border-0">
-                <h5 class="fw-semibold mb-0">Data Outlet</h5>
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="fw-semibold mb-0">Data Outlet Terbaru</h5>
             </div>
             <div class="card-body table-responsive">
                 <table class="table table-hover align-middle">
                     <thead class="table-light">
+                        <tr><th>Nama Outlet</th><th>No HP</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach($outlets as $o)
+                        <tr><td class="fw-semibold">{{ $o->nama_outlet }}</td><td>{{ $o->no_hp }}</td></tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="fw-semibold mb-0">Stok Masuk Terbaru</h5>
+            </div>
+            <div class="card-body table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr><th>Bahan</th><th>Jumlah</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach($latestStokMasuk as $s)
+                        <tr><td class="fw-semibold">{{ $s->bahan->nama_bahan ?? '-' }}</td><td><span class="badge bg-success">{{ $s->jumlah }}</span></td></tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- 3. RADAR STOK & LATEST CHAT (YANG HILANG SUDAH KEMBALI) --}}
+<div class="row mb-4">
+    <div class="col-lg-7 mb-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3 border-0">
+                <h5 class="fw-bold mb-0 text-danger"><i class="fas fa-exclamation-triangle me-2"></i> Radar Stok Kritis (<= 5)</h5>
+            </div>
+            <div class="card-body table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-danger text-white">
                         <tr>
-                            <th>Nama Outlet</th>
-                            <th>No HP</th>
+                            <th>Outlet</th>
+                            <th>Bahan</th>
+                            <th class="text-center">Sisa</th>
+                            <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($outlets as $o)
+                        @forelse($stokKritis as $sk)
                         <tr>
-                            <td class="fw-semibold">{{ $o->nama_outlet }}</td>
-                            <td>{{ $o->no_hp }}</td>
+                            <td class="fw-bold">{{ $sk->outlet->nama_outlet ?? 'N/A' }}</td>
+                            <td>{{ $sk->bahan->nama_bahan ?? 'N/A' }}</td>
+                            <td class="text-center"><span class="badge bg-danger rounded-pill px-3">{{ $sk->stok }}</span></td>
+                            <td class="text-center"><a href="{{ route('admin.distribusi.index') }}" class="btn btn-xs btn-outline-primary">Kirim</a></td>
                         </tr>
                         @empty
-                        <tr><td colspan="2" class="text-center text-muted">Belum ada data</td></tr>
+                        <tr><td colspan="4" class="text-center py-4 text-muted">✅ Stok semua outlet aman</td></tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -190,33 +229,43 @@
         </div>
     </div>
 
-    {{-- STOK MASUK TERBARU --}}
-    <div class="col-lg-6 mb-4">
+    <div class="col-lg-5 mb-4">
         <div class="card shadow-sm border-0 h-100">
-            <div class="card-header bg-white border-0">
-                <h5 class="fw-semibold mb-0">Stok Masuk Terbaru</h5>
+            <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold mb-0 text-dark"><i class="fas fa-comments text-primary me-2"></i> Chat Terbaru</h5>
+                @if($unreadCount > 0) <span class="badge bg-danger rounded-pill">{{ $unreadCount }} Baru</span> @endif
             </div>
-            <div class="card-body table-responsive">
-                <table class="table table-hover align-middle text-sm">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Tanggal</th>
-                            <th>Bahan</th>
-                            <th>Jumlah</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($latestStokMasuk as $s)
-                        <tr>
-                            <td>{{ \Carbon\Carbon::parse($s->tanggal)->format('d M Y') }}</td>
-                            <td class="fw-semibold">{{ $s->bahan->nama_bahan ?? '-' }}</td>
-                            <td><span class="badge bg-success">{{ $s->jumlah }}</span></td>
-                        </tr>
-                        @empty
-                        <tr><td colspan="3" class="text-center text-muted">Belum ada data</td></tr>
-                        @endforelse
-                    </tbody>
-                </table>
+            {{-- Scrollable Container: Tampil sekitar 5 data --}}
+            <div class="card-body p-0" style="max-height: 380px; overflow-y: auto;">
+                <div class="list-group list-group-flush">
+                    @forelse($latestChats as $chat)
+                        @php $isMe = $chat->sender_id === auth()->id(); @endphp
+                        <a href="{{ route('chat.show', $isMe ? $chat->receiver_id : $chat->sender_id) }}" class="list-group-item list-group-item-action border-0 px-3 py-3">
+                            <div class="d-flex w-100 justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-soft-primary text-primary rounded-circle d-flex justify-content-center align-items-center fw-bold me-3" style="width: 40px; height: 40px; font-size: 0.8rem;">
+                                        {{ strtoupper(substr($isMe ? $chat->receiver->name : $chat->sender->name, 0, 1)) }}
+                                    </div>
+                                    <div style="max-width: 180px;">
+                                        <h6 class="mb-0 fw-bold text-dark" style="font-size: 0.9rem;">{{ $isMe ? $chat->receiver->name : $chat->sender->name }}</h6>
+                                        <p class="mb-0 text-muted text-truncate small">
+                                            {{ $isMe ? 'Anda: ' : '' }}{{ $chat->message }}
+                                        </p>
+                                    </div>
+                                </div>
+                                <small class="text-muted" style="font-size: 0.7rem;">{{ $chat->created_at->diffForHumans(null, true) }}</small>
+                            </div>
+                        </a>
+                    @empty
+                        <div class="text-center py-5">
+                            <i class="fas fa-comment-slash fa-2x text-light mb-2"></i>
+                            <p class="text-muted small">Tidak ada pesan</p>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+            <div class="card-footer bg-white border-0 text-center py-3">
+                <a href="{{ route('chat.index') }}" class="text-primary fw-bold text-decoration-none small">Lihat Semua Pesan <i class="fas fa-arrow-right ms-1"></i></a>
             </div>
         </div>
     </div>
@@ -227,7 +276,7 @@
 @push('js')
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    // --- 1. INISIALISASI GRAFIK ---
+    // Grafik
     const ctx = document.getElementById('pemakaianChart');
     if (ctx) {
         new Chart(ctx, {
@@ -236,38 +285,19 @@ document.addEventListener("DOMContentLoaded", function () {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true } }
-                },
-                scales: {
-                    y: { beginAtZero: true, grid: { color: '#f0f0f0' } },
-                    x: { grid: { display: false } }
-                }
+                plugins: { legend: { position: 'bottom' } }
             }
         });
     }
 
-    // --- 2. INISIALISASI KALENDER (CALENDER CANTIKMU) ---
+    // Kalender
     const calendarEl = document.getElementById('calendar');
     if (calendarEl) {
         const calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
-            height: '100%', // Mengikuti container 400px
-            headerToolbar: {
-                left: 'prev,next',
-                center: 'title',
-                right: 'today'
-            },
-            events: @json($calendarEvents ?? []),
-            eventDidMount: function(info) {
-                info.el.style.cursor = 'pointer';
-                info.el.setAttribute("title", "Jumlah: " + info.event.extendedProps.jumlah);
-            },
-            eventClick: function(info) {
-                if (info.event.extendedProps.url) {
-                    window.location.href = info.event.extendedProps.url;
-                }
-            }
+            height: '100%',
+            headerToolbar: { left: 'prev,next', center: 'title', right: 'today' },
+            events: @json($calendarEvents ?? [])
         });
         calendar.render();
     }

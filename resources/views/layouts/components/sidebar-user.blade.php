@@ -179,7 +179,7 @@
                         @csrf
                         <button type="submit" class="nav-link btn btn-link text-left w-100 text-danger border-0">
                             <i class="nav-icon fas fa-sign-out-alt"></i>
-                            <p>Keluar Aplikasi</p>
+                            <p>Logout</p>
                         </button>
                     </form>
                 </li>
