@@ -4,7 +4,7 @@
 {{-- Tarik paksa ke atas dengan margin-top negatif ekstrem --}}
 <div class="content-header p-0" style="margin-top: -25px;"> 
     <div class="container-fluid">
-        <div class="row pt-0 pb-3"> {{-- pt-0 supaya benar-benar tidak ada jarak --}}
+        <div class="row pt-0 pb-3"> 
             <div class="col-sm-12">
                 <h1 class="m-0 font-weight-bold text-dark" style="letter-spacing: -1.5px; font-size: 2.2rem; line-height: 1;">
                     <i class="fas fa-recycle text-danger mr-2"></i>Manajemen Waste
@@ -21,10 +21,15 @@
         <div class="row mb-3">
             <div class="col-md-3">
                 <div class="info-box shadow-sm border-0 bg-white" style="min-height: 70px;">
-                    <span class="info-box-icon bg-danger-soft" style="background-color: #fff5f5; width: 60px;"><i class="fas fa-exclamation-triangle text-danger" style="font-size: 1.2rem;"></i></span>
+                    <span class="info-box-icon bg-danger-soft" style="background-color: #fff5f5; width: 60px;">
+                        <i class="fas fa-exclamation-triangle text-danger" style="font-size: 1.2rem;"></i>
+                    </span>
                     <div class="info-box-content">
                         <span class="info-box-text text-muted small">Waste Bulan Ini</span>
-                        <span class="info-box-number text-dark" style="font-size: 1.1rem;">12 <small class="text-secondary font-weight-normal text-xs">Item</small></span>
+                        {{-- REVISI: Angka 12 diganti jadi variabel dinamis --}}
+                        <span class="info-box-number text-dark" style="font-size: 1.1rem;">
+                            {{ $wasteBulanIni ?? 0 }} <small class="text-secondary font-weight-normal text-xs">Item</small>
+                        </span>
                     </div>
                 </div>
             </div>
@@ -40,9 +45,18 @@
                         </h3>
                     </div>
                     
+                    {{-- Pastikan route ini sesuai dengan di web.php kamu --}}
                     <form action="{{ route('user.waste.store') }}" method="POST">
                         @csrf
                         <div class="card-body px-4 pt-0">
+                            {{-- Notifikasi Sukses --}}
+                            @if(session('success'))
+                                <div class="alert alert-success border-0 shadow-sm mb-4">
+                                    <i class="icon fas fa-check mr-2"></i> {{ session('success') }}
+                                </div>
+                            @endif
+
+                            {{-- Notifikasi Error --}}
                             @if(session('error'))
                                 <div class="alert alert-danger border-0 shadow-sm mb-4">
                                     <i class="icon fas fa-ban mr-2"></i> {{ session('error') }}
@@ -51,7 +65,7 @@
 
                             <div class="form-group mb-4">
                                 <label class="text-secondary small font-weight-bold mb-2">PILIH BAHAN BAKU</label>
-                                <select name="stok_outlet_id" class="form-control select2 custom-select-lg">
+                                <select name="stok_outlet_id" class="form-control select2 custom-select-lg @error('stok_outlet_id') is-invalid @enderror">
                                     <option value="" selected disabled>Cari bahan di stok...</option>
                                     @foreach($stokOutlets as $stok)
                                         <option value="{{ $stok->id }}">
@@ -59,6 +73,7 @@
                                         </option>
                                     @endforeach
                                 </select>
+                                @error('stok_outlet_id') <span class="text-danger small">{{ $message }}</span> @enderror
                             </div>
 
                             <div class="row">
@@ -66,11 +81,12 @@
                                     <div class="form-group mb-4">
                                         <label class="text-secondary small font-weight-bold mb-2">JUMLAH KERUSAKAN</label>
                                         <div class="input-group input-group-lg shadow-none">
-                                            <input type="number" name="jumlah" class="form-control border-right-0 bg-light" placeholder="0" min="1">
+                                            <input type="number" name="jumlah" class="form-control border-right-0 bg-light @error('jumlah') is-invalid @enderror" placeholder="0" min="1">
                                             <div class="input-group-append">
                                                 <span class="input-group-text bg-light text-muted small font-weight-bold">UNIT</span>
                                             </div>
                                         </div>
+                                        @error('jumlah') <span class="text-danger small">{{ $message }}</span> @enderror
                                     </div>
                                 </div>
                                 <div class="col-md-6">

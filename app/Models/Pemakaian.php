@@ -12,12 +12,15 @@ class Pemakaian extends Model
 
     protected $table = 'pemakaians'; 
 
-    protected $fillable = [
-        'bahan_id',
-        'outlet_id',
-        'jumlah',
-        'tanggal',
-    ];
+   protected $fillable = [
+    'bahan_id',
+    'outlet_id',
+    'jumlah',
+    'tanggal',
+    'tipe',       // TAMBAHKAN INI
+    'status',     // TAMBAHKAN INI
+    'keterangan', // TAMBAHKAN INI
+];
 
     protected $casts = [
         'tanggal' => 'date',

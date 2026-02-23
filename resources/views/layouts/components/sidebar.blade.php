@@ -1,6 +1,5 @@
 <aside class="main-sidebar sidebar-light-success elevation-3">
 
-    <!-- BRAND -->
     <a href="{{ route('admin.dashboard') }}" class="brand-link text-center">
         <img src="{{ asset('images/logo teh kita.png') }}"
              alt="Logo"
@@ -10,7 +9,6 @@
 
     <div class="sidebar">
 
-        <!-- USER PANEL -->
         <div class="user-panel mt-3 pb-3 mb-3 d-flex align-items-center">
             <div class="image">
                 <img src="{{ auth()->user()->photo
@@ -27,14 +25,12 @@
             </div>
         </div>
 
-        <!-- MENU -->
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column"
                 data-widget="treeview"
                 role="menu"
                 data-accordion="false">
 
-                <!-- DASHBOARD -->
                 <li class="nav-item">
                     <a href="{{ route('admin.dashboard') }}"
                        class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
@@ -43,7 +39,6 @@
                     </a>
                 </li>
 
-                <!-- MASTER DATA -->
                 <li class="nav-header">MASTER DATA</li>
 
                 <li class="nav-item">
@@ -54,7 +49,14 @@
                     </a>
                 </li>
 
-                <!-- TRANSAKSI -->
+                <li class="nav-item">
+                    <a href="{{ route('admin.bahan.index') }}"
+                       class="nav-link {{ request()->routeIs('admin.bahan.*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-box"></i>
+                        <p>Data Bahan Baku</p>
+                    </a>
+                </li>
+
                 <li class="nav-header">TRANSAKSI</li>
 
                 <li class="nav-item">
@@ -73,13 +75,27 @@
                     </a>
                 </li>
 
-                <!-- LAPORAN -->
+                <li class="nav-item">
+                    <a href="{{ route('admin.waste.index') }}"
+                       class="nav-link {{ request()->routeIs('admin.waste.*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-dumpster text-danger"></i>
+                        <p>
+                            Monitoring Waste
+                            @php
+                                $pendingCount = \App\Models\Pemakaian::where('tipe', 'waste')->where('status', 'pending')->count();
+                            @endphp
+                            @if($pendingCount > 0)
+                                <span class="right badge badge-danger">{{ $pendingCount }}</span>
+                            @endif
+                        </p>
+                    </a>
+                </li>
+
                 <li class="nav-header">LAPORAN</li>
 
                 <li class="nav-item has-treeview 
                     {{ request()->routeIs('admin.laporan.*') ? 'menu-open' : '' }}">
 
-                    <!-- PARENT HANYA TOGGLE -->
                     <a href="#"
                     class="nav-link {{ request()->routeIs('admin.laporan.*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-file-alt"></i>
@@ -90,8 +106,6 @@
                     </a>
 
                     <ul class="nav nav-treeview">
-
-                        <!-- INDEX DIPINDAH KE SINI -->
                         <li class="nav-item">
                             <a href="{{ route('admin.laporan.index') }}"
                             class="nav-link {{ request()->routeIs('admin.laporan.index') ? 'active' : '' }}">
@@ -115,11 +129,9 @@
                                 <p>Distribusi</p>
                             </a>
                         </li>
-
                     </ul>
                 </li>
 
-                <!-- KOMUNIKASI -->
                 <li class="nav-header">KOMUNIKASI</li>
 
                 <li class="nav-item">
@@ -130,7 +142,6 @@
                     </a>
                 </li>
 
-                <!-- AKUN -->
                 <li class="nav-header">AKUN</li>
 
                 <li class="nav-item">
