@@ -3,8 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
-use App\Http\Controllers\Admin\LaporanController;
+use App\Http\Controllers\Admin\LaporanController as AdminLaporanController;
 use App\Http\Controllers\User\DashboardController as UserDashboardController;
+use App\Http\Controllers\User\LaporanController as UserLaporanController;
 use App\Http\Controllers\OutletController;
 use App\Http\Controllers\BahanController;
 use App\Http\Controllers\StokMasukController;
@@ -14,91 +15,226 @@ use App\Http\Controllers\PemakaianController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\NotifikasiController;
 
-/* --- HOME --- */
-Route::get('/', fn() => view('welcome'))->name('home');
+/*
+|--------------------------------------------------------------------------
+| HOME
+|--------------------------------------------------------------------------
+*/
+Route::get('/', fn () => view('welcome'))->name('home');
 
-/* --- DASHBOARD REDIRECT BERDASARKAN ROLE --- */
+/*
+|--------------------------------------------------------------------------
+| DASHBOARD REDIRECT SESUAI ROLE
+|--------------------------------------------------------------------------
+*/
 Route::middleware('auth')->get('/dashboard', function () {
-    return match(auth()->user()->role) {
+    return match (auth()->user()->role) {
         'admin' => redirect()->route('admin.dashboard'),
         'user'  => redirect()->route('user.dashboard'),
         default => abort(403),
     };
 })->name('dashboard');
 
-Route::prefix('admin')->middleware(['auth','role:admin'])->name('admin.')->group(function() {
 
-    // Dashboard
-    Route::get('/dashboard', [AdminDashboardController::class,'dashboard'])->name('dashboard');
+/*
+|--------------------------------------------------------------------------
+| ================= ADMIN AREA =================
+|--------------------------------------------------------------------------
+*/
+Route::prefix('admin')
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.')
+    ->group(function () {
 
-    // LAPORAN ADMIN
-    Route::prefix('laporan')->group(function() {
-        Route::get('/stok-masuk', [LaporanController::class,'stokMasuk'])->name('laporan.stok-masuk');
-        Route::get('/distribusi', [LaporanController::class,'distribusi'])->name('laporan.distribusi');
-        Route::get('/pemakaian', [LaporanController::class,'pemakaian'])->name('laporan.pemakaian');
-        
-        // Laporan Lengkap (gabungan semua)
-        Route::get('/lengkap', [LaporanController::class,'cetakPDF'])->name('laporan.lengkap');
-    });
+    Route::get('/dashboard', [AdminDashboardController::class, 'dashboard'])
+        ->name('dashboard');
 
-    // Notifikasi Admin
-    Route::get('/notifikasi', [NotifikasiController::class, 'indexAdmin'])->name('notifikasi.index');
+    Route::get('/notifikasi', [NotifikasiController::class, 'indexAdmin'])
+        ->name('notifikasi.index');
 
-    // CRUD
     Route::resource('outlet', OutletController::class);
     Route::resource('bahan', BahanController::class);
     Route::resource('stok-masuk', StokMasukController::class);
     Route::resource('distribusi', DistribusiController::class);
     Route::resource('stok-outlet', StokOutletController::class);
 
-    // Profil Admin
-    Route::get('/profile/edit', [ProfileController::class,'edit'])->name('profile.edit');
-    Route::put('/profile', [ProfileController::class,'update'])->name('profile.update');
-    Route::post('/profile/update-password', [ProfileController::class,'updatePassword'])->name('profile.update-password');
-});
+    /*
+    |--------------------------------------------------------------------------
+    | LAPORAN ADMIN
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('laporan')->name('laporan.')->group(function () {
 
-/* --- USER AREA (OUTLET) --- */
-Route::prefix('user')->middleware(['auth','role:user'])->name('user.')->group(function() {
+        Route::get('/', [AdminLaporanController::class, 'index'])
+            ->name('index');
 
-    // Dashboard User
-    Route::get('/dashboard', [UserDashboardController::class,'index'])->name('dashboard');
+        Route::get('/cetak', [AdminLaporanController::class, 'cetakIndex'])
+            ->name('index.cetak');
 
-    // Riwayat Khusus (Untuk di-klik dari Dashboard)
-    Route::get('/riwayat/pemakaian', [UserDashboardController::class, 'riwayatPemakaian'])->name('riwayat_pemakaian');
-    Route::get('/riwayat/distribusi', [UserDashboardController::class, 'riwayatDistribusi'])->name('riwayat.distribusi');
+        Route::get('/stok-outlet', [AdminLaporanController::class, 'stokOutlet'])
+            ->name('stok-outlet');
 
-    // Pemakaian & Waste (REVISI DI SINI)
-    // 1. Tambahkan 'destroy' agar bisa hapus log pemakaian/waste
-    Route::resource('pemakaian', PemakaianController::class)->only(['index','create','store', 'destroy']); 
-    
-    // 2. Tambahkan Rute Khusus Waste Management
-    Route::get('/waste/lapor', [PemakaianController::class, 'createWaste'])->name('waste.create');
-    Route::post('/waste/simpan', [PemakaianController::class, 'storeWaste'])->name('waste.store');
+        Route::get('/stok-outlet/{outlet}', [AdminLaporanController::class, 'detailStokOutlet'])
+            ->name('stok-outlet.detail');
 
-    // Stok & Distribusi
-    Route::get('/distribusi', [DistribusiController::class,'indexUser'])->name('distribusi.index');
-    Route::get('/stok-outlet', [StokOutletController::class,'indexUser'])->name('stok-outlet.index');
+        Route::get('/stok-outlet/{outlet}/cetak', [AdminLaporanController::class, 'cetakStokOutlet'])
+            ->name('stok-outlet.cetak');
 
-    // Profil User
-    Route::get('/profile/edit', [ProfileController::class,'edit'])->name('profile.edit');
-    Route::put('/profile', [ProfileController::class,'update'])->name('profile.update');
-    Route::post('/profile/update-password', [ProfileController::class,'updatePassword'])->name('profile.update-password');
+        Route::get('/distribusi', [AdminLaporanController::class, 'distribusi'])
+            ->name('distribusi');
 
-    // Notifikasi
-    Route::get('/notifikasi', [NotifikasiController::class,'index'])->name('notifikasi.index');
+        Route::get('/distribusi/{id}', [AdminLaporanController::class, 'detailDistribusi'])
+            ->name('distribusi.detail');
 
-    // LAPORAN USER
-    Route::prefix('laporan')->group(function() {
-        Route::get('/pemakaian', [PemakaianController::class,'laporanUser'])->name('laporan.pemakaian');
+        Route::get('/distribusi/{id}/cetak', [AdminLaporanController::class, 'cetakDistribusi'])
+            ->name('distribusi.cetak');
+
+        Route::get('/lengkap', [AdminLaporanController::class, 'cetakPDF'])
+            ->name('lengkap');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | PROFILE ADMIN
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('profile')->name('profile.')->group(function () {
+        Route::get('/edit', [ProfileController::class, 'edit'])->name('edit');
+        Route::put('/', [ProfileController::class, 'update'])->name('update');
+        Route::post('/update-password', [ProfileController::class, 'updatePassword'])
+            ->name('update-password');
     });
 });
 
-/* --- GLOBAL CHAT --- */
-Route::middleware('auth')->group(function() {
-    Route::get('/chat', [ChatController::class,'index'])->name('chat.index');
-    Route::get('/chat/{user}', [ChatController::class,'show'])->name('chat.show');
-    Route::post('/chat/{user}', [ChatController::class,'store'])->name('chat.store');
+
+/*
+|--------------------------------------------------------------------------
+| ================= USER AREA (OUTLET) =================
+|--------------------------------------------------------------------------
+*/
+Route::prefix('user')
+    ->middleware(['auth', 'role:user'])
+    ->name('user.')
+    ->group(function () {
+
+    Route::get('/dashboard', [UserDashboardController::class, 'index'])
+        ->name('dashboard');
+
+    /*
+    |--------------------------------------------------------------------------
+    | RIWAYAT USER
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/riwayat/pemakaian', [UserDashboardController::class, 'riwayatPemakaian'])
+        ->name('riwayat_pemakaian');
+
+    Route::get('/riwayat/distribusi', [UserDashboardController::class, 'riwayatDistribusi'])
+        ->name('riwayat_distribusi');
+
+    /*
+    |--------------------------------------------------------------------------
+    | PEMAKAIAN
+    |--------------------------------------------------------------------------
+    */
+    Route::resource('pemakaian', PemakaianController::class)
+        ->only(['index', 'create', 'store', 'destroy']);
+
+    /*
+    |--------------------------------------------------------------------------
+    | WASTE
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/waste/lapor', [PemakaianController::class, 'createWaste'])
+        ->name('waste.create');
+
+    Route::post('/waste/simpan', [PemakaianController::class, 'storeWaste'])
+        ->name('waste.store');
+
+    /*
+    |--------------------------------------------------------------------------
+    | DISTRIBUSI & STOK OUTLET
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/distribusi', [DistribusiController::class, 'indexUser'])
+        ->name('distribusi.index');
+
+    Route::get('/stok-outlet', [StokOutletController::class, 'indexUser'])
+        ->name('stok-outlet.index');
+
+    /*
+    |--------------------------------------------------------------------------
+    | ================= LAPORAN USER =================
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('laporan')
+        ->name('laporan.')
+        ->group(function () {
+
+        // INDEX
+        Route::get('/', [UserLaporanController::class, 'index'])
+            ->name('index');
+
+        // STOK
+        Route::get('/stok', [UserLaporanController::class, 'stok'])
+            ->name('stok');
+
+        Route::get('/stok/pdf', [UserLaporanController::class, 'cetakStok'])
+            ->name('stok.pdf');
+
+        // DISTRIBUSI
+        Route::get('/distribusi', [UserLaporanController::class, 'distribusi'])
+            ->name('distribusi');
+
+        Route::get('/distribusi/pdf', [UserLaporanController::class, 'cetakDistribusi'])
+            ->name('distribusi.pdf');
+
+        // RINGKASAN
+        Route::get('/ringkasan', [UserLaporanController::class, 'ringkasan'])
+            ->name('ringkasan');
+
+        Route::get('/ringkasan/pdf', [UserLaporanController::class, 'cetakRingkasan'])
+            ->name('ringkasan.pdf');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | PROFILE USER
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])
+        ->name('profile.edit');
+
+    Route::put('/profile', [ProfileController::class, 'update'])
+        ->name('profile.update');
+
+    Route::post('/profile/update-password', [ProfileController::class, 'updatePassword'])
+        ->name('profile.update-password');
+
+    /*
+    |--------------------------------------------------------------------------
+    | NOTIFIKASI USER
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/notifikasi', [NotifikasiController::class, 'index'])
+        ->name('notifikasi.index');
 });
 
-/* --- AUTH --- */
-require __DIR__.'/auth.php';
+
+/*
+|--------------------------------------------------------------------------
+| GLOBAL CHAT
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->group(function () {
+    Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+    Route::get('/chat/{user}', [ChatController::class, 'show'])->name('chat.show');
+    Route::post('/chat/{user}', [ChatController::class, 'store'])->name('chat.store');
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| AUTH
+|--------------------------------------------------------------------------
+*/
+require __DIR__ . '/auth.php';
