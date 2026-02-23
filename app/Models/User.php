@@ -7,19 +7,13 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-/**
- * @property int $id
- * @property string $name
- * @property string $username
- * @property string $email
- * @property string $no_hp
- * @property string $role
- * @property int|null $outlet_id
- */
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
+    /**
+     * Atribut yang dapat diisi secara massal.
+     */
     protected $fillable = [
         'name',
         'username',
@@ -31,18 +25,54 @@ class User extends Authenticatable
         'photo',
     ];
 
+    /**
+     * Atribut yang harus disembunyikan untuk serialisasi.
+     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
+    /**
+     * Cast atribut ke tipe data tertentu.
+     */
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
 
-public function outlet()
-{
-    return $this->belongsTo(\App\Models\Outlet::class, 'outlet_id');
-}
+    /**
+     * RELASI: User (Outlet Admin) dimiliki oleh satu Outlet.
+     */
+    public function outlet(): BelongsTo
+    {
+        return $this->belongsTo(Outlet::class, 'outlet_id');
+    }
+
+    /**
+     * HELPER: Cek apakah user adalah Admin Pusat.
+     * Penggunaan di Controller: if(auth()->user()->isAdmin())
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    /**
+     * HELPER: Cek apakah user adalah Admin Outlet.
+     */
+    public function isUser(): bool
+    {
+        return $this->role === 'user';
+    }
+
+    /**
+     * HELPER: Mendapatkan URL Foto Profil.
+     */
+    public function getPhotoUrlAttribute(): string
+    {
+        return $this->photo 
+            ? asset('storage/' . $this->photo) 
+            : asset('images/default-avatar.png');
+    }
 }

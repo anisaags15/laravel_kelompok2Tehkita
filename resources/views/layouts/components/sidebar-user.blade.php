@@ -140,14 +140,7 @@
                             </a>
                         </li>
 
-                        {{-- RINGKASAN BULANAN --}}
-                        <li class="nav-item">
-                            <a href="{{ route('user.laporan.ringkasan') }}" 
-                            class="nav-link {{ request()->routeIs('user.laporan.ringkasan') ? 'active' : '' }}">
-                                <i class="far fa-circle nav-icon text-warning"></i>
-                                <p>Ringkasan Bulanan</p>
-                            </a>
-                        </li>
+                 
 
                     </ul>
                 </li>

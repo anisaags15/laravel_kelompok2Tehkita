@@ -4,84 +4,54 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\StokOutlet;
-use App\Models\Pemakaian;
-use App\Models\Message;
-use App\Models\Distribusi;
 
 class NotifikasiController extends Controller
 {
     /**
      * NOTIFIKASI UNTUK ADMIN PUSAT
-     * Melihat semua alert yang butuh tindakan cepat
+     * Menampilkan semua notifikasi masuk (Waste, Stok Kritis, Konfirmasi Terima)
      */
     public function indexAdmin()
     {
-        // 1. Ambil stok kritis (<= 5) dari SEMUA outlet
-        $stokKritis = StokOutlet::with(['outlet', 'bahan'])
-            ->where('stok', '<=', 5)
-            ->orderBy('stok', 'asc')
-            ->get();
+        $notifications = Auth::user()->notifications()->latest()->paginate(10);
 
-        // 2. Ambil Laporan Waste yang butuh Verifikasi (Status: pending)
-        $wasteBaru = Pemakaian::with(['outlet', 'bahan'])
-            ->where('tipe', 'waste')
-            ->where('status', 'pending')
-            ->latest()
-            ->get();
-
-        // 3. Ambil pesan masuk yang belum dibaca
-        $unreadMessages = Message::where('receiver_id', Auth::id())
-            ->where('is_read', false)
-            ->with('sender')
-            ->latest()
-            ->get();
-
-        // 4. Ambil konfirmasi pengiriman stok terbaru (Log distribusi)
-        $distribusiTerbaru = Distribusi::with('outlet')
-            ->latest()
-            ->take(5)
-            ->get();
-
-        return view('admin.notifikasi.index', compact(
-            'stokKritis', 
-            'wasteBaru', 
-            'unreadMessages', 
-            'distribusiTerbaru'
-        ));
+        return view('admin.notifikasi.index', compact('notifications'));
     }
 
     /**
-     * NOTIFIKASI UNTUK ADMIN OUTLET (USER)
-     * Fokus pada operasional outlet sendiri
+     * NOTIFIKASI UNTUK USER OUTLET
+     * Menampilkan info pengiriman dan peringatan stok outlet sendiri
      */
     public function index()
     {
-        $user = Auth::user();
+        $notifications = Auth::user()->notifications()->latest()->paginate(10);
 
-        // 1. Stok kurang di outlet ini saja
-        $stokAlert = StokOutlet::with('bahan')
-            ->where('outlet_id', $user->outlet_id)
-            ->where('stok', '<=', 5)
-            ->get();
+        return view('user.notifikasi.index', compact('notifications'));
+    }
 
-        // 2. Ringkasan pemakaian hari ini
-        $pemakaianHariIni = Pemakaian::with('bahan')
-            ->where('outlet_id', $user->outlet_id)
-            ->whereDate('tanggal', now())
-            ->get();
+    /**
+     * FITUR HAPUS NOTIFIKASI (DELETE)
+     * Bisa digunakan oleh Admin maupun User
+     */
+    public function destroy($id)
+    {
+        $notification = Auth::user()->notifications()->where('id', $id)->first();
+        
+        if ($notification) {
+            $notification->delete();
+            return back()->with('success', 'Notifikasi berhasil dihapus!');
+        }
 
-        // 3. Pesan belum dibaca dari pusat
-        $unreadMessages = Message::where('receiver_id', $user->id)
-            ->where('is_read', false)
-            ->with('sender')
-            ->latest()
-            ->get();
+        return back()->with('error', 'Notifikasi tidak ditemukan.');
+    }
 
-        return view('user.notifikasi.index', compact(
-            'stokAlert',
-            'pemakaianHariIni',
-            'unreadMessages'
-        ));
+    /**
+     * FITUR TANDAI SEMUA SUDAH DIBACA
+     * Menghilangkan tanda "unread" di database
+     */
+    public function markAllRead()
+    {
+        Auth::user()->unreadNotifications->markAsRead();
+        return back()->with('success', 'Semua notifikasi telah ditandai dibaca.');
     }
 }

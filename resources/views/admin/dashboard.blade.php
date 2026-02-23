@@ -229,46 +229,55 @@
         </div>
     </div>
 
-    <div class="col-lg-5 mb-4">
-        <div class="card shadow-sm border-0 h-100">
-            <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
-                <h5 class="fw-bold mb-0 text-dark"><i class="fas fa-comments text-primary me-2"></i> Chat Terbaru</h5>
-                @if($unreadCount > 0) <span class="badge bg-danger rounded-pill">{{ $unreadCount }} Baru</span> @endif
-            </div>
-            {{-- Scrollable Container: Tampil sekitar 5 data --}}
-            <div class="card-body p-0" style="max-height: 380px; overflow-y: auto;">
-                <div class="list-group list-group-flush">
-                    @forelse($latestChats as $chat)
-                        @php $isMe = $chat->sender_id === auth()->id(); @endphp
-                        <a href="{{ route('chat.show', $isMe ? $chat->receiver_id : $chat->sender_id) }}" class="list-group-item list-group-item-action border-0 px-3 py-3">
-                            <div class="d-flex w-100 justify-content-between align-items-center">
-                                <div class="d-flex align-items-center">
-                                    <div class="bg-soft-primary text-primary rounded-circle d-flex justify-content-center align-items-center fw-bold me-3" style="width: 40px; height: 40px; font-size: 0.8rem;">
-                                        {{ strtoupper(substr($isMe ? $chat->receiver->name : $chat->sender->name, 0, 1)) }}
-                                    </div>
-                                    <div style="max-width: 180px;">
-                                        <h6 class="mb-0 fw-bold text-dark" style="font-size: 0.9rem;">{{ $isMe ? $chat->receiver->name : $chat->sender->name }}</h6>
-                                        <p class="mb-0 text-muted text-truncate small">
-                                            {{ $isMe ? 'Anda: ' : '' }}{{ $chat->message }}
-                                        </p>
-                                    </div>
+<div class="col-lg-5 mb-4">
+    <div class="card shadow-sm border-0 h-100">
+        <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold mb-0 text-dark"><i class="fas fa-comments text-primary me-2"></i> Chat Terbaru</h5>
+            @if($unreadCount > 0) <span class="badge bg-danger rounded-pill">{{ $unreadCount }} Baru</span> @endif
+        </div>
+        
+        <div class="card-body p-0" style="max-height: 380px; overflow-y: auto;">
+            <div class="list-group list-group-flush">
+                @forelse($latestChats as $chat)
+                    @php 
+                        $isMe = $chat->sender_id === auth()->id();
+                        // Tentukan siapa lawan bicaranya
+                        $opponent = $isMe ? $chat->receiver : $chat->sender;
+                        // Logika Nama: Jika punya outlet, tampilkan nama outlet, jika tidak tampilkan nama user
+                        $displayName = $opponent->outlet ? $opponent->outlet->nama_outlet : $opponent->name;
+                    @endphp
+                    
+                    <a href="{{ route('chat.show', $opponent->id) }}" class="list-group-item list-group-item-action border-0 px-3 py-3">
+                        <div class="d-flex w-100 justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                {{-- Inisial berdasarkan Nama Outlet --}}
+                                <div class="bg-soft-primary text-primary rounded-circle d-flex justify-content-center align-items-center fw-bold me-3" style="width: 40px; height: 40px; font-size: 0.8rem;">
+                                    {{ strtoupper(substr($displayName, 0, 1)) }}
                                 </div>
-                                <small class="text-muted" style="font-size: 0.7rem;">{{ $chat->created_at->diffForHumans(null, true) }}</small>
+                                <div style="max-width: 180px;">
+                                    {{-- Nama Outlet yang muncul di sini --}}
+                                    <h6 class="mb-0 fw-bold text-dark" style="font-size: 0.9rem;">{{ $displayName }}</h6>
+                                    <p class="mb-0 text-muted text-truncate small">
+                                        {{ $isMe ? 'Anda: ' : '' }}{{ $chat->message }}
+                                    </p>
+                                </div>
                             </div>
-                        </a>
-                    @empty
-                        <div class="text-center py-5">
-                            <i class="fas fa-comment-slash fa-2x text-light mb-2"></i>
-                            <p class="text-muted small">Tidak ada pesan</p>
+                            <small class="text-muted" style="font-size: 0.7rem;">{{ $chat->created_at->diffForHumans(null, true) }}</small>
                         </div>
-                    @endforelse
-                </div>
-            </div>
-            <div class="card-footer bg-white border-0 text-center py-3">
-                <a href="{{ route('chat.index') }}" class="text-primary fw-bold text-decoration-none small">Lihat Semua Pesan <i class="fas fa-arrow-right ms-1"></i></a>
+                    </a>
+                @empty
+                    <div class="text-center py-5">
+                        <i class="fas fa-comment-slash fa-2x text-light mb-2"></i>
+                        <p class="text-muted small">Tidak ada pesan</p>
+                    </div>
+                @endforelse
             </div>
         </div>
+        <div class="card-footer bg-white border-0 text-center py-3">
+            <a href="{{ route('chat.index') }}" class="text-primary fw-bold text-decoration-none small">Lihat Semua Pesan <i class="fas fa-arrow-right ms-1"></i></a>
+        </div>
     </div>
+</div>
 </div>
 
 @endsection
