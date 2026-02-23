@@ -3,14 +3,21 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+
+// Model Utama
 use App\Models\Outlet;
 use App\Models\Bahan;
 use App\Models\StokMasuk;
 use App\Models\Distribusi;
 use App\Models\Pemakaian;
-use App\Models\Message;
-use App\Models\StokOutlet; // <--- WAJIB ADA INI
+use App\Models\StokOutlet;
+use App\Models\User;
+use App\Models\Message; // Pastikan Message di-import jika digunakan
+
+// Support & Utilities
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 
@@ -30,13 +37,12 @@ class DashboardController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 2️⃣ RADAR STOK KRITIS (EARLY WARNING SYSTEM) - NEW! 🚨
+        | 2️⃣ RADAR STOK KRITIS (EARLY WARNING SYSTEM)
         |--------------------------------------------------------------------------
-        | Mencari bahan di outlet yang sisa stoknya 5 atau kurang.
         */
         $stokKritis = StokOutlet::with(['outlet', 'bahan'])
             ->where('stok', '<=', 5)
-            ->orderBy('stok', 'asc') // Urutkan dari yang paling sedikit
+            ->orderBy('stok', 'asc')
             ->get();
 
         /*
@@ -64,7 +70,6 @@ class DashboardController extends Controller
         $unreadCount = 0;
         $latestChats = collect();
 
-        // Cek standar apakah model Message ada (untuk safety)
         if (class_exists(Message::class)) {
             $unreadCount = Message::where('receiver_id', Auth::id())
                 ->where('is_read', 0)
@@ -80,55 +85,52 @@ class DashboardController extends Controller
                 ->get();
         }
 
-/*
-/*
-|--------------------------------------------------------------------------
-| 5️⃣ DATA GRAFIK PEMAKAIAN (REVISI DINAMIS)
-|--------------------------------------------------------------------------
-*/
-// Ambil 7 tanggal terakhir secara berurutan
-$labels = Pemakaian::select('tanggal')
-    ->distinct()
-    ->orderBy('tanggal', 'asc')
-    ->take(7) 
-    ->pluck('tanggal')
-    ->toArray();
+        /*
+        |--------------------------------------------------------------------------
+        | 5️⃣ DATA GRAFIK PEMAKAIAN (DINAMIS)
+        |--------------------------------------------------------------------------
+        */
+        $labels = Pemakaian::select('tanggal')
+            ->distinct()
+            ->orderBy('tanggal', 'asc')
+            ->take(7) 
+            ->pluck('tanggal')
+            ->toArray();
 
-$outletList = Outlet::take(5)->get();
-$datasets = [];
+        $outletList = Outlet::take(5)->get();
+        $datasets = [];
 
-foreach ($outletList as $index => $o) {
-    $dataPemakaian = [];
-    
-    foreach ($labels as $tgl) {
-        $total = Pemakaian::where('outlet_id', $o->id)
-            ->where('tanggal', $tgl)
-            ->sum('jumlah'); 
-        
-        $dataPemakaian[] = $total;
-    }
+        foreach ($outletList as $index => $o) {
+            $dataPemakaian = [];
+            foreach ($labels as $tgl) {
+                $total = Pemakaian::where('outlet_id', $o->id)
+                    ->where('tanggal', $tgl)
+                    ->sum('jumlah'); 
+                $dataPemakaian[] = $total;
+            }
 
-    $colors = ['#198754', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'];
-    $color = $colors[$index] ?? '#' . substr(md5($o->id), 0, 6);
+            $colors = ['#198754', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'];
+            $color = $colors[$index] ?? '#' . substr(md5($o->id), 0, 6);
 
-    $datasets[] = [
-        'label'           => $o->nama_outlet,
-        'data'            => $dataPemakaian,
-        'borderColor'     => $color,
-        'backgroundColor' => $color . '15', // Efek bayangan halus (lebih tipis)
-        'tension'         => 0.4,
-        'fill'            => true,
-        'pointRadius'     => 4,
-        'pointHoverRadius'=> 6,
-    ];
-}
+            $datasets[] = [
+                'label'           => $o->nama_outlet,
+                'data'            => $dataPemakaian,
+                'borderColor'     => $color,
+                'backgroundColor' => $color . '15',
+                'tension'         => 0.4,
+                'fill'            => true,
+                'pointRadius'     => 4,
+                'pointHoverRadius'=> 6,
+            ];
+        }
 
-$pemakaianChart = [
-    'labels'   => array_map(function($tgl) { 
-        return \Carbon\Carbon::parse($tgl)->format('d M'); 
-    }, $labels),
-    'datasets' => $datasets
-];
+        $pemakaianChart = [
+            'labels'   => array_map(function($tgl) { 
+                return \Carbon\Carbon::parse($tgl)->format('d M'); 
+            }, $labels),
+            'datasets' => $datasets
+        ];
+
         /*
         |--------------------------------------------------------------------------
         | 6️⃣ DATA KALENDER DISTRIBUSI
@@ -154,15 +156,48 @@ $pemakaianChart = [
 
         /*
         |--------------------------------------------------------------------------
-        | 7️⃣ RETURN VIEW
+        | 7️⃣ MONITORING REAL-TIME OUTLET (NEW FEATURE! 🚀)
+        |--------------------------------------------------------------------------
+        */
+        $monitoringOutlets = Outlet::withSum(['pemakaian' => function($query) {
+            $query->whereDate('tanggal', today());
+        }], 'jumlah')->get()->map(function($outlet) {
+            
+            $target = $outlet->target_pemakaian_harian ?? 100;
+            $realisasi = $outlet->pemakaian_sum_jumlah ?? 0;
+            $persentase = ($target > 0) ? ($realisasi / $target) * 100 : 0;
+
+            // Logika Status Warna
+            if ($persentase >= 100) {
+                $status = 'Over Limit'; $warna = 'danger';
+            } elseif ($persentase >= 80) {
+                $status = 'Waspada'; $warna = 'warning';
+            } else {
+                $status = 'Aman'; $warna = 'success';
+            }
+
+            return (object) [
+                'nama'       => $outlet->nama_outlet,
+                'target'     => $target,
+                'realisasi'  => $realisasi,
+                'persentase' => $persentase,
+                'status'     => $status,
+                'warna'      => $warna
+            ];
+        });
+
+        /*
+        |--------------------------------------------------------------------------
+        | 8️⃣ RETURN VIEW
         |--------------------------------------------------------------------------
         */
         return view('admin.dashboard', compact(
-            'outlet', 'bahan', 'stokMasuk', 'distribusi', // Stats
-            'stokKritis', // <--- Variabel Baru
-            'outlets', 'latestDistribusi', 'latestStokMasuk', // Tables
-            'unreadCount', 'latestChats', // Chat
-            'pemakaianChart', 'calendarEvents' // Charts
+            'outlet', 'bahan', 'stokMasuk', 'distribusi',
+            'stokKritis',
+            'outlets', 'latestDistribusi', 'latestStokMasuk',
+            'unreadCount', 'latestChats',
+            'pemakaianChart', 'calendarEvents',
+            'monitoringOutlets' // Kirim data monitoring ke view
         ));
     }
 }

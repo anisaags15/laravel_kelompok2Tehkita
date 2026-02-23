@@ -13,36 +13,12 @@ class Outlet extends Model
         'nama_outlet',
         'alamat',
         'no_hp',
-        'target_pemakaian_harian'
+        'target_pemakaian_harian' // Sudah aman di sini
     ];
 
-    // admin outlet (user)
-    public function users()
-    {
-        return $this->hasMany(User::class);
-    }
-
-    // stok masuk ke outlet
-    public function stokMasuk()
-    {
-        return $this->hasMany(StokMasuk::class);
-    }
-
-    // stok tersedia di outlet
-    public function stokOutlet()
-    {
-        return $this->hasMany(StokOutlet::class);
-    }
-
-    // distribusi ke outlet
-    public function distribusi()
-    {
-        return $this->hasMany(Distribusi::class);
-    }
-
-    // pemakaian bahan di outlet
-    public function pemakaian()
-    {
-        return $this->hasMany(Pemakaian::class);
-    }
+    public function users() { return $this->hasMany(User::class); }
+    public function stokMasuk() { return $this->hasMany(StokMasuk::class); }
+    public function stokOutlet() { return $this->hasMany(StokOutlet::class); }
+    public function distribusi() { return $this->hasMany(Distribusi::class); }
+    public function pemakaian() { return $this->hasMany(Pemakaian::class); }
 }
