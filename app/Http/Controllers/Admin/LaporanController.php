@@ -7,6 +7,7 @@ use App\Models\Outlet;
 use App\Models\Distribusi;
 use App\Models\StokOutlet;
 use Illuminate\Http\Request;
+use PDF; // Pastikan library DOMPDF sudah terinstall
 
 class LaporanController extends Controller
 {
@@ -34,7 +35,7 @@ class LaporanController extends Controller
             ->get()
             ->map(function ($item) {
                 return (object)[
-                    'nama_outlet' => $item->outlet->nama_outlet,
+                    'nama_outlet' => $item->outlet->nama_outlet ?? 'N/A',
                     'total' => $item->total
                 ];
             });
@@ -49,12 +50,12 @@ class LaporanController extends Controller
             ->get()
             ->map(function ($item) {
                 return (object)[
-                    'nama_bahan' => $item->bahan->nama_bahan,
+                    'nama_bahan' => $item->bahan->nama_bahan ?? 'N/A',
                     'total' => $item->total
                 ];
             });
 
-        $stokMenipis = StokOutlet::where('stok','<',20)->count();
+        $stokMenipis = StokOutlet::where('stok', '<', 20)->count();
 
         $outletAktif = Distribusi::whereMonth('tanggal', $bulan)
             ->whereYear('tanggal', $tahun)
@@ -69,6 +70,20 @@ class LaporanController extends Controller
             'stokMenipis',
             'outletAktif'
         ));
+    }
+
+    /* ===============================
+        HALAMAN STOK KRITIS (BARU)
+    =============================== */
+    public function stokKritis()
+    {
+        // Ambil data stok di bawah atau sama dengan 5
+        $stokKritis = StokOutlet::with(['outlet', 'bahan'])
+            ->where('stok', '<=', 5)
+            ->orderBy('stok', 'asc')
+            ->get();
+
+        return view('admin.laporan.stok_kritis', compact('stokKritis'));
     }
 
     /* ===============================
@@ -92,13 +107,7 @@ class LaporanController extends Controller
             ->groupBy('outlet_id')
             ->orderByDesc('total')
             ->limit(5)
-            ->get()
-            ->map(function ($item) {
-                return (object)[
-                    'nama_outlet' => $item->outlet->nama_outlet,
-                    'total' => $item->total
-                ];
-            });
+            ->get();
 
         $bahanTerbanyak = Distribusi::selectRaw('bahan_id, SUM(jumlah) as total')
             ->with('bahan')
@@ -107,13 +116,7 @@ class LaporanController extends Controller
             ->groupBy('bahan_id')
             ->orderByDesc('total')
             ->limit(5)
-            ->get()
-            ->map(function ($item) {
-                return (object)[
-                    'nama_bahan' => $item->bahan->nama_bahan,
-                    'total' => $item->total
-                ];
-            });
+            ->get();
 
         $stokMenipis = StokOutlet::where('stok','<',20)->count();
 
@@ -122,7 +125,7 @@ class LaporanController extends Controller
             ->distinct('outlet_id')
             ->count('outlet_id');
 
-        $pdf = \PDF::loadView('admin.laporan.pdf.index', compact(
+        $pdf = PDF::loadView('admin.laporan.pdf.index', compact(
             'totalDistribusi',
             'stokMasuk',
             'outletTeraktif',
@@ -160,7 +163,7 @@ class LaporanController extends Controller
             ->with('bahan')
             ->get();
 
-        $pdf = \PDF::loadView('admin.laporan.pdf.stok_outlet', compact('outlet', 'stok'));
+        $pdf = PDF::loadView('admin.laporan.pdf.stok_outlet', compact('outlet', 'stok'));
 
         return $pdf->download("Laporan_Stok_{$outlet->nama_outlet}.pdf");
     }
@@ -190,7 +193,7 @@ class LaporanController extends Controller
         $distribusi = Distribusi::with(['bahan', 'outlet'])
             ->findOrFail($id);
 
-        $pdf = \PDF::loadView('admin.laporan.pdf.distribusi', compact('distribusi'));
+        $pdf = PDF::loadView('admin.laporan.pdf.distribusi', compact('distribusi'));
 
         return $pdf->download("Distribusi_{$distribusi->outlet->nama_outlet}.pdf");
     }

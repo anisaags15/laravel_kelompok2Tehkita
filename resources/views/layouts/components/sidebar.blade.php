@@ -39,6 +39,23 @@
                     </a>
                 </li>
 
+                <li class="nav-item">
+                    <a href="{{ route('admin.notifikasi.index') }}"
+                       class="nav-link {{ request()->routeIs('admin.notifikasi.index') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-bell"></i>
+                        <p>
+                            Log Notifikasi
+                            @php
+                                $notifCount = \App\Models\StokOutlet::where('stok', '<=', 5)->count() + 
+                                             \App\Models\Message::where('receiver_id', auth()->id())->where('is_read', false)->count();
+                            @endphp
+                            @if($notifCount > 0)
+                                <span class="right badge badge-warning">{{ $notifCount }}</span>
+                            @endif
+                        </p>
+                    </a>
+                </li>
+
                 <li class="nav-header">MASTER DATA</li>
 
                 <li class="nav-item">
@@ -106,6 +123,14 @@
                     </a>
 
                     <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('admin.laporan.stok-kritis') }}"
+                            class="nav-link {{ request()->routeIs('admin.laporan.stok-kritis') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon text-danger"></i>
+                                <p>Stok Kritis</p>
+                            </a>
+                        </li>
+                        
                         <li class="nav-item">
                             <a href="{{ route('admin.laporan.index') }}"
                             class="nav-link {{ request()->routeIs('admin.laporan.index') ? 'active' : '' }}">

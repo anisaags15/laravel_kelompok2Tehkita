@@ -1,11 +1,22 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ProfileController;
+
+// ==========================================
+// CONTROLLER ADMIN
+// ==========================================
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
-use App\Http\Controllers\Admin\LaporanController as AdminLaporanController;
+use App\Http\Controllers\Admin\LaporanController; // Pakai ini agar konsisten dengan class LaporanController
+
+// ==========================================
+// CONTROLLER USER/OUTLET
+// ==========================================
 use App\Http\Controllers\User\DashboardController as UserDashboardController;
 use App\Http\Controllers\User\LaporanController as UserLaporanController;
+
+// ==========================================
+// CONTROLLER UMUM/RESOURCES
+// ==========================================
 use App\Http\Controllers\OutletController;
 use App\Http\Controllers\BahanController;
 use App\Http\Controllers\StokMasukController;
@@ -14,6 +25,7 @@ use App\Http\Controllers\StokOutletController;
 use App\Http\Controllers\PemakaianController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\NotifikasiController;
+use App\Http\Controllers\ProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,8 +46,6 @@ Route::middleware('auth')->get('/dashboard', function () {
 |--------------------------------------------------------------------------
 | ================= ADMIN AREA =================
 |--------------------------------------------------------------------------
-| Prefix: /admin | Name: admin. | Role: admin
-|--------------------------------------------------------------------------
 */
 Route::prefix('admin')
     ->middleware(['auth', 'role:admin'])
@@ -43,6 +53,8 @@ Route::prefix('admin')
     ->group(function () {
 
     Route::get('/dashboard', [AdminDashboardController::class, 'dashboard'])->name('dashboard');
+    
+    // Notifikasi Pusat
     Route::get('/notifikasi', [NotifikasiController::class, 'indexAdmin'])->name('notifikasi.index');
 
     // Resources
@@ -54,22 +66,29 @@ Route::prefix('admin')
 
     // Waste Monitoring (Admin Pusat)
     Route::get('/waste', [PemakaianController::class, 'indexPusat'])->name('waste.index');
-    Route::patch('/waste/{id}/verify', [PemakaianController::class, 'verifyWaste'])->name('waste.verify');
+    Route::post('/waste/{id}/verify', [PemakaianController::class, 'verifyWaste'])->name('waste.verify');
 
-    // Laporan Admin
+    // Laporan Admin (Diarahkan ke Admin\LaporanController)
     Route::prefix('laporan')->name('laporan.')->group(function () {
-        Route::get('/', [AdminLaporanController::class, 'index'])->name('index');
-        Route::get('/cetak', [AdminLaporanController::class, 'cetakIndex'])->name('index.cetak');
-        Route::get('/stok-outlet', [AdminLaporanController::class, 'stokOutlet'])->name('stok-outlet');
-        Route::get('/stok-outlet/{outlet}', [AdminLaporanController::class, 'detailStokOutlet'])->name('stok-outlet.detail');
-        Route::get('/stok-outlet/{outlet}/cetak', [AdminLaporanController::class, 'cetakStokOutlet'])->name('stok-outlet.cetak');
-        Route::get('/distribusi', [AdminLaporanController::class, 'distribusi'])->name('distribusi');
-        Route::get('/distribusi/{id}', [AdminLaporanController::class, 'detailDistribusi'])->name('distribusi.detail');
-        Route::get('/distribusi/{id}/cetak', [AdminLaporanController::class, 'cetakDistribusi'])->name('distribusi.cetak');
-        Route::get('/lengkap', [AdminLaporanController::class, 'cetakPDF'])->name('lengkap');
+        Route::get('/', [LaporanController::class, 'index'])->name('index');
+        Route::get('/cetak', [LaporanController::class, 'cetakIndex'])->name('index.cetak');
+        
+        // Route Stok Kritis
+        Route::get('/stok-kritis', [LaporanController::class, 'stokKritis'])->name('stok-kritis');
+        
+        Route::get('/stok-outlet', [LaporanController::class, 'stokOutlet'])->name('stok-outlet');
+        Route::get('/stok-outlet/{outlet}', [LaporanController::class, 'detailStokOutlet'])->name('stok-outlet.detail');
+        Route::get('/stok-outlet/{outlet}/cetak', [LaporanController::class, 'cetakStokOutlet'])->name('stok-outlet.cetak');
+        
+        Route::get('/distribusi', [LaporanController::class, 'distribusi'])->name('distribusi');
+        Route::get('/distribusi/{id}', [LaporanController::class, 'detailDistribusi'])->name('distribusi.detail');
+        Route::get('/distribusi/{id}/cetak', [LaporanController::class, 'cetakDistribusi'])->name('distribusi.cetak');
+        
+        // Jika ada method cetakPDF untuk laporan lengkap
+        Route::get('/lengkap', [LaporanController::class, 'cetakIndex'])->name('lengkap'); 
     });
 
-    // Profile Admin (Sekarang berada di dalam grup admin)
+    // Profile Admin
     Route::prefix('profile')->name('profile.')->group(function () {
         Route::get('/edit', [ProfileController::class, 'edit'])->name('edit');
         Route::put('/', [ProfileController::class, 'update'])->name('update');

@@ -7,34 +7,53 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\StokOutlet;
 use App\Models\Pemakaian;
 use App\Models\Message;
+use App\Models\Distribusi;
 
 class NotifikasiController extends Controller
 {
     /**
      * NOTIFIKASI UNTUK ADMIN PUSAT
-     * Melihat semua stok kritis dari seluruh outlet
+     * Melihat semua alert yang butuh tindakan cepat
      */
     public function indexAdmin()
     {
-        // 1. Ambil stok yang kritis (<= 5) dari SEMUA outlet
+        // 1. Ambil stok kritis (<= 5) dari SEMUA outlet
         $stokKritis = StokOutlet::with(['outlet', 'bahan'])
             ->where('stok', '<=', 5)
             ->orderBy('stok', 'asc')
             ->get();
 
-        // 2. Ambil pesan masuk yang belum dibaca
+        // 2. Ambil Laporan Waste yang butuh Verifikasi (Status: pending)
+        $wasteBaru = Pemakaian::with(['outlet', 'bahan'])
+            ->where('tipe', 'waste')
+            ->where('status', 'pending')
+            ->latest()
+            ->get();
+
+        // 3. Ambil pesan masuk yang belum dibaca
         $unreadMessages = Message::where('receiver_id', Auth::id())
             ->where('is_read', false)
             ->with('sender')
             ->latest()
             ->get();
 
-        return view('admin.notifikasi.index', compact('stokKritis', 'unreadMessages'));
+        // 4. Ambil konfirmasi pengiriman stok terbaru (Log distribusi)
+        $distribusiTerbaru = Distribusi::with('outlet')
+            ->latest()
+            ->take(5)
+            ->get();
+
+        return view('admin.notifikasi.index', compact(
+            'stokKritis', 
+            'wasteBaru', 
+            'unreadMessages', 
+            'distribusiTerbaru'
+        ));
     }
 
     /**
      * NOTIFIKASI UNTUK ADMIN OUTLET (USER)
-     * Hanya melihat peringatan untuk outletnya sendiri
+     * Fokus pada operasional outlet sendiri
      */
     public function index()
     {
@@ -52,7 +71,7 @@ class NotifikasiController extends Controller
             ->whereDate('tanggal', now())
             ->get();
 
-        // 3. Pesan belum dibaca dari admin
+        // 3. Pesan belum dibaca dari pusat
         $unreadMessages = Message::where('receiver_id', $user->id)
             ->where('is_read', false)
             ->with('sender')

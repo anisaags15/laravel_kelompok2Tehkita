@@ -1,107 +1,100 @@
 @extends('layouts.main')
 
-@section('title', 'Pusat Notifikasi Admin')
-
 @section('content')
 <div class="container-fluid mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="fw-bold mb-0 text-dark">
-            <i class="fas fa-bell text-success mr-2"></i> Log Notifikasi Sistem
-        </h3>
-        <span class="badge bg-soft-success px-3 py-2">
-            Total {{ $stokKritis->count() + $unreadMessages->count() }} Perhatian
-        </span>
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h3 class="fw-bold text-dark"><i class="fas fa-bell text-warning mr-2"></i>Pusat Perhatian Admin</h3>
+            <p class="text-muted small">Semua aktivitas sistem yang memerlukan tindakan Anda hari ini.</p>
+        </div>
     </div>
 
     <div class="row">
-        {{-- SECTION 1: STOK KRITIS OUTLET --}}
-        <div class="col-lg-8 mb-4">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0 fw-bold text-danger">
-                        <i class="fas fa-exclamation-circle mr-2"></i> Stok Kritis di Outlet
-                    </h5>
-                </div>
+        <div class="col-lg-12">
+            <div class="card border-0 shadow-sm">
                 <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="text-muted small text-uppercase">
-                                <tr>
-                                    <th class="px-4">Outlet</th>
-                                    <th>Bahan Baku</th>
-                                    <th class="text-center">Sisa Stok</th>
-                                    <th class="text-right px-4">Tindakan</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($stokKritis as $item)
-                                    <tr>
-                                        <td class="px-4">
-                                            <div class="d-flex align-items-center">
-                                                <div class="dashboard-icon bg-soft-danger mr-3" style="width:40px; height:40px; font-size:16px;">
-                                                    <i class="fas fa-store"></i>
-                                                </div>
-                                                <span class="fw-bold text-dark">{{ $item->outlet->nama_outlet }}</span>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-light text-dark border p-2">
-                                                {{ $item->bahan->nama_bahan }}
-                                            </span>
-                                        </td>
-                                        <td class="text-center">
-                                            <b class="text-danger" style="font-size: 1.1rem;">{{ $item->stok }}</b>
-                                            <small class="text-muted d-block">Unit tersisa</small>
-                                        </td>
-                                        <td class="text-right px-4">
-                                            <a href="{{ route('admin.distribusi.create', ['outlet_id' => $item->outlet_id]) }}" 
-                                               class="btn btn-success btn-sm px-3 rounded-pill shadow-sm">
-                                                <i class="fas fa-truck mr-1"></i> Kirim Stok
-                                            </a>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="4" class="text-center py-5">
-                                            <i class="fas fa-check-circle fa-3x text-success mb-3 opacity-50"></i>
-                                            <p class="text-muted mb-0">Semua stok outlet aman terkendali.</p>
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {{-- SECTION 2: PESAN MASUK --}}
-        <div class="col-lg-4 mb-4">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0 fw-bold text-primary">
-                        <i class="fas fa-envelope-open-text mr-2"></i> Pesan Baru
-                    </h5>
-                </div>
-                <div class="card-body px-3 py-3">
-                    @forelse($unreadMessages as $msg)
-                        <a href="{{ route('chat.show', $msg->sender_id) }}" class="text-decoration-none">
-                            <div class="message-item p-3 mb-2 border-0">
-                                <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <small class="fw-bold text-primary">{{ $msg->sender->name }}</small>
-                                    <small class="text-muted small">{{ $msg->created_at->diffForHumans() }}</small>
+                    <ul class="list-group list-group-flush">
+                        
+                        {{-- 1. STOK KRITIS --}}
+                        @foreach($stokKritis as $s)
+                        <li class="list-group-item list-group-item-action py-3">
+                            <div class="d-flex align-items-center">
+                                <div class="icon-circle bg-light-danger text-danger mr-3" style="width:45px; height:45px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:#fff5f5;">
+                                    <i class="fas fa-exclamation-triangle"></i>
                                 </div>
-                                <p class="text-dark small mb-0 text-truncate">
-                                    {{ $msg->message }}
-                                </p>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-0 font-weight-bold">⚠️ Stok Kritis di {{ $s->outlet->nama_outlet }}</h6>
+                                    <small class="text-muted">Bahan <b>{{ $s->bahan->nama_bahan }}</b> tersisa <b>{{ $s->stok }} {{ $s->bahan->satuan }}</b> segera restock!</small>
+                                </div>
+                                <div>
+                                    <a href="{{ route('admin.laporan.stok-kritis') }}" class="btn btn-sm btn-outline-danger rounded-pill px-3">Atasi</a>
+                                </div>
                             </div>
-                        </a>
-                    @empty
-                        <div class="text-center py-4 text-muted">
-                            <i class="fas fa-comment-slash fa-2x mb-2 opacity-50"></i>
-                            <p class="small">Tidak ada pesan baru.</p>
-                        </div>
-                    @endforelse
+                        </li>
+                        @endforeach
+
+                        {{-- 2. WASTE BARU --}}
+                        @foreach($wasteBaru as $w)
+                        <li class="list-group-item list-group-item-action py-3">
+                            <div class="d-flex align-items-center">
+                                <div class="icon-circle bg-light-warning text-warning mr-3" style="width:45px; height:45px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:#fffdf2;">
+                                    <i class="fas fa-trash-alt"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-0 font-weight-bold">🚮 Laporan Waste Baru</h6>
+                                    <small class="text-muted"><b>{{ $w->outlet->nama_outlet }}</b> melaporkan kerusakan <b>{{ $w->jumlah }} {{ $w->bahan->nama_bahan }}</b>.</small>
+                                </div>
+                                <div>
+                                    <a href="{{ route('admin.waste.index') }}" class="btn btn-sm btn-outline-warning rounded-pill px-3 text-dark">Review</a>
+                                </div>
+                            </div>
+                        </li>
+                        @endforeach
+
+                        {{-- 3. CHAT MASUK --}}
+                        @foreach($unreadMessages as $m)
+                        <li class="list-group-item list-group-item-action py-3">
+                            <div class="d-flex align-items-center">
+                                <div class="icon-circle bg-light-primary text-primary mr-3" style="width:45px; height:45px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:#f0f7ff;">
+                                    <i class="fas fa-comment-dots"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-0 font-weight-bold">💬 Pesan dari {{ $m->sender->name }}</h6>
+                                    <small class="text-muted">"{{ Str::limit($m->message, 50) }}"</small>
+                                </div>
+                                <div>
+                                    <a href="{{ route('chat.show', $m->sender_id) }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">Balas</a>
+                                </div>
+                            </div>
+                        </li>
+                        @endforeach
+
+                        {{-- 4. KONFIRMASI STOK --}}
+                        @foreach($distribusiTerbaru as $d)
+                        <li class="list-group-item list-group-item-action py-3">
+                            <div class="d-flex align-items-center">
+                                <div class="icon-circle bg-light-success text-success mr-3" style="width:45px; height:45px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:#f6fff9;">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-0 font-weight-bold">✅ Pengiriman Selesai</h6>
+                                    <small class="text-muted">Outlet <b>{{ $d->outlet->nama_outlet }}</b> telah menerima pengiriman #{{ $d->id }}.</small>
+                                </div>
+                                <div>
+                                    <a href="{{ route('admin.distribusi.index') }}" class="btn btn-sm btn-outline-success rounded-pill px-3">Detail</a>
+                                </div>
+                            </div>
+                        </li>
+                        @endforeach
+
+                        @if($stokKritis->isEmpty() && $wasteBaru->isEmpty() && $unreadMessages->isEmpty())
+                        <li class="list-group-item py-5 text-center text-muted">
+                            <i class="fas fa-smile-beam fa-3x mb-3 opacity-20"></i>
+                            <p>Semua beres! Tidak ada notifikasi mendesak saat ini.</p>
+                        </li>
+                        @endif
+
+                    </ul>
                 </div>
             </div>
         </div>
