@@ -12,7 +12,8 @@
                 <p class="text-muted mb-0">Kelola semua aktivitas dan laporan masuk dari seluruh outlet.</p>
             </div>
             @if($notifications->count() > 0)
-            <form action="{{ route('notifikasi.markAllRead') }}" method="POST">
+            {{-- PERBAIKAN: Tambah admin. di depan nama route --}}
+            <form action="{{ route('admin.notifikasi.markAllRead') }}" method="POST">
                 @csrf
                 <button type="submit" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold shadow-sm">
                     <i class="fas fa-check-double me-1"></i> Tandai Semua Dibaca
@@ -22,6 +23,13 @@
         </div>
     </div>
 
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4">
+            <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     <div class="row">
         <div class="col-lg-12">
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
@@ -30,7 +38,6 @@
                         
                         @forelse($notifications as $n)
                             @php
-                                // Konfigurasi Tampilan berdasarkan Tipe Notifikasi
                                 $type = $n->data['type'] ?? 'info';
                                 $config = match($type) {
                                     'stok_kritis' => [
@@ -58,9 +65,10 @@
                                         'label' => 'INFO'
                                     ]
                                 };
+                                $isUnread = $n->read_at === null;
                             @endphp
 
-                            <div class="list-group-item list-group-item-action py-3 px-4 border-bottom border-light transition-all hover-bg-light">
+                            <div class="list-group-item list-group-item-action py-3 px-4 border-bottom border-light transition-all {{ $isUnread ? 'bg-unread' : '' }}">
                                 <div class="row align-items-center">
                                     {{-- Kolom 1: Icon --}}
                                     <div class="col-auto">
@@ -79,8 +87,11 @@
                                             <small class="text-muted fw-medium">
                                                 <i class="far fa-clock me-1"></i>{{ $n->created_at->diffForHumans() }}
                                             </small>
+                                            @if($isUnread)
+                                                <span class="ms-2 badge bg-danger rounded-circle p-1" title="Baru"><span class="visually-hidden">.</span></span>
+                                            @endif
                                         </div>
-                                        <h6 class="mb-1 fw-bold text-dark">{{ $n->data['title'] }}</h6>
+                                        <h6 class="mb-1 fw-bold {{ $isUnread ? 'text-dark' : 'text-secondary' }}">{{ $n->data['title'] }}</h6>
                                         <p class="mb-0 text-secondary small text-truncate" style="max-width: 600px;">
                                             {{ $n->data['message'] }}
                                         </p>
@@ -92,8 +103,8 @@
                                             Tindak Lanjut
                                         </a>
                                         
-                                        {{-- Tombol Hapus --}}
-                                        <form action="{{ route('notifikasi.destroy', $n->id) }}" method="POST" onsubmit="return confirm('Hapus notifikasi ini?')">
+                                        {{-- PERBAIKAN: Tambah admin. di depan nama route --}}
+                                        <form action="{{ route('admin.notifikasi.destroy', $n->id) }}" method="POST" onsubmit="return confirm('Hapus notifikasi ini?')">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-link text-danger p-2 text-decoration-none hover-scale" title="Hapus">
@@ -129,10 +140,10 @@
 
 <style>
     .transition-all { transition: all 0.3s ease; }
+    .bg-unread { background-color: #fbfcfe; border-left: 4px solid #007bff; }
     .hover-bg-light:hover { background-color: #f8f9fa; }
     .hover-scale:hover { transform: scale(1.1); }
     .icon-box { border: 1px solid rgba(0,0,0,0.03); }
-    /* Memperbaiki style pagination Laravel agar match dengan Bootstrap */
     .pagination { margin-bottom: 0; }
 </style>
 @endsection

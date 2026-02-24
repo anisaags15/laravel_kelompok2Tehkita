@@ -45,7 +45,7 @@
                     <i class="fas fa-filter"></i> Tampilkan
                 </button>
 
-                <a href="{{ route('admin.laporan.index.cetak', ['bulan' => request('bulan', now()->month), 'tahun' => request('tahun', now()->year)]) }}" 
+                <a href="{{ route('admin.laporan.index', ['bulan' => request('bulan', now()->month), 'tahun' => request('tahun', now()->year)]) }}" 
                    class="btn btn-outline-secondary btn-sm">
                     <i class="fas fa-file-pdf"></i> Cetak PDF
                 </a>
