@@ -77,10 +77,7 @@
     <div class="col-12">
         <div class="card shadow-sm border-0">
             <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
-                <h5 class="fw-bold mb-0 text-dark">
-                    <i class="fas fa-desktop text-primary me-2"></i>
-                    Monitoring Pemakaian Outlet Hari Ini
-                </h5>
+                <h5 class="fw-bold mb-0 text-dark"><i class="fas fa-desktop text-primary me-2"></i> Monitoring Pemakaian Outlet Hari Ini</h5>
                 <span class="badge bg-soft-primary text-primary">{{ date('d M Y') }}</span>
             </div>
             <div class="card-body table-responsive">
@@ -99,14 +96,12 @@
                             <td class="fw-bold text-dark">{{ $m->nama }}</td>
                             <td>
                                 <div class="progress" style="height: 12px; border-radius: 10px; background-color: #f0f0f0;">
-                                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-{{ $m->warna }}"
-                                         role="progressbar"
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-{{ $m->warna }}" 
+                                         role="progressbar" 
                                          style="width: {{ min($m->persentase, 100) }}%">
                                     </div>
                                 </div>
-                                <small class="text-muted mt-1 d-block">
-                                    {{ number_format($m->persentase, 1) }}% Kapasitas Terpakai
-                                </small>
+                                <small class="text-muted mt-1 d-block">{{ number_format($m->persentase, 1) }}% Kapasitas Terpakai</small>
                             </td>
                             <td class="text-center">
                                 <span class="badge bg-light text-dark border py-2 px-3">
@@ -120,12 +115,79 @@
                             </td>
                         </tr>
                         @empty
-                        <tr>
-                            <td colspan="4" class="text-center text-muted">
-                                Belum ada aktivitas hari ini
-                            </td>
-                        </tr>
+                        <tr><td colspan="4" class="text-center text-muted">Belum ada aktivitas hari ini</td></tr>
                         @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{{-- 4. GRAFIK & KALENDER --}}
+<div class="row">
+    <div class="col-lg-8 mb-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="fw-semibold mb-0">Grafik Pemakaian 5 Outlet</h5>
+            </div>
+            <div class="card-body">
+                <div style="position: relative; height: 350px; width: 100%;">
+                    <canvas id="pemakaianChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4 mb-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="fw-semibold mb-0">Kalender Distribusi</h5>
+            </div>
+            <div class="card-body">
+                <div id="calendar-container" style="height: 350px;">
+                    <div id="calendar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- 5. TABLE SECTION --}}
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="fw-semibold mb-0">Data Outlet Terbaru</h5>
+            </div>
+            <div class="card-body table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr><th>Nama Outlet</th><th>No HP</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach($outlets as $o)
+                        <tr><td class="fw-semibold">{{ $o->nama_outlet }}</td><td>{{ $o->no_hp }}</td></tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="fw-semibold mb-0">Stok Masuk Terbaru</h5>
+            </div>
+            <div class="card-body table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr><th>Bahan</th><th>Jumlah</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach($latestStokMasuk as $s)
+                        <tr><td class="fw-semibold">{{ $s->bahan->nama_bahan ?? '-' }}</td><td><span class="badge bg-success">{{ $s->jumlah }}</span></td></tr>
+                        @endforeach
                     </tbody>
                 </table>
             </div>
@@ -274,3 +336,35 @@
 </div>
 
 @endsection
+
+@push('js')
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Grafik
+    const ctx = document.getElementById('pemakaianChart');
+    if (ctx) {
+        new Chart(ctx, {
+            type: 'line',
+            data: @json($pemakaianChart ?? []),
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom' } }
+            }
+        });
+    }
+
+    // Kalender
+    const calendarEl = document.getElementById('calendar');
+    if (calendarEl) {
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            height: '100%',
+            headerToolbar: { left: 'prev,next', center: 'title', right: 'today' },
+            events: @json($calendarEvents ?? [])
+        });
+        calendar.render();
+    }
+});
+</script>
+@endpush
