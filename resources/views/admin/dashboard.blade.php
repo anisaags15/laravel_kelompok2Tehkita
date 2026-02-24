@@ -195,13 +195,24 @@
     </div>
 </div>
 
-{{-- 3. RADAR STOK & LATEST CHAT (YANG HILANG SUDAH KEMBALI) --}}
+{{-- 3. RADAR STOK & LATEST CHAT --}}
 <div class="row mb-4">
     <div class="col-lg-7 mb-4">
         <div class="card shadow-sm border-0 h-100">
-            <div class="card-header bg-white py-3 border-0">
-                <h5 class="fw-bold mb-0 text-danger"><i class="fas fa-exclamation-triangle me-2"></i> Radar Stok Kritis (<= 5)</h5>
+            
+            <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold mb-0 text-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i> 
+                    Radar Stok Kritis (<= 5)
+                </h5>
+
+                {{-- Tombol Lihat Semua --}}
+                <a href="{{ route('admin.laporan.stok-kritis') }}" 
+                   class="btn btn-sm btn-outline-danger">
+                    Lihat Semua
+                </a>
             </div>
+
             <div class="card-body table-responsive">
                 <table class="table table-hover align-middle">
                     <thead class="table-danger text-white">
@@ -209,26 +220,54 @@
                             <th>Outlet</th>
                             <th>Bahan</th>
                             <th class="text-center">Sisa</th>
+                            <th class="text-center">Status</th>
                             <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($stokKritis as $sk)
                         <tr>
-                            <td class="fw-bold">{{ $sk->outlet->nama_outlet ?? 'N/A' }}</td>
-                            <td>{{ $sk->bahan->nama_bahan ?? 'N/A' }}</td>
-                            <td class="text-center"><span class="badge bg-danger rounded-pill px-3">{{ $sk->stok }}</span></td>
-                            <td class="text-center"><a href="{{ route('admin.distribusi.index') }}" class="btn btn-xs btn-outline-primary">Kirim</a></td>
+                            <td class="fw-bold">
+                                {{ $sk->outlet->nama_outlet ?? 'N/A' }}
+                            </td>
+
+                            <td>
+                                {{ $sk->bahan->nama_bahan ?? 'N/A' }}
+                            </td>
+
+                            <td class="text-center">
+                                <span class="badge bg-danger rounded-pill px-3">
+                                    {{ $sk->stok }}
+                                </span>
+                            </td>
+
+                            <td class="text-center">
+                                <span class="badge bg-danger-subtle text-danger px-3">
+                                    Kritis
+                                </span>
+                            </td>
+
+                            <td class="text-center">
+                                <a href="{{ route('admin.laporan.stok-kritis') }}" 
+                                   class="btn btn-sm btn-outline-danger">
+                                    Detail
+                                </a>
+                            </td>
                         </tr>
                         @empty
-                        <tr><td colspan="4" class="text-center py-4 text-muted">✅ Stok semua outlet aman</td></tr>
+                        <tr>
+                            <td colspan="5" class="text-center py-4 text-muted">
+                                ✅ Stok semua outlet aman
+                            </td>
+                        </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
+
         </div>
     </div>
-
+    
 <div class="col-lg-5 mb-4">
     <div class="card shadow-sm border-0 h-100">
         <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">

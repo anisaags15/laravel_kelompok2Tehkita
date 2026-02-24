@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Outlet;
+use App\Models\Bahan;
 use App\Models\Distribusi;
 use App\Models\StokOutlet;
 use Illuminate\Http\Request;
-use PDF; // Pastikan library DOMPDF sudah terinstall
+// Gunakan Facade PDF yang benar untuk Laravel
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class LaporanController extends Controller
 {
@@ -55,7 +57,8 @@ class LaporanController extends Controller
                 ];
             });
 
-        $stokMenipis = StokOutlet::where('stok', '<', 20)->count();
+        // Samakan standar kritis dengan dashboard (<= 5)
+        $stokMenipis = StokOutlet::where('stok', '<=', 5)->count();
 
         $outletAktif = Distribusi::whereMonth('tanggal', $bulan)
             ->whereYear('tanggal', $tahun)
@@ -68,12 +71,14 @@ class LaporanController extends Controller
             'outletTeraktif',
             'bahanTerbanyak',
             'stokMenipis',
-            'outletAktif'
+            'outletAktif',
+            'bulan',
+            'tahun'
         ));
     }
 
     /* ===============================
-        HALAMAN STOK KRITIS (BARU)
+        HALAMAN STOK KRITIS (REDIRECT DARI DASHBOARD)
     =============================== */
     public function stokKritis()
     {
@@ -88,7 +93,7 @@ class LaporanController extends Controller
 
     /* ===============================
         CETAK PDF RINGKASAN LAPORAN
-    =============================== */
+    ============================== */
     public function cetakIndex(Request $request)
     {
         $bulan = $request->bulan ?? now()->month;
@@ -118,14 +123,14 @@ class LaporanController extends Controller
             ->limit(5)
             ->get();
 
-        $stokMenipis = StokOutlet::where('stok','<',20)->count();
+        $stokMenipis = StokOutlet::where('stok','<=', 5)->count();
 
         $outletAktif = Distribusi::whereMonth('tanggal', $bulan)
             ->whereYear('tanggal', $tahun)
             ->distinct('outlet_id')
             ->count('outlet_id');
 
-        $pdf = PDF::loadView('admin.laporan.pdf.index', compact(
+        $pdf = Pdf::loadView('admin.laporan.pdf.index', compact(
             'totalDistribusi',
             'stokMasuk',
             'outletTeraktif',
@@ -163,7 +168,7 @@ class LaporanController extends Controller
             ->with('bahan')
             ->get();
 
-        $pdf = PDF::loadView('admin.laporan.pdf.stok_outlet', compact('outlet', 'stok'));
+        $pdf = Pdf::loadView('admin.laporan.pdf.stok_outlet', compact('outlet', 'stok'));
 
         return $pdf->download("Laporan_Stok_{$outlet->nama_outlet}.pdf");
     }
@@ -193,7 +198,7 @@ class LaporanController extends Controller
         $distribusi = Distribusi::with(['bahan', 'outlet'])
             ->findOrFail($id);
 
-        $pdf = PDF::loadView('admin.laporan.pdf.distribusi', compact('distribusi'));
+        $pdf = Pdf::loadView('admin.laporan.pdf.distribusi', compact('distribusi'));
 
         return $pdf->download("Distribusi_{$distribusi->outlet->nama_outlet}.pdf");
     }
