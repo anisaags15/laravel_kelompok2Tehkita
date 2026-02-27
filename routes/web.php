@@ -54,12 +54,12 @@ Route::prefix('admin')
 
     Route::get('/dashboard', [AdminDashboardController::class, 'dashboard'])->name('dashboard');
     
-    // --- Notifikasi Admin ---
+    // Notifikasi Admin
     Route::get('/notifikasi', [NotifikasiController::class, 'indexAdmin'])->name('notifikasi.index');
     Route::post('/notifikasi/mark-all-read', [NotifikasiController::class, 'markAllRead'])->name('notifikasi.markAllRead');
     Route::delete('/notifikasi/{id}', [NotifikasiController::class, 'destroy'])->name('notifikasi.destroy');
 
-    // Resources
+    // Resources Dasar
     Route::resource('outlet', OutletController::class);
     Route::resource('bahan', BahanController::class);
     Route::resource('stok-masuk', StokMasukController::class);
@@ -73,6 +73,7 @@ Route::prefix('admin')
     // Laporan Admin
     Route::prefix('laporan')->name('laporan.')->group(function () {
         Route::get('/', [LaporanController::class, 'index'])->name('index');
+        Route::get('/cetak-ringkasan', [LaporanController::class, 'cetakIndex'])->name('cetak');
         Route::get('/stok-kritis', [LaporanController::class, 'stokKritis'])->name('stok-kritis');
         Route::get('/stok-outlet', [LaporanController::class, 'stokOutlet'])->name('stok-outlet');
         Route::get('/stok-outlet/{outlet}', [LaporanController::class, 'detailStokOutlet'])->name('stok-outlet.detail');
@@ -102,23 +103,26 @@ Route::prefix('user')
 
     Route::get('/dashboard', [UserDashboardController::class, 'index'])->name('dashboard');
     
-    // --- Notifikasi User ---
+    // Notifikasi User
     Route::get('/notifikasi', [NotifikasiController::class, 'index'])->name('notifikasi.index');
     Route::post('/notifikasi/mark-all-read', [NotifikasiController::class, 'markAllRead'])->name('notifikasi.markAllRead');
     Route::delete('/notifikasi/{id}', [NotifikasiController::class, 'destroy'])->name('notifikasi.destroy');
 
-    // Riwayat
+    // --- PERBAIKAN DI SINI ---
+    // Riwayat Pemakaian & Distribusi (Menggunakan nama yang dipanggil di Blade)
     Route::get('/riwayat/pemakaian', [UserDashboardController::class, 'riwayatPemakaian'])->name('riwayat_pemakaian');
     Route::get('/riwayat/distribusi', [UserDashboardController::class, 'riwayatDistribusi'])->name('riwayat_distribusi');
 
-    // Pemakaian & Waste
-    Route::resource('pemakaian', PemakaianController::class)->only(['index', 'create', 'store', 'destroy']);
+    // Pemakaian (Resource)
+    Route::resource('pemakaian', PemakaianController::class);
+    
+    // Waste
     Route::get('/waste/lapor', [PemakaianController::class, 'createWaste'])->name('waste.create');
     Route::post('/waste/simpan', [PemakaianController::class, 'storeWaste'])->name('waste.store');
 
     // Distribusi & Stok
     Route::get('/distribusi', [DistribusiController::class, 'indexUser'])->name('distribusi.index');
-    Route::post('/distribusi/{id}/terima', [DistribusiController::class, 'terima'])->name('distribusi.terima');
+    Route::match(['post', 'patch'], '/distribusi/{id}/terima', [DistribusiController::class, 'terima'])->name('distribusi.terima');
     Route::get('/stok-outlet', [StokOutletController::class, 'indexUser'])->name('stok-outlet.index');
 
     // Laporan User
@@ -144,13 +148,9 @@ Route::prefix('user')
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {
-    // Chat bisa diakses Admin maupun User
     Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
     Route::get('/chat/{user}', [ChatController::class, 'show'])->name('chat.show');
     Route::post('/chat/{user}', [ChatController::class, 'store'])->name('chat.store');
-    
-    // Route notifikasi global saya hapus karena sudah ada di dalam prefix admin/user 
-    // agar redirect back() bekerja lebih akurat sesuai role.
 });
 
 require __DIR__ . '/auth.php';

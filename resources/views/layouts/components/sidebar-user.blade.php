@@ -49,7 +49,7 @@
                         <p>Stok Tersedia</p>
                     </a>
                 </li>
-
+                
                 {{-- INPUT PEMAKAIAN --}}
                 <li class="nav-item">
                     <a href="{{ route('user.pemakaian.create') }}" 
@@ -96,7 +96,7 @@
                     </ul>
                 </li>
 
-                {{-- ================= LAPORAN OUTLET ================= --}}
+                {{-- LAPORAN OUTLET --}}
                 <li class="nav-header text-uppercase small font-weight-bold text-muted">
                     Laporan Outlet
                 </li>
@@ -112,8 +112,6 @@
                     </a>
 
                     <ul class="nav nav-treeview">
-
-                        {{-- DASHBOARD LAPORAN (INDEX) --}}
                         <li class="nav-item">
                             <a href="{{ route('user.laporan.index') }}" 
                             class="nav-link {{ request()->routeIs('user.laporan.index') ? 'active' : '' }}">
@@ -121,8 +119,6 @@
                                 <p>Dash Laporan</p>
                             </a>
                         </li>
-
-                        {{-- LAPORAN STOK --}}
                         <li class="nav-item">
                             <a href="{{ route('user.laporan.stok') }}" 
                             class="nav-link {{ request()->routeIs('user.laporan.stok') ? 'active' : '' }}">
@@ -130,8 +126,6 @@
                                 <p>Laporan Stok</p>
                             </a>
                         </li>
-
-                        {{-- LAPORAN DISTRIBUSI --}}
                         <li class="nav-item">
                             <a href="{{ route('user.laporan.distribusi') }}" 
                             class="nav-link {{ request()->routeIs('user.laporan.distribusi') ? 'active' : '' }}">
@@ -139,13 +133,9 @@
                                 <p>Laporan Distribusi</p>
                             </a>
                         </li>
-
-                 
-
                     </ul>
                 </li>
 
-                {{-- KOMUNIKASI --}}
                 <li class="nav-header text-uppercase small font-weight-bold text-muted">
                     Komunikasi & Info
                 </li>

@@ -1,0 +1,138 @@
+/* ==========================================================================
+   SECTION 1: WEB DASHBOARD & UI COMPONENTS (Index, Stok, Distribusi)
+   ========================================================================== */
+
+/* Dashboard Stat Cards */
+.stat-card {
+    border-radius: 15px;
+    transition: all 0.3s ease;
+    border: none;
+    border-bottom: 4px solid transparent;
+}
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+.stat-card.border-primary { border-bottom-color: #4338ca !important; }
+.stat-card.border-success { border-bottom-color: #15803d !important; }
+.stat-card.border-info { border-bottom-color: #0369a1 !important; }
+.stat-card.border-danger { border-bottom-color: #b91c1c !important; }
+
+/* Icon Shapes & Soft Backgrounds */
+.icon-shape {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+}
+.bg-primary-soft { background-color: #e0e7ff; color: #4338ca; }
+.bg-success-soft { background-color: #dcfce7; color: #15803d; }
+.bg-info-soft { background-color: #e0f2fe; color: #0369a1; }
+.bg-danger-soft { background-color: #fee2e2; color: #b91c1c; }
+
+/* Filter & Layout Sections */
+.filter-section {
+    background: #ffffff;
+    border-radius: 15px;
+    padding: 25px;
+    border: 1px solid #edf2f7;
+    border-left: 6px solid #4338ca;
+}
+.card-header-accent {
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 15px;
+}
+
+/* Edit & Form Components (REVISI BARU) */
+.text-xs { font-size: 0.75rem; }
+.tracking-wider { letter-spacing: 0.05em; }
+.shadow-xl { box-shadow: 0 20px 27px 0 rgba(0, 0, 0, 0.05); }
+
+.form-control:focus {
+    border-color: #1cc88a !important;
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(28, 200, 138, 0.1) !important;
+}
+
+.input-group-text {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+}
+
+.breadcrumb-item + .breadcrumb-item::before { content: "•"; color: #d1d3e2; }
+
+.badge-soft-success {
+    background-color: #e6f9f1;
+    color: #1cc88a;
+    font-weight: 600;
+}
+
+.text-success { color: #1cc88a !important; }
+.btn-white { background-color: #fff; border: 1px solid #e3e6f0; }
+
+/* Tables Styling (Luxury & Premium) */
+.table-luxury thead th {
+    background-color: #f8f9fa;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    color: #4a5568;
+    border-top: none;
+    border-bottom: 3px solid #edf2f7;
+    padding: 15px 12px;
+}
+.table-luxury td {
+    padding: 15px 12px;
+    vertical-align: middle;
+    color: #2d3748;
+    border-bottom: 1px solid #f1f5f9;
+}
+.table-premium tbody tr { transition: all 0.3s ease; }
+.table-premium tbody tr:hover {
+    background-color: #f6fff9 !important;
+    transform: scale(1.005);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+/* Modern Buttons */
+.btn-circle, .btn-action-sq {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: none;
+    margin: 0 6px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+.btn-circle-detail:hover {
+    transform: translateY(-3px) rotate(8deg);
+}
+.btn-success:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(28, 200, 138, 0.2) !important;
+}
+
+/* Critical Status & Animations */
+.pulse-danger { animation: pulse-red 2s infinite; }
+@keyframes pulse-red {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(231, 74, 59, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(231, 74, 59, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(231, 74, 59, 0); }
+}
+
+/* ==========================================================================
+   SECTION 2: PDF & PRINT REPORT STYLES
+   ========================================================================== */
+@media print {
+    @page { margin: 1.5cm; }
+    .pdf-body { font-family: 'Helvetica', 'Arial', sans-serif; font-size: 11px; color: #333; line-height: 1.6; }
+    .pdf-header-green { border-bottom: 2px solid #12c509; padding-bottom: 10px; margin-bottom: 25px; }
+    .pdf-table { width: 100%; border-collapse: collapse; margin-bottom: 25px; }
+    .pdf-table th { background-color: #15df52; color: #ffffff; padding: 10px; border: 1px solid #047857; }
+    .pdf-table td { padding: 10px; border: 1px solid #e5e7eb; text-align: center; }
+}

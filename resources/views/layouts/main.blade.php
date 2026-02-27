@@ -6,44 +6,19 @@
     <title>@yield('title', 'Pengelolaan Teh Kita')</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <link rel="stylesheet" href="{{ asset('templates/dist/css/adminlte.min.css') }}">
     <link rel="stylesheet" href="{{ asset('templates/dist/css/custom-admin.css') }}">
+    <link rel="stylesheet" href="{{ asset('templates/dist/css/table-admin.css') }}">
+    <link rel="stylesheet" href="{{ asset('templates/dist/css/table-user.css') }}">
+    <link rel="stylesheet" href="{{ asset('templates/dist/css/laporan-user.css') }}">
+     <link rel="stylesheet" href="{{ asset('templates/dist/css/laporan-admin.css') }}">
     
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
     @stack('css')
-
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f4f6f9;
-        }
-
-        /* Perbaikan Sidebar agar tidak goyang */
-        .main-sidebar { transition: width 0.3s ease; }
-        .content-wrapper { transition: margin-left 0.3s ease; }
-
-        /* Card Shadow lebih halus */
-        .card {
-            border-radius: 12px;
-            border: none;
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
-        }
-
-        /* --- FIX SIDEBAR COLLAPSE --- */
-        .sidebar-mini.sidebar-collapse .main-sidebar:hover {
-            width: 4.6rem !important; 
-        }
-
-        .sidebar-mini.sidebar-collapse .main-sidebar:hover .nav-sidebar p,
-        .sidebar-mini.sidebar-collapse .main-sidebar:hover .brand-text,
-        .sidebar-mini.sidebar-collapse .main-sidebar:hover .user-panel .info {
-            display: none !important;
-        }
-    </style>
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed">
@@ -78,6 +53,36 @@
 
         <section class="content pb-4">
             <div class="container-fluid">
+                
+                @if(session('success'))
+                    <div class="alert bg-soft-success border-0 shadow-sm alert-dismissible fade show mb-4" role="alert">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-check-circle mr-3 fa-lg text-success"></i>
+                            <div>
+                                <strong class="text-success d-block">Berhasil!</strong>
+                                <span class="text-dark">{{ session('success') }}</span>
+                            </div>
+                        </div>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                @endif
+
+                @if(session('error'))
+                    <div class="alert bg-soft-danger border-0 shadow-sm alert-dismissible fade show mb-4" role="alert">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-exclamation-circle mr-3 fa-lg text-danger"></i>
+                            <div>
+                                <strong class="text-danger d-block">Gagal!</strong>
+                                <span class="text-dark">{{ session('error') }}</span>
+                            </div>
+                        </div>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                @endif
                 @yield('content')
             </div>
         </section>
@@ -94,9 +99,17 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+@include('layouts.components.sweet-alert')
+
 <script>
   $(document).ready(function() {
-    $('[data-widget="pushmenu"]').PushMenu({ expandOnHover: false });
+    // Inisialisasi PushMenu dengan opsi agar tidak melebar saat di-hover (Fixed Sidebar)
+    $('[data-widget="pushmenu"]').PushMenu({
+        expandOnHover: false,
+        enableRemember: true
+    });
   });
 </script>
 

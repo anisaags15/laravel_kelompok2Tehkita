@@ -1,5 +1,29 @@
 /* ======================================================
-   SIDEBAR STRUCTURE
+    GLOBAL & BODY
+====================================================== */
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f4f6f9;
+}
+
+.img-circle {
+    border-radius: 50% !important;
+    object-fit: cover;
+}
+
+/* Transition agar perpindahan sidebar halus */
+.main-sidebar { 
+    transition: width 0.3s ease; 
+}
+
+.content-wrapper { 
+    transition: margin-left 0.3s ease; 
+}
+
+
+/* ======================================================
+    SIDEBAR STRUCTURE
 ====================================================== */
 
 .main-sidebar {
@@ -17,7 +41,7 @@
 
 
 /* ======================================================
-   BRAND
+    BRAND
 ====================================================== */
 
 .brand-link {
@@ -44,7 +68,7 @@
 
 
 /* ======================================================
-   USER PANEL (HORIZONTAL FIX)
+    USER PANEL (HORIZONTAL FIX)
 ====================================================== */
 
 .user-panel {
@@ -85,8 +109,9 @@
     font-size: 12px;
 }
 
+
 /* ======================================================
-   NAV MENU
+    NAV MENU
 ====================================================== */
 
 .nav-sidebar .nav-link {
@@ -108,7 +133,7 @@
 
 
 /* ======================================================
-   COLLAPSE MODE
+    COLLAPSE MODE (FIX SIDEBAR)
 ====================================================== */
 
 .sidebar-mini.sidebar-collapse .brand-text {
@@ -128,26 +153,26 @@
     height: 38px;
 }
 
+/* Mencegah sidebar melebar saat di-hover dalam kondisi collapse */
+.sidebar-mini.sidebar-collapse .main-sidebar:hover {
+    width: 4.6rem !important; 
+}
 
-/* ======================================================
-   GLOBAL FIX
-====================================================== */
-
-.img-circle {
-    border-radius: 50% !important;
-    object-fit: cover;
+.sidebar-mini.sidebar-collapse .main-sidebar:hover .nav-sidebar p,
+.sidebar-mini.sidebar-collapse .main-sidebar:hover .brand-text,
+.sidebar-mini.sidebar-collapse .main-sidebar:hover .user-panel .info {
+    display: none !important;
 }
 
 
-
 /* ======================================================
-   CARD
+    CARD
 ====================================================== */
 
 .card {
     border: none;
-    border-radius: 18px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+    border-radius: 18px; /* Mengikuti style yang lebih baru (18px) */
+    box-shadow: 0 8px 25px rgba(0,0,0,0.05) !important;
     overflow: hidden;
 }
 
@@ -159,7 +184,7 @@
 
 
 /* ======================================================
-   TABLE
+    TABLE
 ====================================================== */
 
 .table {
@@ -178,7 +203,7 @@
 
 
 /* ======================================================
-   DASHBOARD CARD
+    DASHBOARD CARD
 ====================================================== */
 
 .dashboard-card {
@@ -203,7 +228,7 @@
 
 
 /* ======================================================
-   UTILITY COLORS
+    UTILITY COLORS
 ====================================================== */
 
 .bg-soft-success { background: rgba(25,135,84,.1); color:#198754; }
@@ -213,7 +238,7 @@
 
 
 /* ======================================================
-   MESSAGE ITEM
+    MESSAGE ITEM
 ====================================================== */
 
 .message-item {
@@ -230,7 +255,7 @@
 
 
 /* ======================================================
-   FOOTER
+    FOOTER
 ====================================================== */
 
 .main-footer {
