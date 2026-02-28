@@ -14,7 +14,7 @@ class StokOutletController extends Controller
     | ADMIN - Lihat Semua Stok Outlet
     |--------------------------------------------------------------------------
     */
-    public function index(Request $request)
+public function index(Request $request)
     {
         $outlets = Outlet::all();
 
@@ -24,15 +24,10 @@ class StokOutletController extends Controller
             })
             ->get();
 
-        // VIEW ADMIN
-        return view('user.stok-outlet.index', compact('outlets', 'stokOutlets'));
+        // Arahkan ke view KHUSUS ADMIN
+        return view('admin.stok-outlet.index', compact('outlets', 'stokOutlets'));
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | USER (ADMIN OUTLET) - Lihat Stok Outlet Sendiri
-    |--------------------------------------------------------------------------
-    */
     public function indexUser()
     {
         $outletId = Auth::user()->outlet_id;
@@ -41,7 +36,7 @@ class StokOutletController extends Controller
             ->where('outlet_id', $outletId)
             ->get();
 
-        // VIEW USER
+        // Tetap di view USER
         return view('user.stok-outlet.index', compact('stokOutlets'));
     }
 }

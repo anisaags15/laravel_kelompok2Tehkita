@@ -215,7 +215,7 @@
                         </div>
                     </div>
 
-                <a href="{{ route('admin.laporan.stok-kritis') }}"
+                <a href="{{ route('admin.stok-kritis.index') }}"
    class="btn btn-sm btn-outline-success rounded-pill px-3 shadow-sm"
    style="font-size: 11px; font-weight: 600; margin-left: auto;">
     Detail <i class="fas fa-chevron-right ms-1"></i>
@@ -367,4 +367,4 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 </script>
-@endpush
+@endpushp

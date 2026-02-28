@@ -46,11 +46,11 @@
                         <p>
                             Log Notifikasi
                             @php
-                                $notifCount = \App\Models\StokOutlet::where('stok', '<=', 5)->count() + 
-                                             \App\Models\Message::where('receiver_id', auth()->id())->where('is_read', false)->count();
+                                $unreadCount = auth()->user()->unreadNotifications->count();
                             @endphp
-                            @if($notifCount > 0)
-                                <span class="right badge badge-warning">{{ $notifCount }}</span>
+                            
+                            @if($unreadCount > 0)
+                                <span class="right badge badge-warning">{{ $unreadCount }}</span>
                             @endif
                         </p>
                     </a>
@@ -107,14 +107,24 @@
                         </p>
                     </a>
                 </li>
+                
+                <li class="nav-item">
+                    <a href="{{ route('admin.stok-kritis.index') }}" 
+                       class="nav-link {{ request()->routeIs('admin.stok-kritis.*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-exclamation-triangle text-warning"></i>
+                        <p>
+                            Stok Kritis
+                            @if($stokKritisCount > 0)
+                                <span class="right badge badge-danger">{{ $stokKritisCount }}</span>
+                            @endif
+                        </p>
+                    </a>
+                </li>
 
                 <li class="nav-header">LAPORAN</li>
 
-                <li class="nav-item has-treeview 
-                    {{ request()->routeIs('admin.laporan.*') ? 'menu-open' : '' }}">
-
-                    <a href="#"
-                    class="nav-link {{ request()->routeIs('admin.laporan.*') ? 'active' : '' }}">
+                <li class="nav-item has-treeview {{ request()->routeIs('admin.laporan.*') ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ request()->routeIs('admin.laporan.*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-file-alt"></i>
                         <p>
                             Laporan
@@ -124,14 +134,6 @@
 
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="{{ route('admin.laporan.stok-kritis') }}"
-                            class="nav-link {{ request()->routeIs('admin.laporan.stok-kritis') ? 'active' : '' }}">
-                                <i class="far fa-circle nav-icon text-danger"></i>
-                                <p>Stok Kritis</p>
-                            </a>
-                        </li>
-                        
-                        <li class="nav-item">
                             <a href="{{ route('admin.laporan.index') }}"
                             class="nav-link {{ request()->routeIs('admin.laporan.index') ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon"></i>
@@ -139,6 +141,14 @@
                             </a>
                         </li>
 
+                        <li class="nav-item">
+                            <a href="{{ route('admin.laporan.stok-kritis') }}"
+                            class="nav-link {{ request()->routeIs('admin.laporan.stok-kritis') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon text-danger"></i>
+                                <p>Stok Kritis</p>
+                            </a>
+                        </li>
+                        
                         <li class="nav-item">
                             <a href="{{ route('admin.laporan.stok-outlet') }}"
                             class="nav-link {{ request()->routeIs('admin.laporan.stok-outlet') ? 'active' : '' }}">

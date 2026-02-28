@@ -14,16 +14,28 @@ return new class extends Migration
         Schema::create('pemakaians', function (Blueprint $table) {
             $table->id();
 
+            // Relasi ke bahan baku
             $table->foreignId('bahan_id')
                   ->constrained('bahans')
                   ->cascadeOnDelete();
 
+            // Relasi ke outlet
             $table->foreignId('outlet_id')
                   ->constrained('outlets')
                   ->cascadeOnDelete();
 
             $table->integer('jumlah');
             $table->date('tanggal');
+
+            // --- KOLOM TAMBAHAN UNTUK WASTE ---
+            // tipe: untuk membedakan 'rutin' atau 'waste'
+            $table->string('tipe')->default('rutin'); 
+            
+            // keterangan: alasan kenapa barang jadi waste (rusak/kadaluwarsa)
+            $table->text('keterangan')->nullable();
+            
+            // status: untuk verifikasi dari admin pusat
+            $table->string('status')->default('pending'); 
 
             $table->timestamps();
         });

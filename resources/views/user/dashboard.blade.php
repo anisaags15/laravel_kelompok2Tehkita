@@ -180,28 +180,58 @@
             
             <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-hover mb-0 align-middle">
-                        <thead style="background-color: #f8faf9;">
-                            <tr>
-                                <th class="ps-3 py-3 border-0 text-muted small">Bahan</th>
-                                <th class="text-center py-3 border-0 text-muted small">Sisa Stok</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($stokOutlets as $s)
-                            <tr onclick="window.location='{{ route('user.stok-outlet.index') }}'" style="cursor: pointer;">
-                                <td class="ps-3 py-3">
-                                    <span class="fw-bold text-dark">{{ $s->bahan->nama_bahan ?? 'Unknown' }}</span>
-                                </td>
-                                <td class="text-center py-3">
-                                    <span class="badge {{ $s->stok < 10 ? 'bg-danger' : 'bg-success' }} rounded-pill px-3 py-2" style="min-width: 50px;">
-                                        {{ $s->stok }}
-                                    </span>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+<table class="table table-hover mb-0 align-middle" style="width: 100%; table-layout: fixed; border-collapse: collapse;">
+    <thead style="background-color: #f8faf9;">
+        <tr>
+            {{-- 1. Nama Bahan --}}
+            <th class="ps-3 py-3 border-0 text-muted small fw-bold" style="width: 40%;">Bahan</th>
+            
+            {{-- 2. Stok --}}
+            <th class="py-3 border-0 text-muted small fw-bold text-center" style="width: 25%;">Stok</th>
+            
+            {{-- 3. Status (Disesuaikan agar sejajar dengan badge) --}}
+            <th class="py-3 border-0 text-muted small fw-bold text-center" style="width: 35%;">
+                <div style="padding-left: 20px;">Status</div>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($stokOutlets as $s)
+        <tr onclick="window.location='{{ route('user.stok-outlet.index') }}'" style="cursor: pointer; border-bottom: 1px solid #f8faf9;">
+            {{-- Nama Bahan --}}
+            <td class="ps-3 py-3">
+                <span class="fw-bold text-dark d-block text-truncate">{{ $s->bahan->nama_bahan ?? 'Unknown' }}</span>
+            </td>
+
+            {{-- Angka Stok --}}
+            <td class="py-3 text-center">
+                <span class="fw-bold text-secondary" style="font-size: 15px;">
+                    {{ number_format($s->stok, 0, ',', '.') }}
+                </span>
+            </td>
+
+            {{-- Status Badge (Sekarang pakai text-center + padding agar sejajar header) --}}
+            <td class="py-3 text-center">
+                <div style="display: flex; justify-content: center; padding-left: 20px;">
+                    @if ($s->stok == 0)
+                        <span class="badge rounded-pill px-3 py-2 shadow-sm" style="background-color: rgba(220, 53, 69, 0.1); color: #dc3545; font-size: 11px; min-width: 95px; border: 1px solid rgba(220, 53, 69, 0.2);">
+                            <i class="fas fa-times-circle me-1"></i> Habis
+                        </span>
+                    @elseif ($s->stok <= 10)
+                        <span class="badge rounded-pill px-3 py-2 shadow-sm" style="background-color: rgba(255, 193, 7, 0.1); color: #856404; font-size: 11px; min-width: 95px; border: 1px solid rgba(255, 193, 7, 0.2);">
+                            <i class="fas fa-exclamation-triangle me-1"></i> Tipis
+                        </span>
+                    @else
+                        <span class="badge rounded-pill px-3 py-2 shadow-sm" style="background-color: rgba(40, 167, 69, 0.1); color: #28a745; font-size: 11px; min-width: 95px; border: 1px solid rgba(40, 167, 69, 0.2);">
+                            <i class="fas fa-check-circle me-1"></i> Aman
+                        </span>
+                    @endif
+                </div>
+            </td>
+        </tr>
+        @endforeach
+    </tbody>
+</table>
                 </div>
             </div>
             <div class="card-footer bg-white border-0 py-3 text-center">

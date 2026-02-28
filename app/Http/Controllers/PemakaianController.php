@@ -17,15 +17,14 @@ use Illuminate\Support\Facades\Notification;
 class PemakaianController extends Controller
 {
     /**
-     * Tampilkan riwayat (Outlet/User)
-     * Mengarah ke halaman tabel log pemakaian
+     * Tampilkan riwayat (Outlet/User) - Rutin
      */
     public function index()
     {
         $user = Auth::user();
         $pemakaians = Pemakaian::with('bahan')
             ->where('outlet_id', $user->outlet_id)
-            ->where('tipe', 'rutin') // Memastikan hanya pemakaian rutin yang muncul di log utama
+            ->where('tipe', 'rutin') 
             ->latest()
             ->paginate(10); 
 
@@ -33,12 +32,23 @@ class PemakaianController extends Controller
     }
 
     /**
-     * FORM: Input Pemakaian Rutin
+     * Tampilkan riwayat Catatan Waste (BARU)
      */
+    public function indexWaste()
+    {
+        $user = Auth::user();
+        $wastes = Pemakaian::with('bahan')
+            ->where('outlet_id', $user->outlet_id)
+            ->where('tipe', 'waste')
+            ->latest()
+            ->paginate(10);
+
+        return view('user.pemakaian.index_waste', compact('wastes'));
+    }
+
     public function create()
     {
         $user = Auth::user();
-        
         $stokOutlets = StokOutlet::with('bahan')
             ->where('outlet_id', $user->outlet_id)
             ->where('stok', '>', 0)
@@ -47,9 +57,6 @@ class PemakaianController extends Controller
         return view('user.pemakaian.create', compact('stokOutlets'));
     }
 
-    /**
-     * SIMPAN: Setelah klik simpan, lari ke Log Pemakaian
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -82,7 +89,6 @@ class PemakaianController extends Controller
 
             $stokOutlet->decrement('stok', $request->jumlah);
 
-            // Logika Notifikasi Target Harian & Stok Kritis tetap dipertahankan
             $outlet = $user->outlet;
             $totalHariIni = Pemakaian::where('outlet_id', $user->outlet_id)
                 ->where('tanggal', $request->tanggal)
@@ -105,8 +111,6 @@ class PemakaianController extends Controller
             }
 
             DB::commit();
-
-            // REDIRECT KE LOG PEMAKAIAN (Kuning di sidebar-mu)
             return redirect()->route('user.riwayat_pemakaian')->with('success', 'Data pemakaian berhasil masuk ke log.');
 
         } catch (\Exception $e) {
@@ -115,95 +119,6 @@ class PemakaianController extends Controller
         }
     }
 
-    /**
-     * Sinkronisasi Redirect
-     */
-    public function show($id)
-    {
-        return redirect()->route('user.riwayat_pemakaian');
-    }
-
-    public function edit($id)
-    {
-        $user = Auth::user();
-        $pemakaian = Pemakaian::where('outlet_id', $user->outlet_id)->findOrFail($id);
-        
-        return view('user.pemakaian.edit', compact('pemakaian'));
-    }
-
-    /**
-     * UPDATE: Setelah edit, lari kembali ke Log Pemakaian
-     */
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'jumlah' => 'required|integer|min:1',
-            'tanggal' => 'required|date',
-        ]);
-
-        $user = Auth::user();
-        $pemakaian = Pemakaian::where('outlet_id', $user->outlet_id)->findOrFail($id);
-        
-        try {
-            DB::beginTransaction();
-
-            $stokOutlet = StokOutlet::where('outlet_id', $user->outlet_id)
-                ->where('bahan_id', $pemakaian->bahan_id)
-                ->lockForUpdate()
-                ->first();
-
-            $stokTersediaSaatIni = $stokOutlet->stok + $pemakaian->jumlah;
-
-            if ($stokTersediaSaatIni < $request->jumlah) {
-                return redirect()->back()->with('error', 'Stok tidak mencukupi untuk perubahan ini.');
-            }
-
-            $stokOutlet->update(['stok' => $stokTersediaSaatIni - $request->jumlah]);
-
-            $pemakaian->update([
-                'jumlah' => $request->jumlah,
-                'tanggal' => $request->tanggal
-            ]);
-
-            DB::commit();
-            return redirect()->route('user.riwayat_pemakaian')->with('success', 'Perubahan data berhasil disimpan.');
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->back()->with('error', 'Gagal memperbarui: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * DESTROY: Hapus dan tetap di Log Pemakaian
-     */
-    public function destroy($id)
-    {
-        $user = Auth::user();
-        $pemakaian = Pemakaian::where('outlet_id', $user->outlet_id)->findOrFail($id);
-        
-        try {
-            DB::beginTransaction();
-            $stokOutlet = StokOutlet::where('outlet_id', $pemakaian->outlet_id)
-                ->where('bahan_id', $pemakaian->bahan_id)
-                ->first();
-
-            if ($stokOutlet) {
-                $stokOutlet->increment('stok', $pemakaian->jumlah);
-            }
-
-            $pemakaian->delete();
-            DB::commit();
-            
-            return redirect()->route('user.riwayat_pemakaian')->with('success', 'Data dihapus dan stok dikembalikan.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->back()->with('error', 'Gagal menghapus.');
-        }
-    }
-
-    // --- BAGIAN WASTE ---
-    
     public function createWaste()
     {
         $user = Auth::user();
@@ -226,6 +141,7 @@ class PemakaianController extends Controller
             'stok_outlet_id' => 'required|exists:stok_outlets,id',
             'jumlah'         => 'required|integer|min:1',
             'keterangan'     => 'required|string', 
+            'tanggal'        => 'required|date',
         ]);
 
         $user = Auth::user();
@@ -242,7 +158,7 @@ class PemakaianController extends Controller
                 'bahan_id'   => $stokOutlet->bahan_id,
                 'outlet_id'  => $user->outlet_id,
                 'jumlah'     => $request->jumlah,
-                'tanggal'    => now(),
+                'tanggal'    => $request->tanggal,
                 'tipe'       => 'waste', 
                 'keterangan' => $request->keterangan, 
                 'status'     => 'pending', 
@@ -254,7 +170,8 @@ class PemakaianController extends Controller
             Notification::send($admins, new WasteBaruNotification($waste));
 
             DB::commit();
-            return redirect()->back()->with('success', 'Laporan waste terkirim!');
+            // REDIRECT KE INDEX WASTE (Catatan)
+            return redirect()->route('user.waste.index')->with('success', 'Laporan waste berhasil dicatat!');
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -262,8 +179,7 @@ class PemakaianController extends Controller
         }
     }
 
-    // --- BAGIAN ADMIN PUSAT ---
-
+    // --- ADMIN PUSAT ---
     public function indexPusat()
     {
         $allWastes = Pemakaian::with(['bahan', 'outlet'])
