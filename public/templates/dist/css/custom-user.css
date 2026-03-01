@@ -464,3 +464,36 @@ ADDITIONAL FIX FOR WASTE HEADER SECTION (NEW)
     background-color: #1a1d20 !important;
     border-top: 1px solid #3d4146 !important;
 }
+/* ================================================================
+   7. CHAT & MESSAGING SYSTEM
+   ================================================================ */
+.hover-chat-item:hover { 
+    background-color: rgba(25, 135, 84, 0.03) !important; 
+    transform: translateX(8px); 
+    transition: all 0.3s ease;
+}
+
+.bg-soft-primary { background-color: rgba(13, 110, 253, 0.1); }
+.bg-soft-info { background-color: rgba(13, 202, 240, 0.1); }
+.bg-soft-danger { background-color: rgba(220, 53, 69, 0.1); }
+.bg-soft-success { background-color: rgba(25, 135, 84, 0.1); }
+
+.pulse-red { 
+    animation: pulse-red-small 2s infinite; 
+    font-size: 0.7rem;
+}
+
+@keyframes pulse-red-small {
+    0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+    70% { box-shadow: 0 0 0 6px rgba(220, 53, 69, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+}
+
+/* Fix untuk dark mode di list chat */
+.dark-mode .hover-chat-item:hover {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.dark-mode .border-adaptive {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
