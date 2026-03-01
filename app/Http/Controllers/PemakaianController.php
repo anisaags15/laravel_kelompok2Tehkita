@@ -7,18 +7,19 @@ use App\Models\Bahan;
 use App\Models\StokOutlet;
 use App\Models\Message;
 use App\Models\User;
-use App\Models\Waste; // <-- PASTIKAN INI DI-IMPORT
+use App\Models\Waste;
 use App\Notifications\WasteBaruNotification;
 use App\Notifications\StokKritisNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Storage; // Penting untuk upload file
 
 class PemakaianController extends Controller
 {
     /**
-     * 1. RIWAYAT PEMAKAIAN RUTIN
+     * 1. RIWAYAT PEMAKAIAN RUTIN (OUTLET)
      */
     public function index()
     {
@@ -33,12 +34,11 @@ class PemakaianController extends Controller
     }
 
     /**
-     * 2. RIWAYAT WASTE (AMBIL DARI TABEL WASTE)
+     * 2. RIWAYAT WASTE (OUTLET)
      */
     public function indexWaste()
     {
         $user = Auth::user();
-        // Ambil dari model Waste, bukan Pemakaian
         $wastes = Waste::with('stokOutlet.bahan')
             ->where('outlet_id', $user->outlet_id)
             ->latest()
@@ -72,7 +72,6 @@ class PemakaianController extends Controller
             ->where('stok', '>', 0)
             ->get();
 
-        // Hitung total waste bulan ini dari tabel Waste
         $wasteBulanIni = Waste::where('outlet_id', $user->outlet_id)
             ->whereMonth('tanggal', now()->month)
             ->sum('jumlah');
@@ -114,7 +113,6 @@ class PemakaianController extends Controller
 
             $stokOutlet->decrement('stok', $request->jumlah);
             
-            // Logika Bot Over Target & Stok Habis (Sama seperti sebelumnya)
             $this->handleBotNotifications($user, $stokOutlet, $request->jumlah, $request->tanggal);
 
             DB::commit();
@@ -126,7 +124,7 @@ class PemakaianController extends Controller
     }
 
     /**
-     * 6. SIMPAN WASTE (KE TABEL WASTE)
+     * 6. SIMPAN WASTE + LOGIKA UPLOAD FOTO
      */
     public function storeWaste(Request $request)
     {
@@ -135,29 +133,35 @@ class PemakaianController extends Controller
             'jumlah'         => 'required|integer|min:1',
             'keterangan'     => 'required|string', 
             'tanggal'        => 'required|date',
+            'foto'           => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // Validasi Foto
         ]);
 
         $user = Auth::user();
         $stokOutlet = StokOutlet::with('bahan')->findOrFail($request->stok_outlet_id);
 
         if ($stokOutlet->stok < $request->jumlah) {
-            return redirect()->back()->with('error', 'Stok di outlet tidak mencukupi untuk dilaporkan waste!');
+            return redirect()->back()->with('error', 'Stok tidak mencukupi!');
         }
 
         try {
             DB::beginTransaction();
 
-            // SIMPAN KE TABEL WASTE
+            // Handle Upload Foto
+            $fotoPath = null;
+            if ($request->hasFile('foto')) {
+                $fotoPath = $request->file('foto')->store('waste_photos', 'public');
+            }
+
             $waste = Waste::create([
                 'outlet_id'      => $user->outlet_id,
                 'stok_outlet_id' => $request->stok_outlet_id,
                 'jumlah'         => $request->jumlah,
                 'tanggal'        => $request->tanggal,
                 'keterangan'     => $request->keterangan,
+                'foto'           => $fotoPath, // Simpan path foto
                 'status'         => 'pending',
             ]);
 
-            // POTONG STOK
             $stokOutlet->decrement('stok', $request->jumlah);
             $stokSekarang = $stokOutlet->stok;
 
@@ -165,7 +169,8 @@ class PemakaianController extends Controller
             $adminPusat = User::where('role', 'admin')->first();
             if ($adminPusat) {
                 $msgBody = "[SISTEM NOTIFIKASI]\n\n⚠️ *LAPORAN WASTE (KERUSAKAN)*\n------------------------------------------\nOutlet: {$user->outlet->nama_outlet}\nBahan: *{$stokOutlet->bahan->nama_bahan}*\nJumlah: {$request->jumlah}\nKeterangan: \"{$request->keterangan}\"\n\n";
-                $msgBody .= ($stokSekarang <= 0) ? "❗ *STATUS:* Stok bahan ini HABIS." : "Sisa stok: {$stokSekarang} unit.";
+                if ($fotoPath) $msgBody .= "📸 *Bukti foto telah diunggah ke sistem.*\n";
+                $msgBody .= ($stokSekarang <= 0) ? "❗ *STATUS:* Stok HABIS." : "Sisa stok: {$stokSekarang} unit.";
 
                 Message::create([
                     'sender_id'   => $user->id,
@@ -180,39 +185,29 @@ class PemakaianController extends Controller
             return redirect()->route('user.waste.index')->with('success', 'Laporan waste berhasil disimpan.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Gagal memproses waste: ' . $e->getMessage());
-        }
-    }
-
-    // Helper untuk notifikasi rutin (Opsional agar kode bersih)
-    private function handleBotNotifications($user, $stokOutlet, $jumlah, $tanggal) {
-        $stokSekarang = $stokOutlet->stok;
-        $adminPusat = User::where('role', 'admin')->first();
-        if(!$adminPusat) return;
-
-        // Cek Stok Habis
-        if ($stokSekarang <= 0) {
-            Message::create([
-                'sender_id' => $user->id, 'receiver_id' => $adminPusat->id,
-                'subject' => 'NOTIFIKASI SISTEM',
-                'message' => "[SISTEM NOTIFIKASI]\n\n🚨 *STOK HABIS*\nOutlet: {$user->outlet->nama_outlet}\nBahan: {$stokOutlet->bahan->nama_bahan}\nSegera restock!",
-                'is_read' => 0
-            ]);
+            return redirect()->back()->with('error', 'Gagal: ' . $e->getMessage());
         }
     }
 
     /**
-     * 7. ADMIN PUSAT - INDEX WASTE
+     * 7. ADMIN PUSAT - INDEX WASTE (FIX ERROR 500)
      */
-    public function indexPusat()
-    {
-        $allWastes = Waste::with(['stokOutlet.bahan', 'outlet'])
-            ->latest()
-            ->paginate(15);
+   public function indexPusat()
+{
+    // Ambil data untuk tabel
+    $allWastes = Waste::with(['stokOutlet.bahan', 'outlet'])
+        ->latest()
+        ->paginate(15);
 
-        return view('admin.waste.index', compact('allWastes'));
-    }
+    // Ambil data untuk Stats Cards
+    $totalPending = Waste::where('status', 'pending')->count();
+    
+    // SESUAIKAN NAMA VARIABELNYA DI SINI
+    $totalWaste = Waste::whereMonth('tanggal', now()->month)->sum('jumlah');
 
+    // Kirim variabel $totalWaste ke view
+    return view('admin.waste.index', compact('allWastes', 'totalPending', 'totalWaste'));
+}
     /**
      * 8. VERIFIKASI WASTE OLEH ADMIN
      */
@@ -222,5 +217,20 @@ class PemakaianController extends Controller
         $waste->update(['status' => 'verified']);
 
         return redirect()->back()->with('success', 'Laporan waste diverifikasi.');
+    }
+
+    private function handleBotNotifications($user, $stokOutlet, $jumlah, $tanggal) {
+        $stokSekarang = $stokOutlet->stok;
+        $adminPusat = User::where('role', 'admin')->first();
+        if(!$adminPusat) return;
+
+        if ($stokSekarang <= 0) {
+            Message::create([
+                'sender_id' => $user->id, 'receiver_id' => $adminPusat->id,
+                'subject' => 'NOTIFIKASI SISTEM',
+                'message' => "[SISTEM NOTIFIKASI]\n\n🚨 *STOK HABIS*\nOutlet: {$user->outlet->nama_outlet}\nBahan: {$stokOutlet->bahan->nama_bahan}",
+                'is_read' => 0
+            ]);
+        }
     }
 }
