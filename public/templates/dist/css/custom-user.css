@@ -97,28 +97,26 @@ body {
     box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.1);
 }
 
-.input-icon {
-    width: 50px; 
-    background: #f8f9fa;
-    border-right: 1px solid #ced4da;
+/* KOTAK IKON TERPISAH (ANTI-TUMPANG TINDIH) */
+.input-group-prepend-custom,
+.input-icon,
+.input-icon-danger {
+    width: 55px; /* Kunci lebar kotak ikon */
     display: flex; 
     align-items: center; 
     justify-content: center;
+    background: #f8f9fa;
+    border-right: 1px solid #ced4da;
     color: #4b5d53;
-    flex-shrink: 0;
+    flex-shrink: 0; /* Ikon dilarang mengecil saat diketik banyak teks */
 }
 
 .input-icon-danger {
-    width: 50px; 
     background: #fff5f5; 
-    border-right: 1px solid #ced4da;
-    display: flex; 
-    align-items: center; 
-    justify-content: center;
     color: #dc3545;
-    flex-shrink: 0;
 }
 
+/* INPUT TEXT AREA */
 .input-custom-modern, 
 .form-control.input-modern, 
 .custom-select-modern {
@@ -131,12 +129,28 @@ body {
     width: 100%;
 }
 
-.select2-container--default .select2-selection--single {
+.input-custom-modern:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Tombol Simpan Kustom */
+.btn-simpan-custom {
+    height: 50px;
+    border-radius: 12px;
+    font-weight: 700;
+}
+
+/* Bungkusan Select2 */
+.container-select2 .select2-container--default .select2-selection--single {
     border: none !important;
     background: transparent !important;
     height: 50px !important;
     display: flex !important;
     align-items: center !important;
+}
+.container-select2 .select2-container--default .select2-selection--single .select2-selection__rendered {
+    padding-left: 15px !important;
 }
 
 /* ================================================================
@@ -193,6 +207,8 @@ body {
     color: #ffffff !important;
 }
 
+/* Kotak Ikon Dark Mode */
+.dark-mode .input-group-prepend-custom,
 .dark-mode .input-icon {
     background-color: #2c3136 !important;
     border-color: #3d4146 !important;
@@ -206,7 +222,8 @@ body {
 }
 
 /* Select2 Dark Mode */
-.dark-mode .select2-container--default .select2-selection--single .select2-selection__rendered {
+.dark-mode .select2-container--default .select2-selection--single .select2-selection__rendered,
+.dark-mode .container-select2 .select2-container--default .select2-selection--single .select2-selection__rendered {
     color: white !important;
 }
 
@@ -267,6 +284,7 @@ ADDITIONAL FIX FOR WASTE HEADER SECTION (NEW)
     background-color: #1a1d20 !important;
     border-left: 5px solid #e74a3b !important;
 }
+
 /* TABLE ADAPTIVE */
 .table-header-adaptive {
     background-color: #fcfcfd !important;
@@ -328,6 +346,7 @@ ADDITIONAL FIX FOR WASTE HEADER SECTION (NEW)
 .dark-mode .table-row-modern:hover {
     background-color: #25282c !important;
 }
+
 /* HEADER DISTRIBUSI ADAPTIVE */
 .header-distribusi-wrapper {
     background-color: #ffffff;
@@ -337,12 +356,12 @@ ADDITIONAL FIX FOR WASTE HEADER SECTION (NEW)
 
 .dark-mode .header-distribusi-wrapper {
     background-color: #1a1d20;
-    border-left: 5px solid #3751a1; /* Biru lebih gelap agar tidak kontras tinggi */
+    border-left: 5px solid #3751a1;
 }
 
 /* STOCK BUBBLE ADAPTIVE */
 .distribusi-bubble-adaptive {
-    background: #f0f7ff; /* Biru sangat muda */
+    background: #f0f7ff;
     padding: 6px 14px;
     border-radius: 10px;
     display: inline-block;
@@ -356,8 +375,92 @@ ADDITIONAL FIX FOR WASTE HEADER SECTION (NEW)
 
 .distribusi-bubble-adaptive .amount { font-weight: 800; font-size: 1rem; }
 .distribusi-bubble-adaptive .unit { font-size: 0.7rem; font-weight: 600; }
+/* ================================================================
+   6. RIWAYAT & TABLE COMPONENTS (NEW)
+   ================================================================ */
+.bg-soft-success { background-color: rgba(28, 200, 138, 0.1); }
 
-/* REVISI HOVER TABLE DARK MODE */
-.dark-mode .table-row-modern:hover {
-    background-color: #25282c !important;
+.avatar-icon {
+    width: 42px; height: 42px; 
+    border-radius: 12px; 
+    display: flex; align-items: center; justify-content: center; 
+    font-weight: bold;
+}
+
+/* BUBBLE USAGE ADAPTIVE */
+.usage-bubble-adaptive {
+    background: #fffafa;
+    border: 1px solid #ffebeb;
+    padding: 5px 12px;
+    border-radius: 10px;
+    display: inline-block;
+}
+
+.dark-mode .usage-bubble-adaptive {
+    background: rgba(231, 74, 59, 0.05) !important;
+    border: 1px solid rgba(231, 74, 59, 0.1) !important;
+}
+
+.usage-bubble-adaptive .amount { font-weight: 800; font-size: 1rem; }
+
+/* BADGE STATUS */
+.badge-status-success {
+    background: rgba(28, 200, 138, 0.1);
+    color: #1cc88a;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border: 1px solid rgba(28, 200, 138, 0.3);
+}
+
+.badge-status-success .dot {
+    height: 8px; width: 8px; background-color: #1cc88a;
+    border-radius: 50%; display: inline-block; margin-right: 5px;
+}
+
+/* INPUT SEARCH ADAPTIVE */
+.input-adaptive {
+    background-color: #f8f9fc !important;
+    color: #333 !important;
+    transition: all 0.3s;
+}
+
+.dark-mode .input-adaptive {
+    background-color: #1e2125 !important;
+    color: #e0e0e0 !important;
+}
+
+/* PAGINATION FIX */
+.pagination-container .pagination { margin-bottom: 0; gap: 5px; }
+.pagination-container .page-item .page-link {
+    border-radius: 10px !important;
+    margin: 0 3px;
+    border: none !important;
+    background: #f8f9fc;
+    color: #4e73df;
+    font-weight: 600;
+    padding: 8px 14px;
+    transition: 0.3s;
+}
+
+.dark-mode .pagination-container .page-item:not(.active) .page-link {
+    background: #2c3034 !important;
+    color: #aab2bd !important;
+}
+
+.pagination-container .page-item.active .page-link {
+    background: #4e73df !important;
+    color: white !important;
+    box-shadow: 0 4px 10px rgba(78, 115, 223, 0.3);
+}
+
+.footer-adaptive {
+    background-color: #ffffff !important;
+    border-top: 1px solid #f1f1f4 !important;
+}
+
+.dark-mode .footer-adaptive {
+    background-color: #1a1d20 !important;
+    border-top: 1px solid #3d4146 !important;
 }

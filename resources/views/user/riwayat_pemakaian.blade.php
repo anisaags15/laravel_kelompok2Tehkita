@@ -14,34 +14,35 @@
             <i class="fas fa-arrow-left mr-2 text-primary"></i> Kembali
         </a>
     </div>
-{{-- FILTER SEARCH --}}
-<div class="card border-0 shadow-sm mb-4" style="border-radius: 15px; background: transparent;">
-    <div class="card-body p-0"> {{-- P-0 agar tidak ada double padding --}}
-        <form action="{{ route('user.riwayat_pemakaian') }}" method="GET">
-            <div class="row no-gutters shadow-sm" style="border-radius: 15px; overflow: hidden;">
-                <div class="col-md-10 col-9">
-                    <div class="position-relative">
-                        <i class="fas fa-search position-absolute" style="left: 20px; top: 50%; transform: translateY(-50%); color: #a1a1a1; z-index: 5;"></i>
-                        <input type="text" name="search" class="form-control border-0 input-adaptive" 
-                               style="height: 60px; padding-left: 55px; border-radius: 0;"
-                               placeholder="Cari nama bahan (contoh: Gula Aren...)" 
-                               value="{{ request('search') }}">
+
+    {{-- FILTER SEARCH --}}
+    <div class="card border-0 shadow-sm mb-4" style="border-radius: 15px; background: transparent;">
+        <div class="card-body p-0">
+            <form action="{{ route('user.riwayat_pemakaian') }}" method="GET">
+                <div class="row no-gutters shadow-sm" style="border-radius: 15px; overflow: hidden;">
+                    <div class="col-md-10 col-9">
+                        <div class="position-relative">
+                            <i class="fas fa-search position-absolute" style="left: 20px; top: 50%; transform: translateY(-50%); color: #a1a1a1; z-index: 5;"></i>
+                            <input type="text" name="search" class="form-control border-0 input-adaptive" 
+                                   style="height: 60px; padding-left: 55px; border-radius: 0;"
+                                   placeholder="Cari nama bahan (contoh: Gula Aren...)" 
+                                   value="{{ request('search') }}">
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-3">
+                        <button type="submit" class="btn btn-primary w-100 h-100 shadow-none font-weight-bold" 
+                                style="border-radius: 0; background: #4e73df; border: none; min-height: 60px; display: flex; align-items: center; justify-content: center; white-space: nowrap;">
+                            <span class="d-none d-md-inline">Cari Arsip</span>
+                            <i class="fas fa-search d-md-none"></i>
+                        </button>
                     </div>
                 </div>
-                <div class="col-md-2 col-3">
-                    <button type="submit" class="btn btn-primary w-100 h-100 shadow-none font-weight-bold" 
-                            style="border-radius: 0; background: #4e73df; border: none; min-height: 60px;">
-                        <span class="d-none d-md-inline">Cari Arsip</span>
-                        <i class="fas fa-search d-md-none"></i> {{-- Muncul icon saja di mobile --}}
-                    </button>
-                </div>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
-</div>
 
     {{-- TABLE CARD --}}
-    <div class="card shadow-lg border-0" style="border-radius: 20px; overflow: hidden;">
+    <div class="card shadow-lg border-0 bg-adaptive" style="border-radius: 20px; overflow: hidden;">
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0 text-adaptive">
@@ -76,7 +77,7 @@
                             <td class="text-center">
                                 <div class="usage-bubble-adaptive shadow-sm">
                                     <span class="amount text-danger">-{{ number_format($item->jumlah, 0, ',', '.') }}</span>
-                                    <span class="unit text-muted small">{{ $item->bahan->satuan ?? 'unit' }}</span>
+                                    <span class="unit text-muted small ml-1">{{ $item->bahan->satuan ?? 'unit' }}</span>
                                 </div>
                             </td>
                             <td class="text-center">
@@ -121,123 +122,4 @@
         </div>
     </div>
 </div>
-
-<style>
-    /* Tambahan Styling Spesifik Riwayat */
-    .bg-soft-success { background-color: rgba(28, 200, 138, 0.1); }
-    
-    .avatar-icon {
-        width: 42px; height: 42px; 
-        border-radius: 12px; 
-        display: flex; align-items: center; justify-content: center; 
-        font-weight: bold;
-    }
-
-    /* BUBBLE ADAPTIVE */
-    .usage-bubble-adaptive {
-        background: #fffafa;
-        border: 1px solid #ffebeb;
-        padding: 5px 12px;
-        border-radius: 10px;
-        display: inline-block;
-    }
-    .dark-mode .usage-bubble-adaptive {
-        background: rgba(231, 74, 59, 0.05); /* Soft Red Transparan */
-        border: 1px solid rgba(231, 74, 59, 0.1);
-    }
-    .usage-bubble-adaptive .amount { font-weight: 800; font-size: 1rem; }
-
-    /* BADGE STATUS */
-    .badge-status-success {
-        background: rgba(28, 200, 138, 0.1);
-        color: #1cc88a;
-        padding: 6px 14px;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 700;
-        border: 1px solid rgba(28, 200, 138, 0.3);
-    }
-    .badge-status-success .dot {
-        height: 8px; width: 8px; background-color: #1cc88a;
-        border-radius: 50%; display: inline-block; margin-right: 5px;
-    }
-
-    /* INPUT ADAPTIVE */
-    .input-adaptive {
-        background-color: #f8f9fc;
-        border-radius: 12px;
-    }
-    .dark-mode .input-adaptive {
-        background-color: #2c3034 !important;
-        color: #e0e0e0 !important;
-    }
-
-    /* PAGINATION STYLING */
-    .pagination-container .pagination { margin-bottom: 0; gap: 5px; }
-    .pagination-container .page-item .page-link {
-        border-radius: 8px !important;
-        border: none;
-        background: #f8f9fc;
-        color: #4e73df;
-        font-weight: 600;
-        padding: 8px 14px;
-        transition: 0.3s;
-    }
-    .dark-mode .pagination-container .page-item .page-link {
-        background: #2c3034;
-        color: #aab2bd;
-    }
-    .pagination-container .page-item.active .page-link {
-        background: #4e73df;
-        color: white !important;
-        box-shadow: 0 4px 10px rgba(78, 115, 223, 0.3);
-    }
-    <style>
-    /* FIX TOMBOL GEPENG & TEKS VERTIKAL */
-    .btn-primary {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        white-space: nowrap; /* Mencegah teks turun ke bawah */
-    }
-
-    /* INPUT ADAPTIVE - Sesuai Screen Shot Dark Mode Kamu */
-    .input-adaptive {
-        background-color: #f8f9fc;
-        color: #333;
-        transition: all 0.3s;
-    }
-    .dark-mode .input-adaptive {
-        background-color: #1e2125 !important;
-        color: #e0e0e0 !important;
-    }
-
-    /* TABLE IMPROVEMENT */
-    .table-header-adaptive {
-        background-color: #fcfcfd;
-    }
-    .dark-mode .table-header-adaptive {
-        background-color: #1a1d21;
-        color: #aab2bd;
-    }
-    
-    .border-adaptive {
-        border-bottom: 1px solid #f1f1f4;
-    }
-    .dark-mode .border-adaptive {
-        border-bottom: 1px solid #2d3238;
-    }
-
-    /* PAGINATION FIX */
-    .pagination-container .page-link {
-        border-radius: 10px !important;
-        margin: 0 3px;
-        border: none !important;
-    }
-    .dark-mode .pagination-container .page-item:not(.active) .page-link {
-        background: #2c3034 !important;
-        color: #aab2bd;
-    }
-</style>
-</style>
 @endsection

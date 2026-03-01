@@ -11,7 +11,7 @@
 
     <div class="row">
         <div class="col-lg-8">
-            <div class="card border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+            <div class="card border-0 shadow-lg mb-4" style="border-radius: 20px; overflow: hidden;">
                 <div class="card-body p-4 p-md-5">
                     
                     @if(session('error'))
@@ -32,7 +32,7 @@
                                 <div class="input-group-prepend-custom">
                                     <i class="fas fa-box"></i>
                                 </div>
-                                <div class="flex-grow-1">
+                                <div class="flex-grow-1 container-select2">
                                     <select name="bahan_id" class="form-control select2 custom-select-modern" required>
                                         <option value="">Cari atau pilih bahan...</option>
                                         @foreach($stokOutlets as $stok)
@@ -55,7 +55,7 @@
                                         <div class="input-group-prepend-custom">
                                             <i class="fas fa-minus-circle text-danger"></i>
                                         </div>
-                                        <input type="number" name="jumlah" class="form-control input-custom-modern" min="1" placeholder="Masukkan angka..." required>
+                                        <input type="number" name="jumlah" class="form-control input-custom-modern" min="1" placeholder="0" required>
                                     </div>
                                 </div>
                             </div>
@@ -73,8 +73,8 @@
                             </div>
                         </div>
 
-                        <div class="mt-4 pt-4 border-top border-secondary d-flex align-items-center justify-content-between">
-                            <a href="{{ route('user.riwayat_pemakaian') }}" class="btn-batal-custom">
+                        <div class="mt-4 pt-4 border-top border-adaptive d-flex align-items-center justify-content-between">
+                            <a href="{{ route('user.riwayat_pemakaian') }}" class="text-muted text-decoration-none font-weight-bold">
                                 <i class="fas fa-arrow-left mr-2"></i> Batal
                             </a>
                             
@@ -88,7 +88,7 @@
         </div>
         
         <div class="col-lg-4">
-            <div class="card border-0 shadow-sm mb-4 card-tips-dark" style="border-radius: 15px;">
+            <div class="card border-0 shadow-sm mb-4" style="border-radius: 15px;">
                 <div class="card-body p-4">
                     <h6 class="font-weight-bold d-flex align-items-center mb-3">
                         <i class="fas fa-lightbulb text-warning mr-2"></i> Tips Input

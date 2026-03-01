@@ -26,7 +26,9 @@ class StokKritisNotification extends Notification
             'type' => 'stok_kritis',
             'title' => '⚠️ Stok Kritis!',
             'message' => 'Stok ' . $this->stokOutlet->bahan->nama_bahan . ' di ' . $this->stokOutlet->outlet->nama_outlet . ' tersisa ' . $this->stokOutlet->stok,
-            'url' => route('admin.data-bahan-baku.index'), // Sesuaikan route-mu
+            
+            // REVISI DI SINI: Sesuaikan dengan rute yang ada di web.php/Controller tadi
+            'url' => route('admin.stok-kritis.index'), 
         ];
     }
 }
