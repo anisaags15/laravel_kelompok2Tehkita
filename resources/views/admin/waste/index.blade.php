@@ -30,7 +30,7 @@
         {{-- Stats Cards --}}
         <div class="row mb-4">
             <div class="col-md-3">
-                <div class="card border-0 shadow-sm {{ $totalPending > 0 ? 'bg-gradient-danger' : 'bg-gradient-success' }} text-white transition-all" style="border-radius: 15px;">
+                <div class="card border-0 shadow-sm {{ $totalPending > 0 ? 'bg-gradient-danger' : 'bg-gradient-success' }} text-white transition-all overflow-hidden" style="border-radius: 15px;">
                     <div class="card-body p-3">
                         <div class="d-flex justify-content-between">
                             <div>
@@ -43,7 +43,7 @@
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="card border-0 shadow-sm bg-white" style="border-radius: 15px;">
+                <div class="card border-0 shadow-sm bg-white transition-all" style="border-radius: 15px;">
                     <div class="card-body p-3 border-left border-primary" style="border-width: 5px !important;">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
@@ -82,6 +82,7 @@
                                     <tr>
                                         <th class="border-0 pl-4 py-3">Outlet & Tanggal</th>
                                         <th class="border-0 py-3">Bahan Baku</th>
+                                        <th class="border-0 py-3 text-center">Bukti Foto</th>
                                         <th class="border-0 py-3 text-center">Jumlah</th>
                                         <th class="border-0 py-3">Alasan / Keterangan</th>
                                         <th class="border-0 py-3">Status</th>
@@ -93,7 +94,7 @@
                                     <tr>
                                         <td class="pl-4 py-3">
                                             <div class="d-flex align-items-center">
-                                                <div class="rounded-circle mr-3 d-flex align-items-center justify-content-center" style="width: 40px; height:40px; background: #f0f3ff; color: #4e73df;">
+                                                <div class="rounded-circle mr-3 d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height:40px; background: #f0f3ff; color: #4e73df;">
                                                     <i class="fas fa-store"></i>
                                                 </div>
                                                 <div>
@@ -103,6 +104,23 @@
                                             </div>
                                         </td>
                                         <td class="py-3 font-weight-bold text-capitalize text-dark">{{ $w->bahan->nama_bahan }}</td>
+                                        
+                                        {{-- KOLOM FOTO --}}
+                                        <td class="py-3 text-center">
+                                            @if($w->foto)
+                                                <div class="position-relative d-inline-block">
+                                                    <img src="{{ asset('storage/' . $w->foto) }}" 
+                                                         class="img-thumbnail rounded shadow-sm foto-zoom" 
+                                                         style="width: 50px; height: 50px; object-fit: cover; cursor: pointer;"
+                                                         data-toggle="modal" data-target="#modalFoto{{ $w->id }}">
+                                                </div>
+                                            @else
+                                                <span class="badge badge-light text-muted" style="font-weight: normal; font-size: 0.7rem;">
+                                                    <i class="fas fa-image-slash mr-1"></i> No Image
+                                                </span>
+                                            @endif
+                                        </td>
+
                                         <td class="py-3 text-center">
                                             <span class="badge badge-pill px-3 py-2 text-danger" style="background: #fff5f5; font-size: 0.85rem; border: 1px solid rgba(220,53,69,0.1)">
                                                 -{{ $w->jumlah }} {{ $w->bahan->satuan }}
@@ -139,26 +157,48 @@
                                         </td>
                                     </tr>
 
-                                    {{-- MODAL VERIFIKASI (Langsung di sini agar tidak error) --}}
+                                    {{-- MODAL PREVIEW FOTO --}}
+                                    @if($w->foto)
+                                    <div class="modal fade" id="modalFoto{{ $w->id }}" tabindex="-1" role="dialog">
+                                        <div class="modal-dialog modal-dialog-centered" role="document">
+                                            <div class="modal-content bg-transparent border-0">
+                                                <div class="modal-body p-0">
+                                                    <div class="card border-0 shadow-lg overflow-hidden" style="border-radius: 20px;">
+                                                        <img src="{{ asset('storage/' . $w->foto) }}" class="img-fluid w-100">
+                                                        <div class="card-body bg-white text-center">
+                                                            <h5 class="font-weight-bold text-dark mb-1">{{ $w->bahan->nama_bahan }}</h5>
+                                                            <p class="text-muted small mb-0">{{ $w->outlet->nama_outlet }} • {{ $w->created_at->format('d M Y') }}</p>
+                                                            <button type="button" class="btn btn-light rounded-pill mt-3 px-4" data-dismiss="modal">Tutup</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @endif
+
+                                    {{-- MODAL VERIFIKASI --}}
                                     <div class="modal fade" id="modalVerif{{ $w->id }}" tabindex="-1" role="dialog">
                                         <div class="modal-dialog modal-dialog-centered" role="document">
-                                            <div class="modal-content border-0 shadow">
+                                            <div class="modal-content border-0 shadow" style="border-radius: 20px;">
                                                 <div class="modal-body text-center p-5">
-                                                    <i class="fas fa-question-circle text-primary mb-4" style="font-size: 4rem;"></i>
-                                                    <h4 class="font-weight-bold">Verifikasi Laporan?</h4>
-                                                    <p class="text-muted small">Anda akan menyetujui penghapusan stok <b>{{ $w->jumlah }} {{ $w->bahan->satuan }} {{ $w->bahan->nama_bahan }}</b> dari outlet <b>{{ $w->outlet->nama_outlet }}</b>.</p>
+                                                    <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 80px; height: 80px;">
+                                                        <i class="fas fa-clipboard-check text-primary fa-2x"></i>
+                                                    </div>
+                                                    <h4 class="font-weight-bold text-dark">Verifikasi Laporan?</h4>
+                                                    <p class="text-muted">Anda akan menyetujui pemotongan stok <b>{{ $w->jumlah }} {{ $w->bahan->satuan }}</b> karena kerusakan.</p>
                                                     
                                                     <div class="d-flex justify-content-center mt-4">
                                                         <form action="{{ route('admin.waste.verify', $w->id) }}" method="POST" class="mr-2">
                                                             @csrf
                                                             <input type="hidden" name="status" value="rejected">
-                                                            <button type="submit" class="btn btn-light px-4 border">Tolak & Balikin Stok</button>
+                                                            <button type="submit" class="btn btn-light px-4 border rounded-pill">Tolak</button>
                                                         </form>
                                                         
                                                         <form action="{{ route('admin.waste.verify', $w->id) }}" method="POST">
                                                             @csrf
                                                             <input type="hidden" name="status" value="verified">
-                                                            <button type="submit" class="btn btn-primary px-4 shadow">Setujui (Verified)</button>
+                                                            <button type="submit" class="btn btn-primary px-4 shadow rounded-pill">Setujui (Verified)</button>
                                                         </form>
                                                     </div>
                                                 </div>
@@ -168,9 +208,11 @@
 
                                     @empty
                                     <tr>
-                                        <td colspan="6" class="text-center py-5">
-                                            <i class="fas fa-inbox fa-3x text-light mb-3"></i>
-                                            <h6 class="text-muted font-weight-normal">Belum ada laporan waste masuk hari ini.</h6>
+                                        <td colspan="7" class="text-center py-5">
+                                            <div class="py-4">
+                                                <i class="fas fa-inbox fa-3x text-light mb-3"></i>
+                                                <h6 class="text-muted font-weight-normal">Belum ada laporan waste masuk hari ini.</h6>
+                                            </div>
                                         </td>
                                     </tr>
                                     @endforelse
@@ -193,10 +235,4 @@
     </div>
 </section>
 
-<style>
-    .bg-gradient-danger { background: linear-gradient(87deg, #f5365c 0, #f56036 100%) !important; }
-    .bg-gradient-success { background: linear-gradient(87deg, #2dce89 0, #2dcebe 100%) !important; }
-    .transition-all:hover { transform: translateY(-5px); cursor: default; transition: 0.3s; }
-    .table td, .table th { vertical-align: middle; border-top: 1px solid #f8f9fa; }
-</style>
 @endsection

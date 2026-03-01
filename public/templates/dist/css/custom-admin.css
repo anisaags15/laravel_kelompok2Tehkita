@@ -527,3 +527,27 @@ body, .content-wrapper, .main-sidebar, .card, .table, .nav-link, .main-footer, .
 .dark-mode .border-adaptive {
     border-color: rgba(255, 255, 255, 0.1) !important;
 }
+    .bg-gradient-danger { background: linear-gradient(87deg, #f5365c 0, #f56036 100%) !important; }
+    .bg-gradient-success { background: linear-gradient(87deg, #2dce89 0, #2dcebe 100%) !important; }
+    .transition-all:hover { transform: translateY(-5px); box-shadow: 0 1rem 3rem rgba(0,0,0,.1) !important; transition: all 0.3s ease; }
+    .table td, .table th { vertical-align: middle; border-top: 1px solid #f8f9fa; }
+    
+    .foto-zoom {
+        transition: transform .2s;
+        border: 2px solid #fff;
+    }
+    .foto-zoom:hover {
+        transform: scale(1.1);
+        z-index: 10;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2) !important;
+    }
+
+    /* Modal Backdrop Blur */
+    .modal {
+        backdrop-filter: blur(5px);
+    }
+    
+    .btn-primary {
+        background-color: #4e73df;
+        border-color: #4e73df;
+    }
