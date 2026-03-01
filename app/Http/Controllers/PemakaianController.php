@@ -206,9 +206,9 @@ class PemakaianController extends Controller
             ->paginate(15);
 
         $totalPending = Waste::where('status', 'pending')->count();
-        $totalWasteBulanIni = Waste::whereMonth('tanggal', now()->month)->sum('jumlah');
+        $totalWaste = Waste::whereMonth('tanggal', now()->month)->sum('jumlah');
 
-        return view('admin.waste.index', compact('allWastes', 'totalPending', 'totalWasteBulanIni'));
+        return view('admin.waste.index', compact('allWastes', 'totalPending', 'totalWaste'));
     }
 
     /**
