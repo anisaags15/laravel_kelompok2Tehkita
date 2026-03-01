@@ -1,74 +1,206 @@
-/* Laporan CSS Bundle 
-    Target: Laporan Stok & Laporan Distribusi
+/* ================================================================
+   LAPORAN-USER CSS BUNDLE - TEHKITA PREMIUM
+   ================================================================
+   Digunakan untuk: Index Laporan, Laporan Stok, & Detail Distribusi
+   ================================================================
 */
 
-/* --- Typography & Utilities --- */
+:root {
+    /* --- VARIABEL WARNA UTAMA --- */
+    --primary-gradient: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); /* Biru Dashboard */
+    --success-gradient: linear-gradient(135deg, #15803d 0%, #22c55e 100%); /* Hijau Sukses */
+    --header-dark: linear-gradient(135deg, #1e293b 0%, #334155 100%);    /* Gelap Elegant */
+    --success-premium: #15803d; /* Hijau Identitas Tehkita */
+    --bg-soft-success: #f0fdf4; /* Hijau sangat muda untuk background */
+}
+
+/* --- 1. TYPOGRAPHY & UTILITIES (Teks & Jarak) --- */
 .fs-xs { 
     font-size: 0.72rem !important; 
     letter-spacing: 0.08em; 
     text-transform: uppercase;
 }
+.fw-bold { font-weight: 700 !important; }
+.italic { font-style: italic; }
+.opacity-50 { opacity: 0.5; }
+.mt-n4 { margin-top: -2.5rem !important; } /* Memberikan efek kartu 'naik' menimpa header */
 
-/* --- Color Badges & Backgrounds --- */
-.bg-success-subtle { 
-    background-color: #e8f5e9 !important; 
-    color: #2e7d32 !important; 
+/* --- 2. HEADERS & BANNERS (Bagian Atas Halaman) --- */
+/* Banner biru besar (Index Laporan) */
+.executive-header {
+    background: var(--primary-gradient);
+    border-radius: 20px;
+    padding: 30px;
+    color: white;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 25px rgba(30, 58, 138, 0.15);
 }
 
-.bg-danger-subtle { 
-    background-color: #ffebee !important; 
-    color: #c62828 !important; 
+/* Banner gelap (Stok Outlet) */
+.header-gradient-stok {
+    background: var(--header-dark);
+    border-radius: 20px;
+    padding: 2.5rem;
+    color: white;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
 }
 
-.bg-info-subtle { 
-    background-color: #e0f7fa !important; 
-    color: #00acc1 !important; 
+/* Kotak Filter melayang */
+.filter-card {
+    border: none;
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    transform: translateY(-50px);
+    margin-bottom: -20px;
 }
 
-/* --- Card Styling --- */
+/* Overlay transparan untuk elemen di dalam header biru */
+.bg-white-20 { 
+    background: rgba(255, 255, 255, 0.15); 
+    backdrop-filter: blur(5px);
+}
+
+/* --- 3. CARDS & STATS (Kotak Statistik) --- */
 .card { 
-    border-radius: 12px !important; 
+    border-radius: 18px !important; 
+    border: none;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* Animasi kartu saat di-hover */
+.stat-card-modern {
+    transition: all 0.3s ease;
+}
+.stat-card-modern:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important;
+}
+
+/* Wadah ikon bulat premium */
+.icon-box-modern, .avatar-box {
+    width: 50px;
+    height: 50px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* --- 4. TABLE STYLING (Tampilan Tabel Mewah) --- */
+.table-luxury thead th, 
+.table-premium thead th {
+    background-color: #f8fafc;
+    color: #64748b;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 1.25rem;
     border: none;
 }
 
-.card-header {
-    background-color: #ffffff;
-    border-bottom: 1px solid #edf2f9;
-}
-
-/* --- Table Styling --- */
-.table thead th { 
-    border-top: none !important; 
-    border-bottom: 1px solid #edf2f9 !important;
-    background-color: #f8f9fa;
+.table-luxury td, 
+.table-premium tbody td {
+    padding: 1.25rem;
+    vertical-align: middle;
+    color: #1e293b;
+    border-bottom: 1px solid #f1f5f9;
 }
 
 .table-hover tbody tr:hover {
-    background-color: rgba(40, 167, 69, 0.02); /* Hint hijau tipis saat hover */
+    background-color: rgba(40, 167, 69, 0.03) !important;
 }
 
-/* --- Button Styling --- */
+/* --- 5. BADGES & LABELS (Status & Keterangan) --- */
+.badge-soft-success { background: #dcfce7; color: #15803d; border: none; }
+.badge-soft-danger   { background: #fee2e2; color: #b91c1c; border: none; }
+.badge-soft-primary  { background: #e0e7ff; color: #1e3a8a; border: none; }
+.badge-soft-info     { background: #e0f2fe; color: #0369a1; border: none; }
+
+/* Label jumlah stok model Pill (kapsul) */
+.badge-count-premium {
+    background: var(--bg-soft-success);
+    color: var(--success-premium);
+    padding: 0.6rem 1.2rem;
+    border-radius: 50px;
+    font-weight: 700;
+    display: inline-block;
+    border: 1px solid #dcfce7;
+}
+
+/* --- 6. BUTTONS (Tombol Aksi) --- */
 .btn { 
-    border-radius: 8px !important; 
+    border-radius: 10px !important; 
     font-weight: 600; 
     transition: all 0.2s ease-in-out; 
+}
+
+.btn-primary { 
+    background-color: #0d6efd !important; 
+    border-color: #0d6efd !important; 
+    color: #fff !important;
 }
 
 .btn-success { 
     background-color: #28a745 !important; 
     border-color: #28a745 !important; 
+    color: #fff !important;
 }
 
-.btn-success:hover { 
-    background-color: #218838 !important; 
-    transform: translateY(-1px); 
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-/* --- Icon Helpers --- */
-.icon-shape {
+/* Tombol aksi kecil (Ikon saja) di dalam tabel */
+.btn-action-custom {
+    width: 38px;
+    height: 38px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: 8px;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    border: none;
+    text-decoration: none !important;
+}
+
+.btn-action-custom:hover {
+    transform: scale(1.1); /* Efek membesar sedikit saat hover */
+}
+
+.btn-detail { background: #e0e7ff; color: #4338ca; } /* Biru lembut */
+.btn-print  { background: #fee2e2; color: #b91c1c; } /* Merah lembut */
+
+/* --- 7. SEARCH UI (Kotak Cari) --- */
+.search-wrapper {
+    position: relative;
+    max-width: 300px;
+}
+.search-wrapper i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+}
+.search-wrapper input {
+    padding-left: 40px;
+    border-radius: 50px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+}
+
+/* --- 8. PRINT & RESPONSIVE (Aturan Cetak) --- */
+@media print {
+    .no-print, .btn, .search-wrapper, .filter-card, .btn-action-custom { 
+        display: none !important; 
+    }
+    
+    .executive-header, .header-gradient-stok { 
+        background: white !important; 
+        color: black !important; 
+        border-bottom: 2px solid #333;
+        box-shadow: none;
+        padding: 10px 0;
+    }
+
+    .card { box-shadow: none !important; border: 1px solid #eee !important; }
 }

@@ -90,10 +90,11 @@
                                 </td>
                                 <td class="text-center">
                                     <span class="text-muted font-weight-bold" style="font-size: 0.9rem;">
-                                        @if($item->tanggal_pengiriman)
-                                            <i class="far fa-calendar-alt mr-1"></i> {{ \Carbon\Carbon::parse($item->tanggal_pengiriman)->translatedFormat('d M Y') }}
+                                        {{-- REVISI DISINI: Menggunakan tanggal_terakhir_diterima yang kita buat di controller --}}
+                                        @if($item->tanggal_terakhir_diterima)
+                                            <i class="far fa-calendar-alt mr-1"></i> {{ \Carbon\Carbon::parse($item->tanggal_terakhir_diterima)->translatedFormat('d F Y') }}
                                         @else
-                                            <span class="badge badge-light">Belum ada rekaman</span>
+                                            <span class="badge badge-light" style="font-weight: 500; color: #999;">Belum ada distribusi</span>
                                         @endif
                                     </span>
                                 </td>
