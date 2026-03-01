@@ -127,8 +127,8 @@
 <div class="row">
     <div class="col-lg-8 mb-4">
         <div class="card shadow-sm border-0 h-100">
-            <div class="card-header bg-white border-0 py-3">
-                <h5 class="fw-semibold mb-0">Grafik Pemakaian 5 Outlet</h5>
+            <div class="card-header border-0 py-3">
+                <h5 class="fw-semibold mb-0 title-text-adaptive">Grafik Pemakaian 5 Outlet</h5>
             </div>
             <div class="card-body">
                 <div style="position: relative; height: 350px; width: 100%;">
@@ -140,8 +140,8 @@
 
     <div class="col-lg-4 mb-4">
         <div class="card shadow-sm border-0 h-100">
-            <div class="card-header bg-white border-0 py-3">
-                <h5 class="fw-semibold mb-0">Kalender Distribusi</h5>
+            <div class="card-header border-0 py-3">
+                <h5 class="fw-semibold mb-0 title-text-adaptive">Kalender Distribusi</h5>
             </div>
             <div class="card-body">
                 <div id="calendar-container" style="height: 350px;">
@@ -156,45 +156,55 @@
 <div class="row">
     <div class="col-lg-6 mb-4">
         <div class="card shadow-sm border-0 h-100">
-            <div class="card-header bg-white border-0 py-3">
-                <h5 class="fw-semibold mb-0">Data Outlet Terbaru</h5>
+            <div class="card-header border-0 py-3">
+                <h5 class="fw-semibold mb-0 title-text-adaptive">Data Outlet Terbaru</h5>
             </div>
             <div class="card-body table-responsive">
                 <table class="table table-hover align-middle">
-                    <thead class="table-light">
-                        <tr><th>Nama Outlet</th><th>No HP</th></tr>
+                    <thead>
+                        <tr>
+                            <th>Nama Outlet</th>
+                            <th>No HP</th>
+                        </tr>
                     </thead>
                     <tbody>
                         @foreach($outlets as $o)
-                        <tr><td class="fw-semibold">{{ $o->nama_outlet }}</td><td>{{ $o->no_hp }}</td></tr>
+                        <tr>
+                            <td class="fw-semibold">{{ $o->nama_outlet }}</td>
+                            <td>{{ $o->no_hp }}</td>
+                        </tr>
                         @endforeach
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
-
-    <div class="col-lg-6 mb-4">
-        <div class="card shadow-sm border-0 h-100">
-            <div class="card-header bg-white border-0 py-3">
-                <h5 class="fw-semibold mb-0">Stok Masuk Terbaru</h5>
-            </div>
-            <div class="card-body table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead class="table-light">
-                        <tr><th>Bahan</th><th>Jumlah</th></tr>
-                    </thead>
-                    <tbody>
-                        @foreach($latestStokMasuk as $s)
-                        <tr><td class="fw-semibold">{{ $s->bahan->nama_bahan ?? '-' }}</td><td><span class="badge bg-success">{{ $s->jumlah }}</span></td></tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+<div class="col-lg-6 mb-4">
+    <div class="card shadow-sm border-0 h-100">
+        <div class="card-header border-0 py-3">
+            <h5 class="fw-semibold mb-0 title-text-adaptive">Stok Masuk Terbaru</h5>
+        </div>
+        <div class="card-body table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Bahan</th>
+                        <th>Jumlah</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($latestStokMasuk as $s)
+                    <tr>
+                        <td class="fw-semibold">{{ $s->bahan->nama_bahan ?? '-' }}</td>
+                        <td><span class="badge bg-success">{{ $s->jumlah }}</span></td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
-
+</div>
 {{-- 3. RADAR STOK KRITIS + CHAT SEJAJAR --}}
 <div class="row mb-4">
 
@@ -272,99 +282,155 @@
         </div>
     </div>
 
-    {{-- CHAT TERBARU --}}
-    <div class="col-lg-5 mb-4">
-        <div class="card shadow-sm border-0 h-100">
-            <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
-                <h5 class="fw-bold mb-0 text-dark">
-                    <i class="fas fa-comments text-primary me-2"></i> Chat Terbaru
-                </h5>
-                @if($unreadCount > 0)
-                    <span class="badge bg-danger rounded-pill">{{ $unreadCount }} Baru</span>
-                @endif
-            </div>
+{{-- CHAT TERBARU --}}
+<div class="col-lg-5 mb-4">
+    <div class="card shadow-sm border-0 h-100">
+        <div class="card-header py-3 border-0 d-flex justify-content-between align-items-center bg-transparent">
+            <h5 class="fw-bold mb-0 title-text-adaptive">
+                <i class="fas fa-comments text-primary me-2"></i> Chat Terbaru
+            </h5>
+            @if($unreadCount > 0)
+                <span class="badge bg-danger rounded-pill">{{ $unreadCount }} Baru</span>
+            @endif
+        </div>
 
-            <div class="card-body p-0" style="max-height: 380px; overflow-y: auto;">
-                <div class="list-group list-group-flush">
-                    @forelse($latestChats as $chat)
-                        @php
-                            $isMe = $chat->sender_id === auth()->id();
-                            $opponent = $isMe ? $chat->receiver : $chat->sender;
-                            $displayName = $opponent->outlet ? $opponent->outlet->nama_outlet : $opponent->name;
-                        @endphp
+        <div class="card-body p-0" style="max-height: 380px; overflow-y: auto;">
+            <div class="list-group list-group-flush list-group-dark-custom">
+                @forelse($latestChats as $chat)
+                    @php
+                        $isMe = $chat->sender_id === auth()->id();
+                        $opponent = $isMe ? $chat->receiver : $chat->sender;
+                        $displayName = $opponent->outlet ? $opponent->outlet->nama_outlet : $opponent->name;
+                    @endphp
 
-                        <a href="{{ route('chat.show', $opponent->id) }}"
-                           class="list-group-item list-group-item-action border-0 px-3 py-3">
-                            <div class="d-flex w-100 justify-content-between align-items-center">
-                                <div class="d-flex align-items-center">
-                                    <div class="bg-soft-primary text-primary rounded-circle d-flex justify-content-center align-items-center fw-bold me-3"
-                                         style="width: 40px; height: 40px; font-size: 0.8rem;">
-                                        {{ strtoupper(substr($displayName, 0, 1)) }}
-                                    </div>
-                                    <div style="max-width: 180px;">
-                                        <h6 class="mb-0 fw-bold text-dark" style="font-size: 0.9rem;">
-                                            {{ $displayName }}
-                                        </h6>
-                                        <p class="mb-0 text-muted text-truncate small">
-                                            {{ $isMe ? 'Anda: ' : '' }}{{ $chat->message }}
-                                        </p>
-                                    </div>
+                    <a href="{{ route('chat.show', $opponent->id) }}"
+                       class="list-group-item list-group-item-action border-0 px-3 py-3 bg-transparent border-bottom-custom">
+                        <div class="d-flex w-100 justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-soft-primary text-primary rounded-circle d-flex justify-content-center align-items-center fw-bold me-3"
+                                     style="width: 40px; height: 40px; font-size: 0.8rem;">
+                                    {{ strtoupper(substr($displayName, 0, 1)) }}
                                 </div>
-                                <small class="text-muted" style="font-size: 0.7rem;">
-                                    {{ $chat->created_at->diffForHumans(null, true) }}
-                                </small>
+                                <div style="max-width: 180px;">
+                                    <h6 class="mb-0 fw-bold title-text-adaptive" style="font-size: 0.9rem;">
+                                        {{ $displayName }}
+                                    </h6>
+                                    <p class="mb-0 text-muted text-truncate small">
+                                        {{ $isMe ? 'Anda: ' : '' }}{{ $chat->message }}
+                                    </p>
+                                </div>
                             </div>
-                        </a>
-                    @empty
-                        <div class="text-center py-5">
-                            <i class="fas fa-comment-slash fa-2x text-light mb-2"></i>
-                            <p class="text-muted small">Tidak ada pesan</p>
+                            <small class="text-muted" style="font-size: 0.7rem;">
+                                {{ $chat->created_at->diffForHumans(null, true) }}
+                            </small>
                         </div>
-                    @endforelse
-                </div>
-            </div>
-
-            <div class="card-footer bg-white border-0 text-center py-3">
-                <a href="{{ route('chat.index') }}"
-                   class="text-primary fw-bold text-decoration-none small">
-                    Lihat Semua Pesan <i class="fas fa-arrow-right ms-1"></i>
-                </a>
+                    </a>
+                @empty
+                    <div class="text-center py-5">
+                        <i class="fas fa-comment-slash fa-2x text-muted mb-2"></i>
+                        <p class="text-muted small">Tidak ada pesan</p>
+                    </div>
+                @endforelse
             </div>
         </div>
+
+        <div class="card-footer border-0 text-center py-3 bg-transparent border-top-custom">
+            <a href="{{ route('chat.index') }}"
+               class="text-primary fw-bold text-decoration-none small">
+                Lihat Semua Pesan <i class="fas fa-arrow-right ms-1"></i>
+            </a>
+        </div>
     </div>
-
 </div>
-
 @endsection
 
 @push('js')
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    // Grafik
+    // 1. KONFIGURASI GRAFIK PEMAKAIAN
     const ctx = document.getElementById('pemakaianChart');
     if (ctx) {
+        const isDark = document.body.classList.contains('dark-mode');
+        
+        // Tuning warna grid agar "keluar" di mode gelap
+        // Gunakan warna abu-abu terang solid (#555) daripada RGBA transparan
+        const gridColorY = isDark ? '#555555' : '#dddddd'; 
+        const gridColorX = isDark ? '#444444' : '#eeeeee';
+        const textColor  = isDark ? '#ffffff' : '#666666';
+
         new Chart(ctx, {
             type: 'line',
             data: @json($pemakaianChart ?? []),
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { position: 'bottom' } }
+                plugins: { 
+                    legend: { 
+                        position: 'bottom',
+                        labels: { 
+                            color: textColor,
+                            font: { family: 'Poppins', size: 12, weight: '500' }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: isDark ? '#2d3436' : '#fff',
+                        titleColor: isDark ? '#fff' : '#000',
+                        bodyColor: isDark ? '#fff' : '#000',
+                        borderColor: isDark ? '#444' : '#ddd',
+                        borderWidth: 1
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: gridColorY,
+                            lineWidth: 1.5, // Tebalkan sedikit garisnya
+                            drawBorder: true,
+                            borderColor: isDark ? '#666' : '#ddd',
+                        },
+                        ticks: { 
+                            color: textColor,
+                            font: { weight: 'bold', size: 11 } 
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: gridColorX,
+                            lineWidth: 1,
+                            drawBorder: true,
+                            borderColor: isDark ? '#666' : '#ddd',
+                        },
+                        ticks: { 
+                            color: textColor,
+                            font: { weight: 'bold', size: 11 }
+                        }
+                    }
+                }
             }
         });
     }
 
-    // Kalender
+    // 2. KONFIGURASI KALENDER DISTRIBUSI
     const calendarEl = document.getElementById('calendar');
     if (calendarEl) {
         const calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             height: '100%',
-            headerToolbar: { left: 'prev,next', center: 'title', right: 'today' },
-            events: @json($calendarEvents ?? [])
+            headerToolbar: { 
+                left: 'prev,next today', 
+                center: 'title', 
+                right: '' 
+            },
+            eventColor: '#198754', 
+            eventTextColor: '#ffffff',
+            events: @json($calendarEvents ?? []),
+            didOpen: function() {
+                window.dispatchEvent(new Event('resize'));
+            }
         });
         calendar.render();
     }
 });
 </script>
-@endpushp
+@endpush

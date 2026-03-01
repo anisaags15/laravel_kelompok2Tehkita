@@ -8,20 +8,71 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
-    <link rel="stylesheet" href="{{ asset('templates/dist/css/adminlte.min.css') }}">
+  <link rel="stylesheet" href="{{ asset('templates/dist/css/adminlte.min.css') }}">
     <link rel="stylesheet" href="{{ asset('templates/dist/css/custom-admin.css') }}">
     <link rel="stylesheet" href="{{ asset('templates/dist/css/table-admin.css') }}">
     <link rel="stylesheet" href="{{ asset('templates/dist/css/table-user.css') }}">
     <link rel="stylesheet" href="{{ asset('templates/dist/css/laporan-user.css') }}">
-     <link rel="stylesheet" href="{{ asset('templates/dist/css/laporan-admin.css') }}">
-    
+    <link rel="stylesheet" href="{{ asset('templates/dist/css/laporan-admin.css') }}">
+
+    <link rel="stylesheet" href="{{ asset('templates/dist/css/custom-user.css') }}"> 
+
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
     @stack('css')
+
+    <style id="preload-transitions">
+        body, .content-wrapper, .main-sidebar, .card, .table, .nav-link, .main-footer, .main-header, .navbar, .dropdown-menu {
+            transition: none !important;
+        }
+    </style>
+
+    {{-- REVISI CSS: MENGUNCI POSISI NAVBAR AGAR RATA --}}
+    <style>
+        /* Memaksa kontainer navbar kanan menjadi flex dan rata tengah */
+        .navbar-nav.ml-auto {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            height: 100%;
+        }
+
+        /* Memastikan li item di dalam navbar memiliki tinggi yang sama */
+        .navbar-nav.ml-auto .nav-item {
+            display: flex;
+            align-items: center;
+            height: 100%;
+        }
+
+        /* Menstandarkan ukuran ikon agar tidak menggeser layout saat berubah */
+        #dark-mode-icon {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+            display: inline-block;
+        }
+
+        /* Memastikan link navbar tidak punya margin aneh yang bikin miring */
+        .navbar-nav.ml-auto .nav-link {
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed">
+
+<script>
+    if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-mode');
+    }
+</script>
+
 <div class="wrapper">
 
     @include('layouts.components.navbar')
@@ -105,11 +156,64 @@
 
 <script>
   $(document).ready(function() {
-    // Inisialisasi PushMenu dengan opsi agar tidak melebar saat di-hover (Fixed Sidebar)
+    
+    /* =========================================================
+       [REVISI] BUKA GEMBOK TRANSISI
+    ========================================================= */
+    setTimeout(function() {
+        $('#preload-transitions').remove();
+    }, 100);
+
+    /* =========================================================
+       1. INJEKSI TOMBOL DARK MODE (VERSI FIX POSISI)
+       Menggunakan tag <a> agar identik dengan lonceng AdminLTE
+    ========================================================= */
+    if ($('.navbar-nav.ml-auto').length) {
+        if ($('#dark-mode-toggle').length === 0) {
+            $('.navbar-nav.ml-auto').prepend(`
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="dark-mode-toggle" role="button">
+                        <i class="fas fa-moon" id="dark-mode-icon" style="transition: 0.3s;"></i>
+                    </a>
+                </li>
+            `);
+        }
+    }
+
+    /* =========================================================
+       2. LOGIKA DARK MODE
+    ========================================================= */
+    const body = $('body');
+    const icon = $('#dark-mode-icon');
+
+    function updateDarkModeUI(isDark) {
+        if (isDark) {
+            icon.removeClass('fa-moon').addClass('fa-sun').css('color', '#ffc107');
+        } else {
+            icon.removeClass('fa-sun').addClass('fa-moon').css('color', '#ffc107'); // Default warna icon mataharimu tadi
+            // Jika ingin tetap abu-abu di mode terang, gunakan: .css('color', '#2f3e46')
+        }
+    }
+
+    updateDarkModeUI(body.hasClass('dark-mode'));
+
+    $(document).on('click', '#dark-mode-toggle', function(e) {
+        e.preventDefault(); // Mencegah scroll ke atas karena tag <a>
+        body.toggleClass('dark-mode');
+        const isDarkNow = body.hasClass('dark-mode');
+        
+        localStorage.setItem('theme', isDarkNow ? 'dark' : 'light');
+        updateDarkModeUI(isDarkNow);
+    });
+
+    /* =========================================================
+       3. FUNGSI SIDEBAR BAWAAN (JANGAN DIHAPUS)
+    ========================================================= */
     $('[data-widget="pushmenu"]').PushMenu({
         expandOnHover: false,
         enableRemember: true
     });
+
   });
 </script>
 

@@ -6,7 +6,7 @@
 <div class="container-fluid py-4">
     {{-- Header Section --}}
     <div class="row mb-4">
-        <div class="col-12 d-flex flex-column flex-md-row justify-content-between align-items-center bg-white p-4 shadow-sm border-0" style="border-radius: 15px;">
+        <div class="col-12 d-flex flex-column flex-md-row justify-content-between align-items-center card p-4 shadow-sm border-0" style="border-radius: 15px;">
             <div class="mb-3 mb-md-0 text-center text-md-left">
                 <h3 class="font-weight-bold text-dark mb-1">
                     <i class="fas fa-bell text-warning mr-2"></i>Pusat Perhatian Admin
@@ -17,7 +17,7 @@
             @if($notifications->count() > 0)
             <form action="{{ route('admin.notifikasi.markAllRead') }}" method="POST">
                 @csrf
-                <button type="submit" class="btn btn-outline-primary btn-sm rounded-pill px-4 font-weight-bold shadow-sm" style="border-radius: 20px;">
+                <button type="submit" class="btn btn-outline-success btn-sm rounded-pill px-4 font-weight-bold shadow-sm" style="border-radius: 20px;">
                     <i class="fas fa-check-double mr-1"></i> Tandai Semua Dibaca
                 </button>
             </form>
@@ -26,8 +26,8 @@
     </div>
 
     @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" style="border-radius: 12px;">
-            <i class="fas fa-check-circle mr-2"></i> {{ session('success') }}
+        <div class="alert bg-soft-success alert-dismissible fade show border-0 shadow-sm mb-4" style="border-radius: 12px;">
+            <i class="fas fa-check-circle mr-2 text-success"></i> <span class="text-dark">{{ session('success') }}</span>
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
@@ -47,32 +47,32 @@
                                     'stok_kritis' => [
                                         'icon' => 'fa-exclamation-triangle',
                                         'color' => 'danger',
-                                        'bg' => 'rgba(220, 53, 69, 0.1)',
+                                        'bg' => 'rgba(220, 53, 69, 0.15)',
                                         'label' => 'URGENT'
                                     ],
                                     'waste' => [
                                         'icon' => 'fa-trash-alt',
                                         'color' => 'warning',
-                                        'bg' => 'rgba(255, 193, 7, 0.1)',
+                                        'bg' => 'rgba(255, 193, 7, 0.15)',
                                         'label' => 'WASTE'
                                     ],
                                     'chat' => [
                                         'icon' => 'fa-comment-dots',
                                         'color' => 'primary',
-                                        'bg' => 'rgba(0, 123, 255, 0.1)',
+                                        'bg' => 'rgba(0, 123, 255, 0.15)',
                                         'label' => 'CHAT'
                                     ],
                                     default => [
                                         'icon' => 'fa-info-circle',
                                         'color' => 'info',
-                                        'bg' => 'rgba(23, 162, 184, 0.1)',
+                                        'bg' => 'rgba(23, 162, 184, 0.15)',
                                         'label' => 'INFO'
                                     ]
                                 };
                                 $isUnread = $n->read_at === null;
                             @endphp
 
-                            <div class="list-group-item list-group-item-action py-3 px-4 border-bottom {{ $isUnread ? 'bg-unread' : '' }}" style="border-color: #f1f1f1 !important;">
+                            <div class="list-group-item list-group-item-action py-3 px-4 border-bottom {{ $isUnread ? 'bg-unread' : 'bg-transparent' }}">
                                 <div class="row align-items-center">
                                     {{-- Kolom 1: Icon --}}
                                     <div class="col-auto">
@@ -95,15 +95,15 @@
                                                 <span class="ml-2 badge badge-danger badge-pill" style="padding: 4px; height: 8px; width: 8px;"> </span>
                                             @endif
                                         </div>
-                                        <h6 class="mb-1 font-weight-bold {{ $isUnread ? 'text-dark' : 'text-secondary' }}">{{ $n->data['title'] }}</h6>
-                                        <p class="mb-0 text-secondary small text-truncate d-none d-md-block" style="max-width: 500px;">
+                                        <h6 class="mb-1 font-weight-bold text-dark">{{ $n->data['title'] }}</h6>
+                                        <p class="mb-0 text-muted small text-truncate d-none d-md-block" style="max-width: 500px;">
                                             {{ $n->data['message'] }}
                                         </p>
                                     </div>
 
                                     {{-- Kolom 3: Aksi --}}
                                     <div class="col-auto d-flex align-items-center mt-3 mt-md-0">
-                                        <a href="{{ $n->data['url'] }}" class="btn btn-light btn-sm rounded-pill px-3 font-weight-bold text-primary border shadow-sm mr-2">
+                                        <a href="{{ $n->data['url'] }}" class="btn btn-sm rounded-pill px-3 font-weight-bold btn-action shadow-sm mr-2">
                                             Tindak Lanjut
                                         </a>
                                         
@@ -118,7 +118,7 @@
                                 </div>
                                 {{-- Mobile Message --}}
                                 <div class="d-block d-md-none mt-2">
-                                    <p class="mb-0 text-secondary small">{{ $n->data['message'] }}</p>
+                                    <p class="mb-0 text-muted small">{{ $n->data['message'] }}</p>
                                 </div>
                             </div>
                         @empty
@@ -134,9 +134,9 @@
                     </div>
                 </div>
 
-                {{-- Pagination dengan Fix BS4 --}}
+                {{-- Pagination --}}
                 @if($notifications->hasPages())
-                <div class="card-footer bg-white border-top py-4">
+                <div class="card-footer border-top py-4 bg-transparent">
                     <div class="d-flex justify-content-center">
                         {{ $notifications->links('pagination::bootstrap-4') }}
                     </div>
@@ -148,40 +148,63 @@
 </div>
 
 <style>
+    /* Status Belum Dibaca */
     .bg-unread { 
-        background-color: #f4f8ff !important; 
+        background-color: rgba(0, 123, 255, 0.05) !important; 
         border-left: 4px solid #007bff !important; 
     }
     
     .list-group-item {
         transition: all 0.2s ease;
         border-left: 4px solid transparent;
+        background-color: transparent; /* Agar ikut warna card */
     }
 
+    /* Hover effect disesuaikan agar tidak nabrak di dark mode */
     .list-group-item:hover {
-        background-color: #fafafa;
+        background-color: rgba(0,0,0,0.02);
         transform: translateX(5px);
     }
 
-    .hover-scale:hover { transform: scale(1.2); color: #dc3545 !important; }
+    .dark-mode .list-group-item:hover {
+        background-color: rgba(255,255,255,0.02) !important;
+    }
 
-    .btn-outline-primary {
-        border-color: #007bff;
+    /* Tombol Tindak Lanjut */
+    .btn-action {
+        background: #f8f9fa;
         color: #007bff;
+        border: 1px solid #dee2e6;
+    }
+
+    .dark-mode .btn-action {
+        background: #2d2d2d;
+        color: #3b9bff;
+        border-color: #444;
+    }
+
+    .hover-scale:hover { transform: scale(1.2); }
+
+    /* Custom Style untuk List Group di Dark Mode */
+    .dark-mode .list-group-item {
+        border-color: #333 !important;
+    }
+
+    .dark-mode .bg-unread {
+        background-color: rgba(0, 123, 255, 0.1) !important;
     }
 
     /* Fix Pagination Styling */
-    .pagination {
-        margin-bottom: 0;
-    }
-    .page-item.active .page-link {
-        background-color: #007bff;
-        border-color: #007bff;
-    }
     .page-link {
-        color: #007bff;
         border-radius: 8px !important;
         margin: 0 3px;
+        background-color: transparent;
+        border-color: #dee2e6;
+        color: #198754;
+    }
+    .dark-mode .page-link {
+        border-color: #444;
+        color: #e0e0e0;
     }
 </style>
 @endsection

@@ -8,9 +8,9 @@
     {{-- HEADER SECTION --}}
     <div class="row mb-4">
         <div class="col-12">
-            <div class="d-flex flex-column flex-md-row align-items-center justify-content-between bg-white p-4 shadow-sm border-0" style="border-radius: 15px; border-left: 5px solid #e74a3b !important;">
+            <div class="d-flex flex-column flex-md-row align-items-center justify-content-between info-box-custom p-4 shadow-sm header-waste-wrapper">
                 <div class="mb-3 mb-md-0 text-center text-md-left">
-                    <h4 class="font-weight-bold text-dark mb-1">Riwayat Laporan Waste</h4>
+                    <h4 class="font-weight-bold text-adaptive mb-1">Riwayat Laporan Waste</h4>
                     <p class="text-muted mb-0 small">Catatan bahan baku rusak, kadaluwarsa, atau tidak layak pakai.</p>
                 </div>
                 <div class="text-right">
@@ -23,12 +23,12 @@
     </div>
 
     {{-- TABLE CARD --}}
-    <div class="card shadow-lg border-0" style="border-radius: 20px; overflow: hidden;">
+    <div class="card shadow-lg" style="border-radius: 20px;">
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
+                <table class="table table-hover align-middle mb-0 text-adaptive">
                     <thead>
-                        <tr class="text-muted" style="background-color: #fcfcfd; border-bottom: 1px solid #f1f1f4;">
+                        <tr class="table-header-adaptive">
                             <th class="py-4 text-center font-weight-bold text-uppercase small" width="80">No</th>
                             <th class="py-4 font-weight-bold text-uppercase small">Detail Bahan</th>
                             <th class="py-4 text-center font-weight-bold text-uppercase small">Waktu Lapor</th>
@@ -39,7 +39,7 @@
                     </thead>
                     <tbody>
                         @forelse($wastes as $w)
-                        <tr class="table-row-modern border-bottom">
+                        <tr class="table-row-modern border-bottom border-adaptive">
                             <td class="text-center">
                                 <span class="font-weight-bold text-muted small">
                                     {{ str_pad(($wastes->currentPage() - 1) * $wastes->perPage() + $loop->iteration, 2, '0', STR_PAD_LEFT) }}
@@ -52,7 +52,7 @@
                                         <i class="fas fa-biohazard"></i>
                                     </div>
                                     <div>
-                                        <div class="font-weight-bold text-dark mb-0" style="font-size: 1rem;">
+                                        <div class="font-weight-bold text-adaptive mb-0" style="font-size: 1rem;">
                                             {{ $w->bahan->nama_bahan ?? '-' }}
                                         </div>
                                         <div class="text-muted small" style="font-size: 0.7rem;">ID: #WST-{{ str_pad($w->id, 5, '0', STR_PAD_LEFT) }}</div>
@@ -61,7 +61,7 @@
                             </td>
 
                             <td class="text-center">
-                                <div class="font-weight-bold text-dark mb-0" style="font-size: 0.9rem;">
+                                <div class="font-weight-bold text-adaptive mb-0" style="font-size: 0.9rem;">
                                     {{ \Carbon\Carbon::parse($w->tanggal)->translatedFormat('d M Y') }}
                                 </div>
                                 <small class="text-primary font-weight-bold">
@@ -71,14 +71,14 @@
                             </td>
 
                             <td class="text-center">
-                                <div class="waste-bubble shadow-sm">
+                                <div class="waste-bubble-adaptive shadow-sm">
                                     <span class="amount text-danger">-{{ number_format($w->jumlah, 0, ',', '.') }}</span>
                                     <span class="unit text-muted small text-uppercase">{{ $w->bahan->satuan ?? 'Unit' }}</span>
                                 </div>
                             </td>
 
                             <td>
-                                <div class="p-2 rounded small text-muted italic" style="background-color: #f8f9fc; border-left: 3px solid #e74a3b;">
+                                <div class="keterangan-box-adaptive">
                                     "{{ $w->keterangan ?? 'Tanpa alasan spesifik' }}"
                                 </div>
                             </td>
@@ -111,9 +111,8 @@
             </div>
         </div>
         
-        {{-- PAGINATION FIX --}}
         @if($wastes->hasPages())
-        <div class="card-footer bg-white border-top-0 py-4 px-4">
+        <div class="card-footer bg-adaptive py-4 px-4">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
                 <p class="text-muted small mb-3 mb-md-0">
                     Menampilkan <strong>{{ $wastes->firstItem() }}</strong> - <strong>{{ $wastes->lastItem() }}</strong> dari <strong>{{ $wastes->total() }}</strong> laporan
@@ -128,7 +127,7 @@
 </div>
 
 <style>
-    /* CSS Styling senada dengan Theme */
+    /* CSS Utility Tambahan untuk Table & Waste */
     .bg-soft-danger { background-color: rgba(231, 74, 59, 0.1); }
     .bg-soft-success { background-color: rgba(28, 200, 138, 0.1); }
     .bg-soft-warning { background-color: rgba(246, 194, 62, 0.1); }
@@ -138,17 +137,6 @@
         display: flex; align-items: center; justify-content: center;
         border-radius: 10px; font-size: 1rem;
     }
-
-    .waste-bubble {
-        background: #fffafa;
-        padding: 6px 14px;
-        border-radius: 10px;
-        display: inline-block;
-        border: 1px solid #ffebeb;
-    }
-
-    .waste-bubble .amount { font-weight: 800; font-size: 1rem; }
-    .waste-bubble .unit { font-size: 0.7rem; font-weight: 600; }
 
     .badge-pill-custom {
         padding: 6px 14px;
@@ -160,24 +148,20 @@
 
     .pulse { animation: pulse-animation 2s infinite; }
     @keyframes pulse-animation {
-        0% { opacity: 1; }
-        50% { opacity: 0.5; }
-        100% { opacity: 1; }
+        0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; }
     }
 
-    .table-row-modern:hover {
-        background-color: #f8f9fc !important;
-        transition: 0.2s;
-    }
-
-    /* Pagination Styling agar tidak berantakan */
+    /* Override Pagination */
     .pagination-modern .pagination { margin-bottom: 0; gap: 5px; }
     .pagination-modern .page-item .page-link {
-        border: none; background: #f8f9fc; color: #e74a3b;
+        border: none; background: #f8f9fc; color: #198754;
         border-radius: 8px !important; font-weight: 600;
     }
+    .dark-mode .pagination-modern .page-item .page-link {
+        background: #2c3136; color: #adb5bd;
+    }
     .pagination-modern .page-item.active .page-link {
-        background: #e74a3b; color: white;
+        background: #198754 !important; color: white !important;
     }
 </style>
 @endsection

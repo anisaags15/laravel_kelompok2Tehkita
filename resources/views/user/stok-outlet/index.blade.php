@@ -9,11 +9,13 @@
             <h2 class="font-weight-bold text-dark mb-1" style="letter-spacing: -1px;">Stok Bahan</h2>
             <p class="text-muted mb-0">Pantau ketersediaan stok bahan baku secara real-time.</p>
         </div>
-        <div class="d-none d-sm-block">
-            <div class="bg-white px-4 py-2 rounded-pill shadow-sm border-0 d-flex align-items-center">
-                <div class="bg-primary rounded-circle mr-2" style="width: 10px; height: 10px; box-shadow: 0 0 10px rgba(78,115,223,0.5);"></div>
-                <span class="small font-weight-bold text-dark">{{ auth()->user()->outlet->nama_outlet ?? 'Outlet Aktif' }}</span>
-            </div>
+      <div class="d-none d-sm-block">
+    {{-- Ganti bg-white menjadi custom-header-badge --}}
+    <div class="custom-header-badge px-4 py-2 rounded-pill shadow-sm border-0 d-flex align-items-center">
+        <div class="bg-primary rounded-circle mr-2" style="width: 10px; height: 10px; box-shadow: 0 0 10px rgba(78,115,223,0.5);"></div>
+        {{-- Hapus text-dark agar warna teks otomatis adaptif --}}
+        <span class="small font-weight-bold">{{ auth()->user()->outlet->nama_outlet ?? 'Outlet Aktif' }}</span>
+    </div>
         </div>
     </div>
 

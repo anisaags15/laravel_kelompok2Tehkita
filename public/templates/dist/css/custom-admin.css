@@ -1,7 +1,6 @@
 /* ======================================================
     GLOBAL & BODY
 ====================================================== */
-
 body {
     font-family: 'Poppins', sans-serif;
     background-color: #f4f6f9;
@@ -21,11 +20,9 @@ body {
     transition: margin-left 0.3s ease; 
 }
 
-
 /* ======================================================
     SIDEBAR STRUCTURE
 ====================================================== */
-
 .main-sidebar {
     display: flex;
     flex-direction: column;
@@ -39,11 +36,9 @@ body {
     overflow-y: auto;
 }
 
-
 /* ======================================================
     BRAND
 ====================================================== */
-
 .brand-link {
     display: flex;
     align-items: center;
@@ -66,15 +61,13 @@ body {
     color: #198754 !important;
 }
 
-
 /* ======================================================
     USER PANEL (HORIZONTAL FIX)
 ====================================================== */
-
 .user-panel {
     width: 100%;
     display: flex;
-    align-items: center;   /* center vertical */
+    align-items: center;  
     justify-content: center;
     gap: 12px;
     padding: 18px 10px;
@@ -109,11 +102,9 @@ body {
     font-size: 12px;
 }
 
-
 /* ======================================================
     NAV MENU
 ====================================================== */
-
 .nav-sidebar .nav-link {
     color: #2f3e46;
     border-radius: 12px;
@@ -131,11 +122,16 @@ body {
     color: #ffffff !important;
 }
 
+/* Penyesuaian font Nav Header secara global */
+.main-sidebar .nav-header {
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
 
 /* ======================================================
     COLLAPSE MODE (FIX SIDEBAR)
 ====================================================== */
-
 .sidebar-mini.sidebar-collapse .brand-text {
     display: none;
 }
@@ -164,14 +160,12 @@ body {
     display: none !important;
 }
 
-
 /* ======================================================
     CARD
 ====================================================== */
-
 .card {
     border: none;
-    border-radius: 18px; /* Mengikuti style yang lebih baru (18px) */
+    border-radius: 18px;
     box-shadow: 0 8px 25px rgba(0,0,0,0.05) !important;
     overflow: hidden;
 }
@@ -182,11 +176,9 @@ body {
     font-weight: 600;
 }
 
-
 /* ======================================================
     TABLE
 ====================================================== */
-
 .table {
     border-radius: 14px;
     overflow: hidden;
@@ -201,11 +193,9 @@ body {
     vertical-align: middle !important;
 }
 
-
 /* ======================================================
     DASHBOARD CARD
 ====================================================== */
-
 .dashboard-card {
     border-radius: 18px;
     transition: all 0.3s ease;
@@ -226,21 +216,17 @@ body {
     font-size: 22px;
 }
 
-
 /* ======================================================
     UTILITY COLORS
 ====================================================== */
-
 .bg-soft-success { background: rgba(25,135,84,.1); color:#198754; }
 .bg-soft-info { background: rgba(13,202,240,.1); color:#0dcaf0; }
 .bg-soft-warning { background: rgba(255,193,7,.1); color:#ffc107; }
 .bg-soft-danger { background: rgba(220,53,69,.1); color:#dc3545; }
 
-
 /* ======================================================
     MESSAGE ITEM
 ====================================================== */
-
 .message-item {
     transition: 0.3s;
     background-color: #f8f9fa;
@@ -253,12 +239,258 @@ body {
     transform: translateX(5px);
 }
 
-
 /* ======================================================
     FOOTER
 ====================================================== */
-
 .main-footer {
     background: #ffffff;
     border-top: 1px solid #e5e5e5;
+}
+
+/* ======================================================
+    MODERN FORMS & SELECT2 (THE MAGIC FIX)
+====================================================== */
+.input-group-modern { 
+    display: flex !important; 
+    align-items: stretch !important; 
+    width: 100%; 
+    border-radius: 12px; 
+    overflow: hidden;
+    border: 1px solid #ced4da;
+    background: #ffffff;
+    min-height: 50px; 
+}
+
+.input-icon {
+    width: 50px; 
+    background: #f8f9fa;
+    border-right: 1px solid #ced4da;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    color: #4b5d53;
+}
+
+.form-control.input-modern, 
+.custom-select-modern {
+    border: none !important;
+    background: transparent !important;
+    height: 100% !important;
+    padding: 10px 15px !important;
+    flex: 1;
+}
+
+/* SELECT2 GLOBAL FIX */
+.select2-container--default .select2-selection--single {
+    border: none !important;
+    background: transparent !important;
+    height: 50px !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    padding-left: 15px !important;
+    color: inherit !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 48px !important;
+}
+
+/* ======================================================
+    DARK MODE OVERRIDE - FULL PROFESSIONAL & ANTI FLASHBANG
+====================================================== */
+
+/* Menerapkan transisi halus */
+body, .content-wrapper, .main-sidebar, .card, .table, .nav-link, .main-footer, .main-header, .navbar, .dropdown-menu {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Base Body */
+.dark-mode {
+    background-color: #121212 !important;
+    color: #e0e0e0 !important;
+}
+.dark-mode .content-wrapper {
+    background-color: #121212 !important;
+}
+
+/* Navbar Atas */
+.dark-mode .main-header,
+.dark-mode .navbar,
+.dark-mode .navbar-white,
+.dark-mode .navbar-light {
+    background-color: #1e1e1e !important;
+    border-bottom: 1px solid #333 !important;
+    color: #e0e0e0 !important;
+}
+.dark-mode .navbar-light .navbar-nav .nav-link {
+    color: #e0e0e0 !important;
+}
+.dark-mode .navbar-light .navbar-nav .nav-link:hover {
+    color: #ffffff !important;
+}
+
+/* Sidebar & Logo */
+.dark-mode .main-sidebar,
+.dark-mode .brand-link {
+    background-color: #1a1a1a !important;
+    border-right: 1px solid #333 !important;
+    border-bottom: 1px solid #333 !important;
+}
+.dark-mode .nav-sidebar .nav-link {
+    color: #cbd5e0 !important;
+}
+.dark-mode .nav-sidebar .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+}
+.dark-mode .user-panel .info a {
+    color: #e0e0e0 !important;
+}
+
+/* =========================================
+   SUNTIKAN FIX NAV HEADER DI DARK MODE
+   Biar MASTER DATA dll nggak amblas!
+========================================= */
+.dark-mode .main-sidebar .nav-header {
+    color: #28a745 !important; /* Warna Hijau Cerah agar menyala */
+    background-color: rgba(255, 255, 255, 0.05) !important; /* Efek highlight kotak tipis */
+    border-radius: 6px;
+    margin: 10px 10px 5px 10px;
+    padding: 8px 15px;
+}
+
+/* Dropdown Menu & Notifikasi */
+.dark-mode .dropdown-menu {
+    background-color: #242424 !important;
+    border: 1px solid #333 !important;
+    color: #e0e0e0 !important;
+}
+.dark-mode .dropdown-item {
+    color: #e0e0e0 !important;
+}
+.dark-mode .dropdown-item:hover, 
+.dark-mode .dropdown-item:focus {
+    background-color: #333 !important;
+    color: #ffffff !important;
+}
+.dark-mode .dropdown-header, 
+.dark-mode .dropdown-footer {
+    color: #aaa !important;
+    border-color: #333 !important;
+}
+
+/* Card & Wrapper */
+.dark-mode .card,
+.dark-mode .dashboard-card,
+.dark-mode .info-box {
+    background-color: #1e1e1e !important;
+    color: #e0e0e0 !important;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3) !important;
+}
+.dark-mode .card-header {
+    border-bottom: 1px solid #333 !important;
+    background-color: transparent !important;
+}
+
+/* Table Area */
+.dark-mode .table,
+.dark-mode .table > tbody > tr,
+.dark-mode .table td, 
+.dark-mode .table th {
+    background-color: #1e1e1e !important;
+    color: #e0e0e0 !important;
+    border-color: #333 !important;
+}
+.dark-mode .table thead,
+.dark-mode .table thead tr {
+    background-color: #2d3436 !important;
+    color: #e0e0e0 !important;
+}
+
+/* Teks Spesifik */
+.dark-mode .text-dark {
+    color: #ffffff !important; 
+}
+.dark-mode .breadcrumb-item.active {
+    color: #aaaaaa !important;
+}
+
+/* Footer Bawah */
+.dark-mode .main-footer {
+    background-color: #1a1a1a !important;
+    border-top: 1px solid #333 !important;
+    color: #aaaaaa !important;
+}
+
+/* --- FORMS & INPUT FIX ADMIN --- */
+.dark-mode .input-group-modern {
+    background-color: #25282c !important;
+    border: 1px solid #333 !important;
+}
+
+.dark-mode .input-icon {
+    background-color: #1e1e1e !important;
+    border-color: #333 !important;
+    color: #adb5bd !important;
+}
+
+/* PAKSA Input Text dan Number jadi gelap */
+.dark-mode .form-control, 
+.dark-mode .input-modern,
+.dark-mode .form-control:focus, 
+.dark-mode .input-modern:focus {
+    background-color: #25282c !important; 
+    color: #ffffff !important;
+    box-shadow: none !important;
+}
+
+/* --- JINAKKAN DROPDOWN SELECT2 ADMIN --- */
+.dark-mode .select2-container--default .select2-dropdown {
+    background-color: #25282c !important;
+    border: 1px solid #333 !important;
+}
+
+.dark-mode .select2-search--dropdown {
+    background-color: #25282c !important;
+}
+
+.dark-mode .select2-search__field {
+    background-color: #1e1e1e !important;
+    border: 1px solid #333 !important;
+    color: #ffffff !important;
+    border-radius: 6px !important;
+}
+
+.dark-mode .select2-search__field:focus {
+    border-color: #198754 !important;
+    outline: none !important;
+}
+
+.dark-mode .select2-results__option {
+    background-color: #25282c !important;
+    color: #ffffff !important;
+}
+
+.dark-mode .select2-container--default .select2-results__option--highlighted[aria-selected],
+.dark-mode .select2-container--default .select2-results__option--highlighted[aria-selected]:hover {
+    background-color: #198754 !important; 
+    color: #ffffff !important;
+}
+
+.dark-mode .select2-container--default .select2-results__option[aria-selected="true"] {
+    background-color: #1e1e1e !important;
+    color: #adb5bd !important;
+}
+
+/* Date Picker & Placeholder */
+.dark-mode ::placeholder {
+    color: #8898aa !important;
+    opacity: 1;
+}
+
+.dark-mode input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1) brightness(100%);
+    cursor: pointer;
 }
