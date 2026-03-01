@@ -2,62 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Laporan Stok Kritis - {{ date('d/m/Y') }}</title>
-    <style>
-        body { 
-            font-family: 'Helvetica', 'Arial', sans-serif; 
-            font-size: 11px; 
-            color: #333;
-            line-height: 1.5;
-        }
-        .header { 
-            text-align: center; 
-            border-bottom: 2px solid #444; 
-            padding-bottom: 10px;
-            margin-bottom: 20px; 
-        }
-        .header h2 { 
-            text-transform: uppercase; 
-            margin: 0; 
-            font-size: 18px;
-            color: #000;
-        }
-        .header p { margin: 5px 0 0; color: #666; }
-        
-        .info-table { width: 100%; margin-bottom: 20px; }
-        .info-table td { border: none; padding: 2px 0; }
 
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-        }
-        th { 
-            background-color: #f2f2f2; 
-            color: #333; 
-            border: 1px solid #ccc; 
-            padding: 10px 8px;
-            text-transform: uppercase;
-            font-size: 10px;
-        }
-        td { 
-            border: 1px solid #ccc; 
-            padding: 8px; 
-            vertical-align: middle;
-        }
-        .text-center { text-align: center; }
-        .text-danger { color: #d9534f; font-weight: bold; }
-        
-        .footer { 
-            margin-top: 30px; 
-            text-align: right; 
-            font-size: 10px;
-            font-style: italic;
-            color: #777;
-        }
-        
-        /* Zebra Striping */
-        tr:nth-child(even) { background-color: #fafafa; }
-    </style>
 </head>
 <body>
     <div class="header">

@@ -86,11 +86,12 @@ Route::prefix('admin')
         
         // Fitur Laporan Stok Outlet
         Route::get('/stok-outlet', [LaporanController::class, 'stokOutlet'])->name('stok-outlet');
+        // PENTING: cetak-semua harus di atas {outlet} agar tidak dianggap sebagai ID
         Route::get('/stok-outlet/cetak-semua', [LaporanController::class, 'cetakStokSemua'])->name('stok-outlet.cetak-semua');
         Route::get('/stok-outlet/{outlet}', [LaporanController::class, 'detailStokOutlet'])->name('stok-outlet.detail');
         Route::get('/stok-outlet/{outlet}/cetak', [LaporanController::class, 'cetakStokOutlet'])->name('stok-outlet.cetak');
         
-        // --- REVISI FIX: Fitur Laporan Distribusi (Grouping 3 Parameter) ---
+        // Fitur Laporan Distribusi (Grouping 3 Parameter)
         Route::get('/distribusi', [LaporanController::class, 'distribusi'])->name('distribusi');
         Route::get('/distribusi/detail/{outlet_id}/{bulan}/{tahun}', [LaporanController::class, 'detailDistribusi'])->name('distribusi.detail');
         Route::get('/distribusi/cetak/{outlet_id}/{bulan}/{tahun}', [LaporanController::class, 'cetakDistribusi'])->name('distribusi.cetak');

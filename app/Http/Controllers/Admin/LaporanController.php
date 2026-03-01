@@ -14,30 +14,61 @@ use Illuminate\Support\Facades\DB;
 
 class LaporanController extends Controller
 {
+    /**
+     * Dashboard Laporan Utama
+     */
     public function index(Request $request)
     {
         $bulan = (int) ($request->bulan ?? now()->month);
         $tahun = (int) ($request->tahun ?? now()->year);
 
-        $totalDistribusi = Distribusi::whereMonth('tanggal', $bulan)->whereYear('tanggal', $tahun)->sum('jumlah') ?? 0;
+        $totalDistribusi = Distribusi::whereMonth('tanggal', $bulan)
+            ->whereYear('tanggal', $tahun)
+            ->sum('jumlah') ?? 0;
+        
         $stokMasuk = $totalDistribusi;
 
         $outletTeraktif = Distribusi::selectRaw('outlet_id, COUNT(*) as total')
-            ->with('outlet')->whereMonth('tanggal', $bulan)->whereYear('tanggal', $tahun)
-            ->groupBy('outlet_id')->orderByDesc('total')->limit(5)->get()
-            ->map(fn($item) => (object)['nama_outlet' => $item->outlet->nama_outlet ?? 'N/A', 'total' => $item->total]);
+            ->with('outlet')
+            ->whereMonth('tanggal', $bulan)
+            ->whereYear('tanggal', $tahun)
+            ->groupBy('outlet_id')
+            ->orderByDesc('total')
+            ->limit(5)
+            ->get()
+            ->map(fn($item) => (object)[
+                'nama_outlet' => $item->outlet->nama_outlet ?? 'N/A', 
+                'total' => $item->total
+            ]);
 
         $bahanTerbanyak = Distribusi::selectRaw('bahan_id, SUM(jumlah) as total')
-            ->with('bahan')->whereMonth('tanggal', $bulan)->whereYear('tanggal', $tahun)
-            ->groupBy('bahan_id')->orderByDesc('total')->limit(5)->get()
-            ->map(fn($item) => (object)['nama_bahan' => $item->bahan->nama_bahan ?? 'N/A', 'total' => $item->total]);
+            ->with('bahan')
+            ->whereMonth('tanggal', $bulan)
+            ->whereYear('tanggal', $tahun)
+            ->groupBy('bahan_id')
+            ->orderByDesc('total')
+            ->limit(5)
+            ->get()
+            ->map(fn($item) => (object)[
+                'nama_bahan' => $item->bahan->nama_bahan ?? 'N/A', 
+                'total' => $item->total
+            ]);
 
         $stokMenipis = StokOutlet::where('stok', '<=', 5)->count();
-        $outletAktif = Distribusi::whereMonth('tanggal', $bulan)->whereYear('tanggal', $tahun)->distinct('outlet_id')->count('outlet_id');
+        $outletAktif = Distribusi::whereMonth('tanggal', $bulan)
+            ->whereYear('tanggal', $tahun)
+            ->distinct('outlet_id')
+            ->count('outlet_id');
 
-        return view('admin.laporan.index', compact('totalDistribusi', 'stokMasuk', 'outletTeraktif', 'bahanTerbanyak', 'stokMenipis', 'outletAktif', 'bulan', 'tahun'));
+        return view('admin.laporan.index', compact(
+            'totalDistribusi', 'stokMasuk', 'outletTeraktif', 
+            'bahanTerbanyak', 'stokMenipis', 'outletAktif', 'bulan', 'tahun'
+        ));
     }
 
+    /**
+     * Halaman List Stok Kritis
+     */
     public function stokKritis(Request $request)
     {
         $query = StokOutlet::with(['outlet', 'bahan'])->where('stok', '<=', 5);
@@ -49,6 +80,9 @@ class LaporanController extends Controller
         return view('admin.laporan.stok_kritis', compact('stokKritis', 'outlets'));
     }
 
+    /**
+     * Cetak PDF Stok Kritis
+     */
     public function cetakStokKritis(Request $request)
     {
         $query = StokOutlet::with(['outlet', 'bahan'])->where('stok', '<=', 5);
@@ -56,16 +90,37 @@ class LaporanController extends Controller
             $query->where('outlet_id', $request->outlet_id);
         }
         $stokKritis = $query->orderBy('stok', 'asc')->get();
+        
         $pdf = Pdf::loadView('admin.laporan.pdf.stok_kritis', compact('stokKritis'));
         return $pdf->setPaper('a4', 'portrait')->download('Laporan_Stok_Kritis_'.date('d-m-Y').'.pdf');
     }
 
+    /**
+     * List Stok Per Outlet
+     */
     public function stokOutlet() 
     { 
+        // Menggunakan nama relasi yang umum 'stokOutlet' sesuai model kamu
         $outlets = Outlet::with('stokOutlet')->get(); 
         return view('admin.laporan.stok_outlet', compact('outlets')); 
     }
 
+    /**
+     * Cetak SEMUA Stok Outlet (Solusi Error Undefined Method)
+     */
+    public function cetakStokSemua()
+    {
+        $outlets = Outlet::with(['stokOutlet.bahan'])->get();
+        
+        $pdf = Pdf::loadView('admin.laporan.pdf.stok_outlet_semua', compact('outlets'))
+                  ->setPaper('a4', 'portrait');
+                  
+        return $pdf->download('Laporan_Stok_Semua_Outlet_'.date('d-m-Y').'.pdf');
+    }
+
+    /**
+     * Detail Stok satu Outlet
+     */
     public function detailStokOutlet(Outlet $outlet) 
     { 
         $stok = $outlet->stokOutlet()->with('bahan')->get()->map(function($item) use ($outlet) {
@@ -79,6 +134,9 @@ class LaporanController extends Controller
         return view('admin.laporan.detail_stok_outlet', compact('outlet', 'stok')); 
     }
 
+    /**
+     * Cetak PDF Stok satu Outlet
+     */
     public function cetakStokOutlet(Outlet $outlet) 
     { 
         $stok = $outlet->stokOutlet()->with('bahan')->get()->map(function($item) use ($outlet) {
@@ -89,10 +147,14 @@ class LaporanController extends Controller
             $item->tanggal_terakhir_diterima = $lastDistribusi ? $lastDistribusi->tanggal : null;
             return $item;
         });
+        
         $pdf = Pdf::loadView('admin.laporan.pdf.stok_outlet', compact('outlet', 'stok')); 
         return $pdf->download("Laporan_Stok_{$outlet->nama_outlet}.pdf"); 
     }
 
+    /**
+     * List Rekap Distribusi Bulanan
+     */
     public function distribusi() 
     { 
         $distribusis = Distribusi::select(
@@ -111,15 +173,15 @@ class LaporanController extends Controller
         return view('admin.laporan.distribusi', compact('distribusis')); 
     }
 
+    /**
+     * Detail Transaksi Distribusi
+     */
     public function detailDistribusi($outlet_id, $bulan, $tahun) 
     { 
-        // Force conversion ke integer
         $bulan = (int) $bulan;
         $tahun = (int) $tahun;
-
         $outlet = Outlet::findOrFail($outlet_id);
         
-        // REVISI: Dihapus '.kategori' agar tidak error RelationNotFound
         $items = Distribusi::with(['bahan']) 
             ->where('outlet_id', $outlet_id)
             ->whereMonth('tanggal', $bulan)
@@ -130,12 +192,15 @@ class LaporanController extends Controller
         return view('admin.laporan.detail_distribusi', compact('outlet', 'items', 'bulan', 'tahun')); 
     }
 
+    /**
+     * Cetak PDF Distribusi Bulanan
+     */
     public function cetakDistribusi($outlet_id, $bulan, $tahun) 
     { 
         $bulan = (int) $bulan;
         $tahun = (int) $tahun;
-
         $outlet = Outlet::findOrFail($outlet_id);
+        
         $items = Distribusi::with(['bahan'])
             ->where('outlet_id', $outlet_id)
             ->whereMonth('tanggal', $bulan)
