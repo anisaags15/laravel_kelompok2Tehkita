@@ -134,27 +134,4 @@
     </div>
 </div>
 
-<style>
-    /* Gradient Effect */
-    .bg-gradient-danger {
-        background: linear-gradient(45deg, #d9534f, #ff6b6b);
-    }
-    
-    /* Border Accent */
-    .border-left-primary {
-        border-left: 4px solid #4e73df !important;
-    }
-
-    .table td {
-        vertical-align: middle !important;
-    }
-
-    .opacity-50 { opacity: 0.5; }
-
-    @media print {
-        .no-print { display: none !important; }
-        .card { border: 1px solid #ddd !important; }
-        .badge-danger { color: red !important; border: 1px solid red !important; background: transparent !important; }
-    }
-</style>
 @endsection

@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Route;
 // ==========================================
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\LaporanController;
-use App\Http\Controllers\Admin\StokKritisController; // Pastikan ini ada!
+use App\Http\Controllers\Admin\StokKritisController;
 
 // ==========================================
 // CONTROLLER USER/OUTLET
@@ -90,10 +90,10 @@ Route::prefix('admin')
         Route::get('/stok-outlet/{outlet}', [LaporanController::class, 'detailStokOutlet'])->name('stok-outlet.detail');
         Route::get('/stok-outlet/{outlet}/cetak', [LaporanController::class, 'cetakStokOutlet'])->name('stok-outlet.cetak');
         
-        // Fitur Laporan Distribusi
+        // --- REVISI FIX: Fitur Laporan Distribusi (Grouping 3 Parameter) ---
         Route::get('/distribusi', [LaporanController::class, 'distribusi'])->name('distribusi');
-        Route::get('/distribusi/{id}', [LaporanController::class, 'detailDistribusi'])->name('distribusi.detail');
-        Route::get('/distribusi/{id}/cetak', [LaporanController::class, 'cetakDistribusi'])->name('distribusi.cetak');
+        Route::get('/distribusi/detail/{outlet_id}/{bulan}/{tahun}', [LaporanController::class, 'detailDistribusi'])->name('distribusi.detail');
+        Route::get('/distribusi/cetak/{outlet_id}/{bulan}/{tahun}', [LaporanController::class, 'cetakDistribusi'])->name('distribusi.cetak');
     });
 
     // Profile Admin
@@ -103,6 +103,7 @@ Route::prefix('admin')
         Route::post('/update-password', [ProfileController::class, 'updatePassword'])->name('update-password');
     });
 });
+
 /*
 |--------------------------------------------------------------------------
 | ================= USER AREA (OUTLET) =================
