@@ -24,9 +24,12 @@
         <div class="card shadow-sm border-0">
             <div class="card-header bg-white py-3 d-flex align-items-center justify-content-between">
                 <h6 class="fw-bold mb-0 text-success"><i class="fas fa-history me-2"></i>Semua Riwayat Pemakaian</h6>
-                <a href="{{ route('user.dashboard') }}" class="btn btn-sm btn-outline-secondary">
-                    <i class="fas fa-arrow-left me-1"></i> Kembali
-                </a>
+                <div style="margin-right:-1.5rem; text-align:right;">
+    <a href="{{ route('user.dashboard') }}" 
+       class="btn btn-sm btn-outline-secondary">
+        <i class="fas fa-arrow-left me-1"></i> Kembali
+    </a>
+</div>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
