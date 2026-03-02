@@ -13,7 +13,7 @@ use App\Models\Distribusi;
 use App\Models\Pemakaian;
 use App\Models\StokOutlet;
 use App\Models\User;
-use App\Models\Message; // Pastikan Message di-import jika digunakan
+use App\Models\Message; 
 
 // Support & Utilities
 use Illuminate\Support\Facades\Auth;
@@ -85,51 +85,50 @@ class DashboardController extends Controller
                 ->get();
         }
 
-  /*
-|--------------------------------------------------------------------------
-| 5️⃣ DATA GRAFIK PEMAKAIAN (DINAMIS - 7 HARI TERAKHIR)
-|--------------------------------------------------------------------------
-*/
-// Kita buat label manual 7 hari terakhir biar grafik nggak kosong kalau data belum ada
-$labelsRaw = [];
-$labelsFormatted = [];
-for ($i = 6; $i >= 0; $i--) {
-    $date = now()->subDays($i);
-    $labelsRaw[] = $date->format('Y-m-d'); // Untuk filter query
-    $labelsFormatted[] = $date->format('d M'); // Untuk tampilan di chart
-}
+        /*
+        |--------------------------------------------------------------------------
+        | 5️⃣ DATA GRAFIK PEMAKAIAN (DINAMIS - 7 HARI TERAKHIR)
+        |--------------------------------------------------------------------------
+        */
+        $labelsRaw = [];
+        $labelsFormatted = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $date = now()->subDays($i);
+            $labelsRaw[] = $date->format('Y-m-d'); 
+            $labelsFormatted[] = $date->format('d M'); 
+        }
 
-$outletList = Outlet::take(5)->get();
-$datasets = [];
-$colors = ['#198754', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'];
+        $outletList = Outlet::take(5)->get();
+        $datasets = [];
+        $colors = ['#198754', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'];
 
-foreach ($outletList as $index => $o) {
-    $dataPemakaian = [];
-    foreach ($labelsRaw as $tgl) {
-        $total = Pemakaian::where('outlet_id', $o->id)
-            ->whereDate('tanggal', $tgl) // Gunakan whereDate agar lebih akurat
-            ->sum('jumlah'); 
-        $dataPemakaian[] = (int) $total; // Cast ke int biar JS gak bingung
-    }
+        foreach ($outletList as $index => $o) {
+            $dataPemakaian = [];
+            foreach ($labelsRaw as $tgl) {
+                $total = Pemakaian::where('outlet_id', $o->id)
+                    ->whereDate('tanggal', $tgl) 
+                    ->sum('jumlah'); 
+                $dataPemakaian[] = (int) $total; 
+            }
 
-    $color = $colors[$index] ?? '#' . substr(md5($o->id), 0, 6);
+            $color = $colors[$index] ?? '#' . substr(md5($o->id), 0, 6);
 
-    $datasets[] = [
-        'label'           => $o->nama_outlet,
-        'data'            => $dataPemakaian,
-        'borderColor'     => $color,
-        'backgroundColor' => $color . '33', // 33 itu opacity sekitar 20% biar cakep pas fill: true
-        'tension'         => 0.4,
-        'fill'            => true,
-        'pointRadius'     => 4,
-        'pointHoverRadius'=> 6,
-    ];
-}
+            $datasets[] = [
+                'label'           => $o->nama_outlet,
+                'data'            => $dataPemakaian,
+                'borderColor'     => $color,
+                'backgroundColor' => $color . '33', 
+                'tension'         => 0.4,
+                'fill'            => true,
+                'pointRadius'     => 4,
+                'pointHoverRadius'=> 6,
+            ];
+        }
 
-$pemakaianChart = [
-    'labels'   => $labelsFormatted,
-    'datasets' => $datasets
-];
+        $pemakaianChart = [
+            'labels'   => $labelsFormatted,
+            'datasets' => $datasets
+        ];
 
         /*
         |--------------------------------------------------------------------------
@@ -156,7 +155,7 @@ $pemakaianChart = [
 
         /*
         |--------------------------------------------------------------------------
-        | 7️⃣ MONITORING REAL-TIME OUTLET (NEW FEATURE! 🚀)
+        | 7️⃣ MONITORING REAL-TIME OUTLET
         |--------------------------------------------------------------------------
         */
         $monitoringOutlets = Outlet::withSum(['pemakaian' => function($query) {
@@ -167,7 +166,6 @@ $pemakaianChart = [
             $realisasi = $outlet->pemakaian_sum_jumlah ?? 0;
             $persentase = ($target > 0) ? ($realisasi / $target) * 100 : 0;
 
-            // Logika Status Warna
             if ($persentase >= 100) {
                 $status = 'Over Limit'; $warna = 'danger';
             } elseif ($persentase >= 80) {
@@ -188,7 +186,27 @@ $pemakaianChart = [
 
         /*
         |--------------------------------------------------------------------------
-        | 8️⃣ RETURN VIEW
+        | 8️⃣ DATA OUTLET TERAKTIF (PIALA / PERFORMA TERBAIK) - ADDED FIX! 🏆
+        |--------------------------------------------------------------------------
+        | Kita ambil total pemakaian selama 7 hari terakhir agar sinkron dengan grafik.
+        */
+        $outletTeraktif = Pemakaian::select('outlet_id', DB::raw('SUM(jumlah) as total'))
+            ->with('outlet')
+            ->whereBetween('tanggal', [now()->subDays(6)->startOfDay(), now()->endOfDay()])
+            ->groupBy('outlet_id')
+            ->orderBy('total', 'desc')
+            ->take(5)
+            ->get()
+            ->map(function($item) {
+                return (object) [
+                    'nama_outlet' => $item->outlet->nama_outlet ?? 'Unknown Outlet',
+                    'total'       => (int) $item->total
+                ];
+            });
+
+        /*
+        |--------------------------------------------------------------------------
+        | 9️⃣ RETURN VIEW
         |--------------------------------------------------------------------------
         */
         return view('admin.dashboard', compact(
@@ -197,7 +215,8 @@ $pemakaianChart = [
             'outlets', 'latestDistribusi', 'latestStokMasuk',
             'unreadCount', 'latestChats',
             'pemakaianChart', 'calendarEvents',
-            'monitoringOutlets' // Kirim data monitoring ke view
+            'monitoringOutlets',
+            'outletTeraktif' // Sekarang variabel ini sudah dikirim!
         ));
     }
 }

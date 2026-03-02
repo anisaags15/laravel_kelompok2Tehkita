@@ -604,34 +604,29 @@ body, .content-wrapper, .main-sidebar, .card, .table, .nav-link, .main-footer, .
         border: none;
     }
 
-    /* AUTOMATIC DARK MODE */
-    @media (prefers-color-scheme: dark) {
-        .custom-card-theme { background-color: #1a1d21 !important; }
-        .heading-theme { color: #ffffff !important; }
-        .label-theme { color: #aeb1b7 !important; }
-        .input-custom, .custom-addon { 
-            background-color: #24282d !important; 
-            border: none !important; 
-            color: #fff !important; 
-        }
-        .btn-back-custom {
-            background-color: transparent !important;
-            border-color: #3e444a !important;
-            color: #aeb1b7 !important;
-        }
-    }
+/* GANTI @media (prefers-color-scheme: dark) JADI INI: */
 
-    /* Efek Focus */
-    .form-control:focus, .input-group:focus-within .custom-addon {
-        border-color: #28a745 !important;
-        box-shadow: none !important;
-    }
-/* Tambahan dikit biar badgenya kedap-kedip (opsional) */
-.anim-pulse {
-    animation: pulse-red 2s infinite;
+.dark-mode .custom-card-theme { 
+    background-color: #1a1d21 !important; 
 }
-@keyframes pulse-red {
-    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
-    70% { transform: scale(1); box-shadow: 0 0 0 5px rgba(220, 53, 69, 0); }
-    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+
+.dark-mode .heading-theme { 
+    color: #ffffff !important; 
+}
+
+.dark-mode .label-theme { 
+    color: #aeb1b7 !important; 
+}
+
+.dark-mode .input-custom, 
+.dark-mode .custom-addon { 
+    background-color: #24282d !important; 
+    border: 1px solid #3e444a !important; /* Kasih border dikit biar tegas */
+    color: #fff !important; 
+}
+
+.dark-mode .btn-back-custom {
+    background-color: transparent !important;
+    border-color: #3e444a !important;
+    color: #aeb1b7 !important;
 }
