@@ -1,0 +1,67 @@
+/* ==========================================================================
+   SECTION 1: WEB DASHBOARD & UI COMPONENTS
+   ========================================================================== 
+*/
+.stat-card { border-radius: 15px; transition: all 0.3s ease; border: none; border-bottom: 4px solid transparent; }
+.stat-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+.stat-card.border-primary { border-bottom-color: #4338ca !important; }
+.stat-card.border-success { border-bottom-color: #15803d !important; }
+
+.icon-shape { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 12px; }
+.bg-primary-soft { background-color: #e0e7ff; color: #4338ca; }
+.bg-success-soft { background-color: #dcfce7; color: #15803d; }
+
+.table-luxury thead th { background-color: #f8f9fa; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; color: #4a5568; border-bottom: 3px solid #edf2f7; padding: 15px 12px; }
+.table-luxury td { padding: 15px 12px; vertical-align: middle; color: #2d3748; border-bottom: 1px solid #f1f5f9; }
+
+/* ==========================================================================
+   SECTION 2: PDF & PRINT REPORT COMMON STYLES
+   ========================================================================== 
+*/
+@media print {
+    @page { margin: 1.5cm; }
+    .pdf-body { font-family: 'Helvetica', 'Arial', sans-serif; font-size: 11px; color: #333; line-height: 1.6; }
+}
+
+/* Base Report Settings */
+.report-body { font-family: 'Helvetica', 'Arial', sans-serif; font-size: 11pt; line-height: 1.5; color: #333; }
+
+/* Header & Titles */
+.header-table { width: 100%; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
+.title { font-size: 18pt; font-weight: bold; margin: 0; color: #1a1a1a; }
+.subtitle { font-size: 10pt; color: #666; margin: 0; }
+
+/* Detail Info Section */
+.info-table { width: 100%; margin-bottom: 20px; }
+.info-table td { vertical-align: top; padding: 2px 0; }
+.label { width: 120px; font-weight: bold; }
+.separator { width: 10px; }
+
+/* ==========================================================================
+   SECTION 3 & 4: SPECIFIC PDF REPORTS (Stok & Distribusi)
+   ========================================================================== 
+*/
+.stok-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+.stok-table th { background-color: #f2f2f2; border: 1px solid #333; padding: 8px; text-align: center; font-weight: bold; text-transform: uppercase; }
+.stok-table td { border: 1px solid #333; padding: 8px; vertical-align: middle; }
+
+/* Zebra Striping & Utilities */
+.table-zebra tr:nth-child(even) { background-color: #fafafa; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-danger { color: #d9534f; font-weight: bold; }
+
+/* Badges */
+.badge-id { font-family: monospace; font-weight: bold; }
+.badge-id-stok { color: #28a745; }
+.badge-id-distribusi { color: #007bff; }
+
+/* Outlet Section (For All Outlets Report) */
+.outlet-section { margin-bottom: 30px; page-break-inside: avoid; }
+.outlet-name { background: #f4f4f4; padding: 10px 15px; font-size: 14px; font-weight: bold; border-left: 4px solid #28a745; margin-bottom: 5px; }
+
+/* Signature & Footer */
+.signature-wrapper { margin-top: 50px; width: 100%; }
+.signature-box { float: left; width: 200px; text-align: center; }
+.footer-note { clear: both; margin-top: 50px; font-size: 9pt; font-style: italic; color: #777; border-top: 1px solid #eee; padding-top: 10px; }
+.footer-fixed { position: fixed; bottom: 0; width: 100%; text-align: right; font-size: 9px; color: #777; }

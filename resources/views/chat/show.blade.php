@@ -4,80 +4,132 @@
 
 @section('content')
 <style>
-    .chat-card { border-radius: 20px !important; overflow: hidden; border: none !important; box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important; max-width: 900px; }
-    .chat-header { background: linear-gradient(135deg, #0d6efd 0%, #0043a8 100%); padding: 12px 20px !important; border: none; }
-    .chat-body { height: 500px; overflow-y: auto; background: #f0f2f5 url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png') repeat; scroll-behavior: smooth; }
-    .bubble { max-width: 70%; padding: 8px 14px; border-radius: 15px; position: relative; font-size: 0.95rem; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-    .bubble-me { background-color: #dcf8c6; color: #303030; border-top-right-radius: 2px; }
-    .bubble-other { background-color: #ffffff; color: #303030; border-top-left-radius: 2px; }
-    .time-stamp { font-size: 0.65rem; margin-top: 4px; display: block; opacity: 0.6; }
-    .chat-body::-webkit-scrollbar { width: 5px; }
-    .chat-body::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
-    .object-fit-cover { object-fit: cover; }
-</style>
+    /* --- BASE STYLES --- */
+    .chat-card { 
+        border-radius: 20px !important; 
+        overflow: hidden; 
+        border: none !important; 
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05) !important; 
+        max-width: 900px; 
+    }
+    
+    .chat-header { 
+        background: linear-gradient(135deg, #0d6efd 0%, #0043a8 100%); 
+        padding: 15px 25px !important; 
+        border: none; 
+    }
+    
+    .chat-body { 
+        height: 550px; 
+        overflow-y: auto; 
+        background-color: #e5ddd5; /* Warna asli WA */
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+    }
 
+    /* LAYER WALLPAPER (BIAR GAK POLOSAN) */
+    .chat-body::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
+        background-repeat: repeat;
+        background-size: 350px;
+        opacity: 0.08; /* Motif samar di mode terang */
+        z-index: -1;
+    }
+
+    /* --- BUBBLE STYLES --- */
+    .bubble { max-width: 75%; padding: 10px 16px; border-radius: 18px; font-size: 0.95rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 4px; z-index: 2; }
+    .bubble-me { background-color: #dcf8c6; color: #202c33; border-top-right-radius: 2px; align-self: flex-end; }
+    .bubble-other { background-color: #ffffff; color: #202c33; border-top-left-radius: 2px; align-self: flex-start; }
+    
+    .time-stamp { font-size: 0.65rem; margin-top: 4px; display: block; opacity: 0.6; }
+
+    /* --- DARK MODE FIX (ANTI POLOSAN) --- */
+    .dark-mode .chat-card { background-color: #1a1a1a !important; }
+
+    .dark-mode .chat-body { 
+        background-color: #0b141a !important; /* Warna item WA */
+    }
+
+    /* INI KUNCINYA: Membalik warna motif jadi putih samar */
+    .dark-mode .chat-body::before {
+        filter: invert(1); /* Motif item jadi putih */
+        opacity: 0.04 !important; /* Super samar tapi ADA motifnya */
+    }
+
+    .dark-mode .bubble-me { background-color: #005c4b !important; color: #e9edef !important; }
+    .dark-mode .bubble-other { background-color: #202c33 !important; color: #e9edef !important; }
+    .dark-mode .card-footer { background-color: #1a1a1a !important; border-top: 1px solid #333 !important; }
+    .dark-mode .input-group-custom { background-color: #2a3942 !important; }
+    .dark-mode .form-control { color: #ffffff !important; }
+
+    /* Scrollbar */
+    .chat-body::-webkit-scrollbar { width: 6px; }
+    .chat-body::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
+    .dark-mode .chat-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+</style>
 <div class="container-fluid pb-4">
     <div class="card chat-card mx-auto">
-        
-{{-- Header Chat --}}
-<div class="card-header chat-header d-flex align-items-center text-white">
-    <div class="d-flex justify-content-between align-items-center w-100">
-        {{-- SISI KIRI: Profil --}}
-        <div class="d-flex align-items-center">
-            @if($user->photo)
-                <img src="{{ asset('uploads/profile/' . $user->photo) }}" 
-                     class="rounded-circle me-3 border border-2 border-white object-fit-cover shadow-sm" 
-                     style="width: 45px; height: 45px;"
-                     onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&color=FFFFFF&background=0d6efd';">
-            @else
-                <div class="bg-white text-primary rounded-circle d-flex justify-content-center align-items-center shadow-sm me-3 fw-bold" 
-                     style="width: 45px; height: 45px; font-size: 1.1rem;">
-                    {{ strtoupper(substr($user->outlet ? $user->outlet->nama_outlet : $user->name, 0, 1)) }}
+        {{-- Header --}}
+        <div class="card-header chat-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <a href="{{ route('chat.index') }}" class="text-white me-3 d-md-none"><i class="fas fa-arrow-left"></i></a>
+                    <div class="position-relative">
+                        @if($user->photo)
+                            <img src="{{ asset('uploads/profile/' . $user->photo) }}" class="rounded-circle border border-2 border-white object-fit-cover shadow-sm" style="width: 45px; height: 45px;" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&color=FFFFFF&background=0d6efd';">
+                        @else
+                            <div class="bg-white text-primary rounded-circle d-flex justify-content-center align-items-center shadow-sm fw-bold" style="width: 45px; height: 45px;">
+                                {{ strtoupper(substr($user->outlet ? $user->outlet->nama_outlet : $user->name, 0, 1)) }}
+                            </div>
+                        @endif
+                        <span class="position-absolute bottom-0 end-0 p-1 bg-success border border-white rounded-circle"></span>
+                    </div>
+                    <div class="ms-3">
+                        <h6 class="mb-0 fw-bold text-white">{{ $user->outlet ? $user->outlet->nama_outlet : $user->name }}</h6>
+                        <small class="text-white-50">Online</small>
+                    </div>
                 </div>
-            @endif
-            <div>
-                <h6 class="mb-0 fw-bold text-white">{{ $user->outlet ? $user->outlet->nama_outlet : $user->name }}</h6>
-                <small class="opacity-75 d-flex align-items-center">
-                    <i class="fas fa-circle text-success me-1" style="font-size: 8px;"></i> Aktif Sekarang
-                </small>
+                <a href="{{ route('chat.index') }}" class="btn btn-light btn-sm rounded-pill px-3 d-none d-md-block shadow-sm">
+                    <i class="fas fa-times me-1"></i> Tutup
+                </a>
             </div>
         </div>
 
-        {{-- SISI KANAN: Tombol Kembali --}}
-        <div class="ms-auto">
-            <a href="{{ route('chat.index') }}" class="btn btn-light btn-sm rounded-pill px-3 fw-bold text-primary shadow-sm transition-all hover-scale">
-                <i class="fas fa-arrow-left me-1"></i> Kembali
-            </a>
-        </div>
-    </div>
-</div>
-        {{-- Body Chat --}}
-        <div class="card-body chat-body p-4" id="chat-container">
-            <div class="d-flex flex-column">
-                @foreach($messages as $msg)
-                    @php $isMe = $msg->sender_id === auth()->id(); @endphp
-                    <div class="d-flex {{ $isMe ? 'justify-content-end' : 'justify-content-start' }} mb-3">
-                        <div class="bubble {{ $isMe ? 'bubble-me' : 'bubble-other' }}">
-                            <div class="message-text">{{ $msg->message }}</div>
-                            <span class="time-stamp {{ $isMe ? 'text-end' : 'text-start' }}">
-                                {{ $msg->created_at->format('H:i') }}
-                                @if($isMe) <i class="fas fa-check-double ms-1 {{ $msg->is_read ? 'text-primary' : '' }}"></i> @endif
-                            </span>
-                        </div>
+        {{-- Body --}}
+        <div class="card-body chat-body d-flex flex-column p-4" id="chat-container">
+            @foreach($messages as $msg)
+                @php 
+                    $isMe = $msg->sender_id === auth()->id(); 
+                    $isSystem = str_contains($msg->message, '[SISTEM NOTIFIKASI STOK]');
+                @endphp
+                
+                <div class="d-flex flex-column mb-3">
+                    <div class="bubble {{ $isSystem ? 'bubble-system' : ($isMe ? 'bubble-me' : 'bubble-other') }}">
+                        @if($isSystem) <i class="fas fa-robot me-1"></i> @endif
+                        <div class="message-text" style="white-space: pre-wrap;">{{ $msg->message }}</div>
+                        <span class="time-stamp {{ $isMe ? 'text-end' : 'text-start' }}">
+                            {{ $msg->created_at->format('H:i') }}
+                            @if($isMe) 
+                                <i class="fas fa-check-double ms-1 {{ $msg->is_read ? 'text-primary' : '' }}"></i> 
+                            @endif
+                        </span>
                     </div>
-                @endforeach
-            </div>
+                </div>
+            @endforeach
         </div>
 
         {{-- Footer Input --}}
         <div class="card-footer bg-white p-3 border-0">
-            <form action="{{ route('chat.store', $user->id) }}" method="POST" id="chat-form">
+            <form action="{{ route('chat.store', $user->id) }}" method="POST">
                 @csrf
-                <div class="input-group">
-                    <input type="text" name="message" class="form-control border-0 bg-light rounded-pill px-4" 
-                           placeholder="Ketik pesan..." required autocomplete="off" style="height: 48px;">
-                    <button class="btn btn-primary rounded-circle ms-2 shadow-sm d-flex align-items-center justify-content-center" 
-                            type="submit" style="width: 48px; height: 48px;">
+                <div class="input-group input-group-custom shadow-sm rounded-pill bg-light overflow-hidden p-1">
+                    <input type="text" name="message" class="form-control border-0 px-4 shadow-none" placeholder="Ketik pesan di sini..." required autocomplete="off">
+                    <button class="btn btn-primary rounded-pill px-4" type="submit">
                         <i class="fas fa-paper-plane"></i>
                     </button>
                 </div>

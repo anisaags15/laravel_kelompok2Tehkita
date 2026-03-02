@@ -1,424 +1,407 @@
-/* ===============================
-   GLOBAL
-================================ */
-* {
-    font-family: 'Poppins', sans-serif;
+/* =============================================================
+   TEH KITA PRESTIGE CSS - FULL COMPLETE VERSION
+   ============================================================= */
+
+:root {
+    --primary-green: #166534;
+    --primary-light: #15803d;
+    --accent-orange: #b45309;
+    --dark-grey: #1f2937;
+    --light-bg: #f8fafc;
+    --glass: rgba(255, 255, 255, 0.9);
 }
 
 body {
-    background: #f8fafc;
-    color: #334155;
-    scroll-behavior: smooth;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: var(--dark-grey);
+    background-color: #fff;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
 }
 
-/* BRAND */
-.teh { color: #16a34a; }
-.kita { color: #ca8a04; }
-
-/* ===============================
-   NAVBAR
-================================ */
-.navbar .nav-link {
-    font-weight: 500;
-    color: #334155;
-    transition: .3s;
+/* ==========================================
+   BAGIAN: NAVBAR
+   ========================================== */
+.navbar {
+    transition: all 0.4s ease;
+    padding: 20px 0;
+    z-index: 1000;
 }
 
-.navbar .nav-link:hover {
-    color: #16a34a;
+.navbar-scrolled {
+    background: var(--glass) !important;
+    backdrop-filter: blur(10px);
+    padding: 12px 0;
+    box-shadow: 0 4px 30px rgba(0,0,0,0.1);
 }
 
-/* ===============================
-   HERO – PREMIUM VERSION
-================================ */
+.navbar-brand {
+    font-size: 1.6rem;
+    letter-spacing: -1px;
+}
 
+.teh { color: var(--primary-green); }
+.kita { color: var(--accent-orange); }
+
+.nav-link {
+    font-weight: 600;
+    color: var(--dark-grey) !important;
+    position: relative;
+    transition: 0.3s;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: var(--primary-green);
+    transition: 0.3s;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+.btn-login {
+    background: var(--primary-green);
+    color: white;
+    font-weight: 600;
+    transition: 0.3s;
+    border: none;
+}
+
+.btn-login:hover {
+    background: var(--accent-orange);
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* ==========================================
+   BAGIAN: HERO (SAMPUL ATAS)
+   ========================================== */
 .hero-img {
     height: 100vh;
     object-fit: cover;
-    filter: brightness(65%) saturate(105%);
+    animation: zoomEffect 20s infinite alternate;
 }
 
-/* overlay lebih soft & elegan */
+@keyframes zoomEffect {
+    from { transform: scale(1); }
+    to { transform: scale(1.15); }
+}
+
 .hero-overlay {
     position: absolute;
-    inset: 0;
-    background: linear-gradient(
-        to bottom,
-        rgba(2, 6, 23, 0.25),
-        rgba(2, 6, 23, 0.7)
-    );
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0.2));
 }
 
 .hero-content {
     position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    padding: 0 20px;
-    animation: fadeUp 1.2s ease;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    width: 100%;
 }
 
-/* ===== TITLE (INI ANDALANNYA) ===== */
+.badge-custom {
+    display: inline-block;
+    padding: 8px 20px;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(5px);
+    border-radius: 50px;
+    border: 1px solid rgba(255,255,255,0.3);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
 .hero-title {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 3.4rem;
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
     font-weight: 800;
-    line-height: 1.15;
-    letter-spacing: 0.6px;
-
-    background: linear-gradient(
-        90deg,
-        #f8fafc,
-        #99f6e4,
-        #7dd3fc
-    );
-
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-
-    text-shadow:
-        0 8px 30px rgba(0,0,0,.35);
+    line-height: 1.1;
 }
 
-/* subtitle lebih tenang */
+.text-highlight {
+    color: #fcd34d;
+}
+
 .hero-sub {
-    font-family: 'Inter', sans-serif;
-    font-size: 1.15rem;
-    font-weight: 500;
-    color: #e2e8f0;
-    margin-top: 14px;
+    font-size: 1.2rem;
     max-width: 600px;
+    opacity: 0.9;
+    margin: 20px 0 30px;
 }
 
-/* alamat */
-.hero-address {
-    font-size: .95rem;
-    color: #cbd5e1;
-    margin-top: 12px;
-}
-
-/* button */
-.hero-btn {
-    margin-top: 32px;
-}
-
-.hero-btn .btn {
-    font-family: 'Inter', sans-serif;
-    font-weight: 500;
-    padding: 10px 28px;
-}
-
-/* responsive */
-@media (max-width: 768px) {
-    .hero-title {
-        font-size: 2.4rem;
-    }
-
-    .hero-sub {
-        font-size: 1rem;
-    }
-}
-
-/* ===============================
-   WELCOME
-================================ */
-.welcome-section {
-    background: linear-gradient(180deg, #ffffff, #f8fafc);
-}
-
-.welcome-title {
-    font-size: 2.4rem;
+.btn-main {
+    background: #fcd34d;
+    color: #78350f;
+    padding: 12px 35px;
+    border-radius: 50px;
     font-weight: 700;
-    color: #166534;
-    margin-bottom: 10px;
+    text-decoration: none;
+    transition: 0.3s;
 }
 
-.welcome-subtitle {
-    font-size: 1.1rem;
-    font-weight: 500;
-    color: #ca8a04;
-    margin-bottom: 25px;
+.btn-main:hover {
+    background: white;
+    transform: scale(1.05);
 }
 
-.welcome-text {
-    font-size: 1rem;
-    color: #475569;
-    line-height: 1.8;
-    margin-bottom: 14px;
-}
-
-.welcome-divider {
-    width: 80px;
-    height: 4px;
-    background: linear-gradient(to right, #22c55e, #fde047);
-    margin: 30px auto;
-    border-radius: 10px;
-}
-
-.welcome-note {
-    font-size: .95rem;
-    color: #64748b;
-    font-style: italic;
-}
-
-/* ===============================
-   SECTION
-================================ */
+/* ==========================================
+   ATURAN UMUM SEKSI (GENERAL SECTION)
+   ========================================== */
 .section {
-    padding: 90px 20px;
+    padding: 100px 0;
+}
+
+.section-dark {
+    background: var(--light-bg);
 }
 
 .section-title {
-    text-align: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
     font-weight: 700;
-    color: #166534;
-    margin-bottom: 40px;
 }
 
-/* ===============================
-   INFO CARD (FIX GEDE SEBELAH)
-================================ */
-.info-card {
-    background: #ffffff;
-    padding: 32px 24px;
-    border-radius: 18px;
-    text-align: center;
-    box-shadow: 0 12px 30px rgba(0,0,0,.06);
-    transition: all .4s ease;
+.title-divider {
+    width: 80px;
+    height: 4px;
+    background: var(--primary-green);
+    margin-top: 15px;
+    border-radius: 2px;
+}
+
+/* =============================================================
+   START: BAGIAN TENTANG KAMI (WELCOME SECTION)
+   ============================================================= */
+
+/* Wadah Foto dengan Efek Menumpuk */
+.welcome-image-stack {
     position: relative;
-    overflow: hidden;
-
-    /* 🔥 PENTING: SAMAIN TINGGI */
-    height: 100%;
+    padding: 20px;
     display: flex;
-    flex-direction: column;
     justify-content: center;
-
-    animation: fadeScale .8s ease both;
 }
 
-/* icon */
-.info-card i {
-    font-size: 2.3rem;
-    color: #22c55e;
-    margin-bottom: 12px;
-    transition: .4s;
+/* Kotak Foto Utama */
+.img-box.main-img {
+    position: relative;
+    z-index: 2;
+    overflow: hidden;
+    border-radius: 30px;
+    max-width: 420px;
+    transition: transform 0.5s ease;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
 }
 
-/* hover hidup */
-.info-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(0,0,0,.12);
+.img-box.main-img img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    transition: transform 0.8s ease;
 }
 
-.info-card:hover i {
-    transform: scale(1.15) rotate(5deg);
+/* Efek Gerak saat Foto Disentuh */
+.welcome-image-stack:hover .img-box.main-img {
+    transform: translateY(-10px);
 }
 
-/* garis bawah animasi */
-.info-card::after {
+.welcome-image-stack:hover .img-box.main-img img {
+    transform: scale(1.05);
+}
+
+/* Garis Dekorasi Oranye di Belakang Foto */
+.welcome-image-stack::after {
     content: "";
     position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 4px;
-    width: 100%;
-    background: linear-gradient(to right, #22c55e, #fde047);
-    transform: scaleX(0);
-    transition: .4s;
+    width: 80%;
+    height: 90%;
+    border: 3px solid var(--accent-orange);
+    border-radius: 30px;
+    top: 40px;
+    left: 10%;
+    z-index: 1;
+    opacity: 0.3;
 }
 
-.info-card:hover::after {
-    transform: scaleX(1);
+/* Judul dan Teks Tentang Kami */
+.welcome-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem;
+    font-weight: 900;
+    line-height: 1.15;
+    color: var(--dark-grey);
+    letter-spacing: -0.5px;
 }
 
-/* ===============================
-   JAM OPERASIONAL (HIGHLIGHT RAPiH)
-================================ */
-.info-card.highlight {
-    background: linear-gradient(135deg, #ecfdf5, #f0fdf4);
-    border: 2px solid #22c55e;
-    padding: 30px 24px;
+.welcome-text {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #4b5563;
+    font-weight: 400;
 }
 
-.info-card.highlight i {
-    color: #16a34a;
+/* Kartu Fitur Kecil di Samping Foto (Keamanan & Efisiensi) */
+.features-mini .d-flex {
+    background: #fff;
+    padding: 20px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.03);
+    margin-bottom: 15px !important;
 }
 
-.info-card.highlight strong {
-    color: #ca8a04;
-    font-size: 1.15rem;
+.features-mini .d-flex:hover {
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    transform: translateX(10px);
+    border-color: var(--primary-green);
 }
 
-.info-card.highlight p {
-    margin-bottom: 6px;
-    line-height: 1.6;
+/* Ikon Kecil Hijau */
+.icon-small {
+    min-width: 48px;
+    height: 48px;
+    background: var(--primary-green);
+    color: #fff;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    box-shadow: 0 4px 15px rgba(22, 101, 52, 0.2);
 }
 
-/* denyut halus */
-.info-card.highlight {
-    animation: pulseSoft 3s infinite;
+/* =============================================================
+   END: BAGIAN TENTANG KAMI
+   ============================================================= */
+
+/* ==========================================
+   BAGIAN: INFO CARDS (FITUR SISTEM)
+   ========================================== */
+.info-card-premium {
+    background: white;
+    padding: 40px 30px;
+    border-radius: 24px;
+    border-bottom: 5px solid transparent;
+    transition: 0.4s;
+    height: 100%;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
 }
 
-/* ===============================
-   CABANG
-================================ */
-.cabang-list {
-    list-style: none;
-    max-width: 650px;
-    margin: auto;
-    padding: 0;
+.info-card-premium:hover {
+    transform: translateY(-10px);
+    border-color: var(--primary-green);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
 }
 
-.cabang-list li {
-    margin-bottom: 14px;
+.card-icon {
+    font-size: 2.5rem;
+    color: var(--primary-green);
+    margin-bottom: 20px;
 }
 
-.cabang-list a {
-    color: #166534;
+.info-card-premium.highlight {
+    background: var(--primary-green);
+    color: white;
+}
+
+.info-card-premium.highlight .card-icon {
+    color: #fcd34d;
+}
+
+/* ==========================================
+   BAGIAN: CABANG GRID
+   ========================================== */
+.cabang-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+}
+
+.cabang-item {
+    background: white;
+    color: var(--dark-grey);
+    padding: 15px 25px;
+    border-radius: 15px;
     text-decoration: none;
-    font-weight: 500;
-    transition: .3s;
+    font-weight: 600;
+    border: 1px solid #e2e8f0;
+    transition: 0.3s;
 }
 
-.cabang-list a:hover {
-    color: #ca8a04;
-    padding-left: 6px;
+.cabang-item:hover {
+    background: var(--primary-green);
+    color: white;
+    transform: scale(1.05);
 }
 
-/* ===============================
-   SOP
-================================ */
-.sop-list {
-    list-style: none;
-    max-width: 650px;
-    margin: auto;
-    padding: 0;
+/* ==========================================
+   BAGIAN: SOP STYLING
+   ========================================== */
+.sop-container {
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
 }
 
-.sop-list li {
-    margin-bottom: 14px;
-    font-size: .95rem;
+.sop-item {
+    padding: 15px 0;
+    font-size: 1.1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
 }
 
-.sop-list i {
-    color: #22c55e;
-    margin-right: 8px;
-}
-
-/* ===============================
-   FOOTER
-================================ */
-.footer {
-    background: #022c22;
-    color: #e5e7eb;
-    padding: 35px 0;
-}
-
-.footer .social a {
+.sop-item i {
+    margin-right: 15px;
     font-size: 1.4rem;
-    color: #e5e7eb;
-    transition: .3s;
+    color: #fcd34d;
 }
 
-.footer .social a:hover {
-    color: #22c55e;
-}
-
-/* ===============================
-   ANIMATIONS
-================================ */
-@keyframes fadeUp {
-    from {
-        opacity: 0;
-        transform: translateY(40px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes fadeScale {
-    from {
-        opacity: 0;
-        transform: scale(.92);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-@keyframes pulseSoft {
-    0% {
-        box-shadow: 0 0 0 0 rgba(34,197,94,.35);
-    }
-    70% {
-        box-shadow: 0 0 0 14px rgba(34,197,94,0);
-    }
-    100% {
-        box-shadow: 0 0 0 0 rgba(34,197,94,0);
-    }
-}
-
-/* =========================
-   FOOTER
-========================= */
+/* ==========================================
+   BAGIAN: FOOTER (BAGIAN BAWAH)
+   ========================================== */
 .footer {
-    background-color: #111;
-    color: #ccc;
-    padding: 30px 0;
-    margin-top: 60px;
+    background: #0f172a;
+    color: #94a3b8;
+    padding: 80px 0 30px;
 }
 
-.footer p {
-    margin: 0;
-    font-size: 14px;
+.social-icons a {
+    font-size: 1.5rem;
+    color: white;
+    margin: 0 15px;
+    transition: 0.3s;
 }
 
-/* Email */
-.footer-email {
-    color: #f1f1f1;
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.3s ease;
+.social-icons a:hover {
+    color: #fcd34d;
 }
 
-.footer-email:hover {
-    color: #25d366; /* hijau soft */
-    text-decoration: underline;
-}
-
-/* Social Icons */
-.footer .social {
-    margin-top: 10px;
-}
-
-.footer .social a {
-    color: #ccc;
-    font-size: 22px;
-    margin: 0 8px;
-    display: inline-block;
-    transition: transform 0.3s ease, color 0.3s ease;
-}
-
-.footer .social a:hover {
-    color: #25d366;
-    transform: scale(1.2);
-}
-
-/* Responsive */
-@media (max-width: 576px) {
-    .footer {
-        padding: 25px 10px;
+/* ==========================================
+   RESPONSIVE (TAMPILAN HP/TABLET)
+   ========================================== */
+@media (max-width: 991px) {
+    .welcome-title {
+        font-size: 2.2rem;
     }
+    .img-box.main-img {
+        max-width: 100%;
+    }
+}
 
-    .footer .social a {
-        font-size: 20px;
-        margin: 0 6px;
+@media (max-width: 768px) {
+    .hero-content {
+        text-align: center;
+    }
+    .section {
+        padding: 60px 0;
     }
 }

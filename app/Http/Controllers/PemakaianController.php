@@ -7,23 +7,26 @@ use App\Models\Bahan;
 use App\Models\StokOutlet;
 use App\Models\Message;
 use App\Models\User;
+use App\Models\Waste;
 use App\Notifications\WasteBaruNotification;
 use App\Notifications\StokKritisNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Storage;
 
 class PemakaianController extends Controller
 {
     /**
-     * Tampilkan riwayat (Outlet/User)
+     * 1. RIWAYAT PEMAKAIAN RUTIN (OUTLET)
      */
     public function index()
     {
         $user = Auth::user();
         $pemakaians = Pemakaian::with('bahan')
             ->where('outlet_id', $user->outlet_id)
+            ->where('tipe', 'rutin') 
             ->latest()
             ->paginate(10); 
 
@@ -31,13 +34,25 @@ class PemakaianController extends Controller
     }
 
     /**
-     * FORM 1: Input Pemakaian Rutin (PENTING: Ini yang tadi hilang!)
+     * 2. RIWAYAT WASTE (OUTLET)
+     */
+    public function indexWaste()
+    {
+        $user = Auth::user();
+        $wastes = Waste::with('stokOutlet.bahan')
+            ->where('outlet_id', $user->outlet_id)
+            ->latest()
+            ->paginate(10);
+
+        return view('user.pemakaian.index_waste', compact('wastes'));
+    }
+
+    /**
+     * 3. FORM INPUT RUTIN
      */
     public function create()
     {
         $user = Auth::user();
-        
-        // Mengambil stok yang tersedia di outlet user tersebut
         $stokOutlets = StokOutlet::with('bahan')
             ->where('outlet_id', $user->outlet_id)
             ->where('stok', '>', 0)
@@ -47,95 +62,7 @@ class PemakaianController extends Controller
     }
 
     /**
-     * Tampilkan MONITORING WASTE (Admin Pusat)
-     */
-    public function indexPusat()
-    {
-        $allWastes = Pemakaian::with(['bahan', 'outlet'])
-            ->where('tipe', 'waste')
-            ->latest()
-            ->paginate(15);
-
-        $totalPending = Pemakaian::where('tipe', 'waste')
-            ->where('status', 'pending')
-            ->count();
-
-        $totalWaste = Pemakaian::where('tipe', 'waste')
-            ->whereMonth('tanggal', now()->month)
-            ->sum('jumlah');
-
-        return view('admin.waste.index', compact('allWastes', 'totalPending', 'totalWaste'));
-    }
-
-    /**
-     * SIMPAN: Logika Pemakaian Rutin
-     */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'bahan_id' => 'required|exists:bahans,id',
-            'jumlah'   => 'required|integer|min:1',
-            'tanggal'  => 'required|date',
-        ]);
-
-        $user = Auth::user();
-        
-        try {
-            DB::beginTransaction();
-
-            $stokOutlet = StokOutlet::where('outlet_id', $user->outlet_id)
-                ->where('bahan_id', $request->bahan_id)
-                ->lockForUpdate() 
-                ->first();
-
-            if (!$stokOutlet || $stokOutlet->stok < $request->jumlah) {
-                return redirect()->back()->with('error', 'Maaf, stok bahan tidak mencukupi.');
-            }
-
-            $pemakaian = Pemakaian::create([
-                'bahan_id'  => $request->bahan_id,
-                'outlet_id' => $user->outlet_id,
-                'jumlah'    => $request->jumlah,
-                'tanggal'   => $request->tanggal,
-                'tipe'      => 'rutin',
-            ]);
-
-            $stokOutlet->decrement('stok', $request->jumlah);
-
-            // Cek Target Harian
-            $outlet = $user->outlet;
-            $totalHariIni = Pemakaian::where('outlet_id', $user->outlet_id)
-                ->where('tanggal', $request->tanggal)
-                ->where('tipe', 'rutin')
-                ->sum('jumlah');
-
-            if ($outlet && $outlet->target_pemakaian_harian > 0 && $totalHariIni >= $outlet->target_pemakaian_harian) {
-                Message::create([
-                    'sender_id'   => $user->id,
-                    'receiver_id' => 1, 
-                    'subject'     => '⚠️ OVER TARGET',
-                    'message'     => "Outlet {$outlet->nama_outlet} mencapai target harian. Total: {$totalHariIni} unit.",
-                    'is_read'     => 0
-                ]);
-            }
-
-            // Cek Stok Kritis
-            if ($stokOutlet->stok <= 10) {
-                $admins = User::where('role', 'admin')->get();
-                Notification::send($admins, new StokKritisNotification($stokOutlet));
-            }
-
-            DB::commit();
-            return redirect()->route('user.pemakaian.index')->with('success', 'Pemakaian berhasil dicatat.');
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->back()->with('error', 'Gagal: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * FORM & SIMPAN WASTE
+     * 4. FORM INPUT WASTE
      */
     public function createWaste()
     {
@@ -145,100 +72,188 @@ class PemakaianController extends Controller
             ->where('stok', '>', 0)
             ->get();
 
-        $wasteBulanIni = Pemakaian::where('outlet_id', $user->outlet_id)
-            ->where('tipe', 'waste')
+        $wasteBulanIni = Waste::where('outlet_id', $user->outlet_id)
             ->whereMonth('tanggal', now()->month)
-            ->sum('jumlah');
+            ->count(); // Menghitung berapa kali laporan bulan ini
 
         return view('user.pemakaian.create_waste', compact('stokOutlets', 'wasteBulanIni'));
     }
 
+    /**
+     * 5. SIMPAN PEMAKAIAN RUTIN
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'bahan_id' => 'required|exists:bahans,id',
+            'jumlah'   => 'required|numeric|min:0.01',
+            'tanggal'  => 'required|date',
+        ]);
+
+        $user = Auth::user();
+        
+        try {
+            DB::beginTransaction();
+            $stokOutlet = StokOutlet::with('bahan')->where('outlet_id', $user->outlet_id)
+                ->where('bahan_id', $request->bahan_id)
+                ->lockForUpdate() 
+                ->first();
+
+            if (!$stokOutlet || $stokOutlet->stok < $request->jumlah) {
+                return redirect()->back()->with('error', 'Maaf, stok bahan tidak mencukupi.');
+            }
+
+            Pemakaian::create([
+                'bahan_id'   => $request->bahan_id,
+                'outlet_id'  => $user->outlet_id,
+                'jumlah'     => $request->jumlah,
+                'tanggal'    => $request->tanggal,
+                'tipe'       => 'rutin',
+            ]);
+
+            $stokOutlet->decrement('stok', $request->jumlah);
+            
+            $this->handleBotNotifications($user, $stokOutlet, $request->jumlah, $request->tanggal);
+
+            DB::commit();
+            return redirect()->route('user.riwayat_pemakaian')->with('success', 'Data pemakaian berhasil dicatat.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Gagal: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * 6. SIMPAN WASTE + NOTIFIKASI LONCENG
+     */
     public function storeWaste(Request $request)
     {
         $request->validate([
             'stok_outlet_id' => 'required|exists:stok_outlets,id',
-            'jumlah'         => 'required|integer|min:1',
+            'jumlah'         => 'required|numeric|min:0.01',
             'keterangan'     => 'required|string', 
+            'foto'           => 'required|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         $user = Auth::user();
         $stokOutlet = StokOutlet::with('bahan')->findOrFail($request->stok_outlet_id);
 
         if ($stokOutlet->stok < $request->jumlah) {
-            return redirect()->back()->with('error', 'Stok tidak cukup!');
+            return redirect()->back()->with('error', 'Gagal! Stok di outlet tidak mencukupi.');
         }
 
+        $fotoPath = null;
         try {
             DB::beginTransaction();
 
-            $waste = Pemakaian::create([
-                'bahan_id'   => $stokOutlet->bahan_id,
-                'outlet_id'  => $user->outlet_id,
-                'jumlah'     => $request->jumlah,
-                'tanggal'    => now(),
-                'tipe'       => 'waste', 
-                'keterangan' => $request->keterangan, 
-                'status'     => 'pending', 
+            // 1. Handle Upload Foto
+            if ($request->hasFile('foto')) {
+                $namaFile = time() . '_' . $user->id . '.' . $request->file('foto')->extension();
+                $fotoPath = $request->file('foto')->storeAs('waste_photos', $namaFile, 'public');
+            }
+
+            // 2. Simpan ke Database
+            $waste = Waste::create([
+                'outlet_id'      => $user->outlet_id,
+                'stok_outlet_id' => $request->stok_outlet_id,
+                'jumlah'         => $request->jumlah,
+                'tanggal'        => now(),
+                'keterangan'     => $request->keterangan,
+                'foto'           => $fotoPath,
+                'status'         => 'pending',
             ]);
 
+            // 3. Potong Stok Sementara
             $stokOutlet->decrement('stok', $request->jumlah);
 
-            // Chat & Notif Lonceng
-            Message::create([
-                'sender_id'   => $user->id,
-                'receiver_id' => 1,
-                'subject'     => '🚨 LAPORAN WASTE',
-                'message'     => "Waste baru dari {$user->outlet->nama_outlet}: {$stokOutlet->bahan->nama_bahan}.",
-                'is_read'     => 0
-            ]);
+          // 4. Kirim Notifikasi ke Admin
+$adminPusat = User::where('role', 'admin')->first();
+if ($adminPusat) {
+    // Notifikasi Pesan (Chat System) dengan Format yang Lebih Jelas
+    Message::create([
+        'sender_id'   => $user->id,
+        'receiver_id' => $adminPusat->id,
+        'subject'     => '⚠️ PERLU VERIFIKASI: LAPORAN WASTE',
+        'message'     => "Halo Admin, ada laporan waste baru yang butuh verifikasi segera:\n\n" .
+                         "📍 Outlet: {$user->outlet->nama_outlet}\n" .
+                         "📦 Bahan: {$stokOutlet->bahan->nama_bahan}\n" .
+                         "🔢 Jumlah: {$request->jumlah} {$stokOutlet->bahan->satuan}\n" .
+                         "📝 Alasan: {$request->keterangan}\n\n" .
+                         "Mohon segera dicek dan lakukan verifikasi pada menu Manajemen Waste agar stok pusat tetap sinkron. Terima kasih!",
+        'is_read'     => 0
+    ]);
 
-            $admins = User::where('role', 'admin')->get();
-            Notification::send($admins, new WasteBaruNotification($waste));
+    // Notifikasi Lonceng (Laravel Notification)
+    $waste->load(['outlet', 'stokOutlet.bahan']); 
+    $adminPusat->notify(new WasteBaruNotification($waste)); 
+}
 
             DB::commit();
-            return redirect()->back()->with('success', 'Laporan waste terkirim!');
+            return redirect()->route('user.waste.index')->with('success', 'Laporan waste berhasil dikirim.');
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Gagal memproses waste.');
+            // Hapus foto jika DB gagal agar tidak menyampah di storage
+            if ($fotoPath && Storage::disk('public')->exists($fotoPath)) {
+                Storage::disk('public')->delete($fotoPath);
+            }
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 
     /**
-     * VERIFIKASI WASTE (Admin Pusat)
+     * 7. ADMIN PUSAT - MONITORING WASTE
+     */
+    public function indexPusat()
+    {
+        $allWastes = Waste::with(['stokOutlet.bahan', 'outlet'])
+            ->latest()
+            ->paginate(15);
+
+        $totalPending = Waste::where('status', 'pending')->count();
+        $totalWaste = Waste::whereMonth('tanggal', now()->month)->sum('jumlah');
+
+        return view('admin.waste.index', compact('allWastes', 'totalPending', 'totalWaste'));
+    }
+
+    /**
+     * 8. VERIFIKASI WASTE OLEH ADMIN
      */
     public function verifyWaste($id)
     {
-        $waste = Pemakaian::where('tipe', 'waste')->findOrFail($id);
-        $waste->update(['status' => 'verified']);
+        try {
+            $waste = Waste::findOrFail($id);
+            $waste->update(['status' => 'verified']);
 
-        return redirect()->back()->with('success', 'Laporan waste telah diverifikasi.');
+            return redirect()->back()->with('success', 'Laporan waste berhasil diverifikasi.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal verifikasi: ' . $e->getMessage());
+        }
     }
 
     /**
-     * HAPUS DATA
+     * BOT NOTIFICATION HANDLER (RUTIN)
      */
-    public function destroy($id)
+    private function handleBotNotifications($user, $stokOutlet, $jumlah, $tanggal) 
     {
-        $pemakaian = Pemakaian::findOrFail($id);
+        $stokSekarang = $stokOutlet->stok;
+        $adminPusat = User::where('role', 'admin')->first();
         
-        try {
-            DB::beginTransaction();
-            $stokOutlet = StokOutlet::where('outlet_id', $pemakaian->outlet_id)
-                ->where('bahan_id', $pemakaian->bahan_id)
-                ->first();
+        if(!$adminPusat) return;
 
-            if ($stokOutlet) {
-                $stokOutlet->increment('stok', $pemakaian->jumlah);
-            }
-
-            $pemakaian->delete();
+        // Jika stok kritis atau habis
+        if ($stokSekarang <= 5) {
+            $status = ($stokSekarang <= 0) ? "🚨 *STOK HABIS*" : "⚠️ *STOK KRITIS*";
             
-            DB::commit();
-            return redirect()->back()->with('success', 'Data dihapus.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->back()->with('error', 'Gagal menghapus.');
+            Message::create([
+                'sender_id' => $user->id, 
+                'receiver_id' => $adminPusat->id,
+                'subject' => 'NOTIFIKASI SISTEM',
+                'message' => "[SISTEM NOTIFIKASI]\n\n{$status}\nOutlet: {$user->outlet->nama_outlet}\nBahan: {$stokOutlet->bahan->nama_bahan}\nSisa Stok: {$stokSekarang}",
+                'is_read' => 0
+            ]);
+
+            // Bisa juga pemicu StokKritisNotification di sini jika diinginkan
         }
     }
 }

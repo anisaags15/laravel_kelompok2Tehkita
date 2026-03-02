@@ -1,0 +1,98 @@
+/* * MASTER TABLE ADMIN STYLE (Bahan, Distribusi, Outlet, Stok Masuk)
+ * Gabungan & Optimasi dari semua halaman Index
+ */
+
+/* 1. Global Card Layout */
+.card-modern {
+    border: none !important;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.02) !important;
+    border-radius: 16px !important;
+    overflow: hidden;
+    background: #ffffff !important;
+}
+
+/* 2. Table Header - Standar Profesional */
+.table-modern.table thead th {
+    background-color: #fcfcfd !important;
+    border-top: none !important;
+    border-bottom: 1px solid #f0f2f5 !important;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 1.2px;
+    font-weight: 700;
+    color: #94a3b8 !important;
+    padding: 1.25rem 1rem !important;
+}
+
+/* 3. Table Body - Mengambil Padding Terlega agar Mirip Gambar 2 */
+.table-modern.table tbody td {
+    padding: 1.5rem 1rem !important; /* Standar seragam untuk semua index */
+    vertical-align: middle !important;
+    border-top: 1px solid #f8fafc !important;
+    color: #334155;
+}
+
+/* 4. Hover Effect - Animasi halus dari Distribusi */
+.table-modern.table tbody tr {
+    transition: all 0.2s ease;
+}
+
+.table-modern.table tbody tr:hover td {
+    background-color: #f8fafc !important; /* Warna hover seragam */
+    transform: scale(1.001); /* Efek zoom tipis agar terasa interaktif */
+}
+
+/* 5. Icon Circle Wrappers */
+.icon-circle-wrapper {
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 12px !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* Palette Warna Soft */
+.bg-soft-blue   { background-color: #eff6ff !important; color: #3b82f6 !important; } /* Outlet */
+.bg-soft-green  { background-color: #ecfdf5 !important; color: #10b981 !important; } /* Selesai / Stok */
+.bg-soft-orange { background-color: #fff7ed !important; color: #f59e0b !important; } /* Warning / Pending */
+.bg-soft-cyan   { background-color: #e0f7fa !important; color: #00acc1 !important; }
+
+/* 6. Action Buttons - Gabungan Style Semua Index */
+.btn-action-custom {
+    width: 34px !important;
+    height: 34px !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px !important;
+    transition: all 0.3s ease;
+    background: #ffffff;
+    border: 1px solid #e2e8f0 !important;
+    color: #64748b;
+    margin: 0 2px;
+    padding: 0 !important;
+}
+
+.btn-action-custom:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    background: #f8fafc;
+}
+
+.btn-action-custom.edit:hover { color: #f59e0b; border-color: #f59e0b !important; }
+.btn-action-custom.delete:hover { color: #ef4444; border-color: #ef4444 !important; }
+
+/* 7. Typography Helpers */
+.font-weight-500 { font-weight: 500 !important; }
+.text-id { font-size: 0.65rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
+
+/* 8. Badge Khusus Distribusi & Stok */
+.badge-custom {
+    padding: 0.5rem 0.8rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    display: inline-block;
+}
