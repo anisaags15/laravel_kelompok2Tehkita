@@ -85,51 +85,51 @@ class DashboardController extends Controller
                 ->get();
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | 5️⃣ DATA GRAFIK PEMAKAIAN (DINAMIS)
-        |--------------------------------------------------------------------------
-        */
-        $labels = Pemakaian::select('tanggal')
-            ->distinct()
-            ->orderBy('tanggal', 'asc')
-            ->take(7) 
-            ->pluck('tanggal')
-            ->toArray();
+  /*
+|--------------------------------------------------------------------------
+| 5️⃣ DATA GRAFIK PEMAKAIAN (DINAMIS - 7 HARI TERAKHIR)
+|--------------------------------------------------------------------------
+*/
+// Kita buat label manual 7 hari terakhir biar grafik nggak kosong kalau data belum ada
+$labelsRaw = [];
+$labelsFormatted = [];
+for ($i = 6; $i >= 0; $i--) {
+    $date = now()->subDays($i);
+    $labelsRaw[] = $date->format('Y-m-d'); // Untuk filter query
+    $labelsFormatted[] = $date->format('d M'); // Untuk tampilan di chart
+}
 
-        $outletList = Outlet::take(5)->get();
-        $datasets = [];
+$outletList = Outlet::take(5)->get();
+$datasets = [];
+$colors = ['#198754', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'];
 
-        foreach ($outletList as $index => $o) {
-            $dataPemakaian = [];
-            foreach ($labels as $tgl) {
-                $total = Pemakaian::where('outlet_id', $o->id)
-                    ->where('tanggal', $tgl)
-                    ->sum('jumlah'); 
-                $dataPemakaian[] = $total;
-            }
+foreach ($outletList as $index => $o) {
+    $dataPemakaian = [];
+    foreach ($labelsRaw as $tgl) {
+        $total = Pemakaian::where('outlet_id', $o->id)
+            ->whereDate('tanggal', $tgl) // Gunakan whereDate agar lebih akurat
+            ->sum('jumlah'); 
+        $dataPemakaian[] = (int) $total; // Cast ke int biar JS gak bingung
+    }
 
-            $colors = ['#198754', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'];
-            $color = $colors[$index] ?? '#' . substr(md5($o->id), 0, 6);
+    $color = $colors[$index] ?? '#' . substr(md5($o->id), 0, 6);
 
-            $datasets[] = [
-                'label'           => $o->nama_outlet,
-                'data'            => $dataPemakaian,
-                'borderColor'     => $color,
-                'backgroundColor' => $color . '15',
-                'tension'         => 0.4,
-                'fill'            => true,
-                'pointRadius'     => 4,
-                'pointHoverRadius'=> 6,
-            ];
-        }
+    $datasets[] = [
+        'label'           => $o->nama_outlet,
+        'data'            => $dataPemakaian,
+        'borderColor'     => $color,
+        'backgroundColor' => $color . '33', // 33 itu opacity sekitar 20% biar cakep pas fill: true
+        'tension'         => 0.4,
+        'fill'            => true,
+        'pointRadius'     => 4,
+        'pointHoverRadius'=> 6,
+    ];
+}
 
-        $pemakaianChart = [
-            'labels'   => array_map(function($tgl) { 
-                return \Carbon\Carbon::parse($tgl)->format('d M'); 
-            }, $labels),
-            'datasets' => $datasets
-        ];
+$pemakaianChart = [
+    'labels'   => $labelsFormatted,
+    'datasets' => $datasets
+];
 
         /*
         |--------------------------------------------------------------------------

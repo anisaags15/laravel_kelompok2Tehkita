@@ -37,6 +37,21 @@
                     </a>
                 </li>
 
+                {{-- NOTIFIKASI (Dipindah ke bawah Dashboard) --}}
+                <li class="nav-item">
+                    <a href="{{ route('user.notifikasi.index') }}" 
+                       class="nav-link {{ request()->routeIs('user.notifikasi.index') ? 'active bg-success' : '' }}">
+                        <i class="nav-icon fas fa-bell"></i>
+                        <p>
+                            Notifikasi
+                            @php $notifCount = auth()->user()->unreadNotifications->count(); @endphp
+                            @if($notifCount > 0)
+                                <span class="badge badge-warning right">{{ $notifCount }}</span>
+                            @endif
+                        </p>
+                    </a>
+                </li>
+
                 <li class="nav-header text-uppercase small font-weight-bold text-muted">
                     Operasional Outlet
                 </li>
@@ -72,41 +87,42 @@
                     Monitoring & Data
                 </li>
 
-{{-- RIWAYAT (LOG DATA) --}}
-<li class="nav-item {{ request()->routeIs('user.riwayat*') || request()->routeIs('user.distribusi.index') || request()->routeIs('user.waste.index') ? 'menu-open' : '' }}">
-    <a href="#" 
-       class="nav-link {{ request()->routeIs('user.riwayat*') || request()->routeIs('user.distribusi.index') || request()->routeIs('user.waste.index') ? 'active bg-success' : '' }}">
-        <i class="nav-icon fas fa-history"></i>
-        <p>
-            Riwayat Log
-            <i class="right fas fa-angle-left"></i>
-        </p>
-    </a>
-    <ul class="nav nav-treeview">
-        <li class="nav-item">
-            <a href="{{ route('user.riwayat_pemakaian') }}" 
-               class="nav-link {{ request()->routeIs('user.riwayat_pemakaian') ? 'active' : '' }}">
-                <i class="far fa-circle nav-icon text-warning"></i>
-                <p>Log Pemakaian</p>
-            </a>
-        </li>
-        {{-- LINK BARU: CATATAN WASTE --}}
-        <li class="nav-item">
-            <a href="{{ route('user.waste.index') }}" 
-               class="nav-link {{ request()->routeIs('user.waste.index') ? 'active' : '' }}">
-                <i class="far fa-circle nav-icon text-danger"></i>
-                <p>Log Waste (Rusak)</p>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{{ route('user.distribusi.index') }}" 
-               class="nav-link {{ request()->routeIs('user.distribusi.index') ? 'active' : '' }}">
-                <i class="far fa-circle nav-icon text-info"></i>
-                <p>Log Penerimaan</p>
-            </a>
-        </li>
-    </ul>
-</li>
+                {{-- RIWAYAT (LOG DATA) --}}
+                <li class="nav-item {{ request()->routeIs('user.riwayat*') || request()->routeIs('user.distribusi.index') || request()->routeIs('user.waste.index') ? 'menu-open' : '' }}">
+                    <a href="#" 
+                       class="nav-link {{ request()->routeIs('user.riwayat*') || request()->routeIs('user.distribusi.index') || request()->routeIs('user.waste.index') ? 'active bg-success' : '' }}">
+                        <i class="nav-icon fas fa-history"></i>
+                        <p>
+                            Riwayat Log
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('user.riwayat_pemakaian') }}" 
+                               class="nav-link {{ request()->routeIs('user.riwayat_pemakaian') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon text-warning"></i>
+                                <p>Log Pemakaian</p>
+                            </a>
+                        </li>
+                        {{-- LINK BARU: CATATAN WASTE --}}
+                        <li class="nav-item">
+                            <a href="{{ route('user.waste.index') }}" 
+                               class="nav-link {{ request()->routeIs('user.waste.index') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon text-danger"></i>
+                                <p>Log Waste (Rusak)</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('user.distribusi.index') }}" 
+                               class="nav-link {{ request()->routeIs('user.distribusi.index') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon text-info"></i>
+                                <p>Log Penerimaan</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                
                 {{-- LAPORAN RESMI --}}
                 <li class="nav-item {{ request()->routeIs('user.laporan.*') ? 'menu-open' : '' }}">
                     <a href="#" 
@@ -165,20 +181,6 @@
                        class="nav-link {{ request()->routeIs('chat.*') ? 'active bg-success' : '' }}">
                         <i class="nav-icon fas fa-comments"></i>
                         <p>Chat Pusat</p>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="{{ route('user.notifikasi.index') }}" 
-                       class="nav-link {{ request()->routeIs('user.notifikasi.index') ? 'active bg-success' : '' }}">
-                        <i class="nav-icon fas fa-bell"></i>
-                        <p>
-                            Notifikasi
-                            @php $notifCount = auth()->user()->unreadNotifications->count(); @endphp
-                            @if($notifCount > 0)
-                                <span class="badge badge-warning right">{{ $notifCount }}</span>
-                            @endif
-                        </p>
                     </a>
                 </li>
 

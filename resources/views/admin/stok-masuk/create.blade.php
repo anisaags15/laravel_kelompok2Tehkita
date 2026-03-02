@@ -4,9 +4,9 @@
 @section('page', 'Tambah Stok Masuk')
 
 @section('content')
-<div class="card shadow-sm border-0">
-    <div class="card-header py-3">
-        <h3 class="card-title font-weight-bold">
+<div class="card shadow-sm border-0 custom-card-theme" style="border-radius: 20px;">
+    <div class="card-header border-0 py-4 bg-transparent">
+        <h3 class="card-title font-weight-bold m-0 heading-theme">
             <i class="fas fa-arrow-down text-success mr-2"></i> Form Stok Masuk
         </h3>
     </div>
@@ -19,12 +19,14 @@
                 <div class="col-md-8 mx-auto">
                     
                     <div class="form-group mb-4">
-                        <label class="font-weight-bold">Bahan</label>
-                        <div class="input-group-modern @error('bahan_id') border-danger @enderror">
-                            <div class="input-icon">
-                                <i class="fas fa-box"></i>
+                        <label class="font-weight-bold label-theme">Bahan Baku</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text custom-addon">
+                                    <i class="fas fa-box text-success"></i>
+                                </span>
                             </div>
-                            <select name="bahan_id" class="form-control input-modern select2 @error('bahan_id') is-invalid @enderror">
+                            <select name="bahan_id" class="form-control form-control-lg input-custom select2 @error('bahan_id') is-invalid @enderror">
                                 <option value="">-- Pilih Bahan --</option>
                                 @foreach($bahans as $bahan)
                                     <option value="{{ $bahan->id }}" {{ old('bahan_id') == $bahan->id ? 'selected' : '' }}>
@@ -34,35 +36,41 @@
                             </select>
                         </div>
                         @error('bahan_id')
-                            <small class="text-danger mt-1">{{ $message }}</small>
+                            <small class="text-danger mt-1 d-block">{{ $message }}</small>
                         @enderror
                     </div>
 
                     <div class="form-group mb-4">
-                        <label class="font-weight-bold">Jumlah</label>
-                        <div class="input-group-modern @error('jumlah') border-danger @enderror">
-                            <div class="input-icon">
-                                <i class="fas fa-calculator"></i>
+                        <label class="font-weight-bold label-theme">Jumlah Masuk</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text custom-addon">
+                                    <i class="fas fa-calculator text-success"></i>
+                                </span>
                             </div>
-                            <input type="number" name="jumlah" class="form-control input-modern" 
-                                   value="{{ old('jumlah') }}" placeholder="Masukkan jumlah">
+                            <input type="number" name="jumlah" 
+                                   class="form-control form-control-lg input-custom @error('jumlah') is-invalid @enderror" 
+                                   value="{{ old('jumlah') }}" placeholder="Masukkan jumlah stok">
                         </div>
                         @error('jumlah')
-                            <small class="text-danger mt-1">{{ $message }}</small>
+                            <small class="text-danger mt-1 d-block">{{ $message }}</small>
                         @enderror
                     </div>
 
                     <div class="form-group mb-4">
-                        <label class="font-weight-bold">Tanggal</label>
-                        <div class="input-group-modern @error('tanggal') border-danger @enderror">
-                            <div class="input-icon">
-                                <i class="fas fa-calendar-alt"></i>
+                        <label class="font-weight-bold label-theme">Tanggal Masuk</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text custom-addon">
+                                    <i class="fas fa-calendar-alt text-success"></i>
+                                </span>
                             </div>
-                            <input type="date" name="tanggal" class="form-control input-modern" 
+                            <input type="date" name="tanggal" 
+                                   class="form-control form-control-lg input-custom @error('tanggal') is-invalid @enderror" 
                                    value="{{ old('tanggal', date('Y-m-d')) }}">
                         </div>
                         @error('tanggal')
-                            <small class="text-danger mt-1">{{ $message }}</small>
+                            <small class="text-danger mt-1 d-block">{{ $message }}</small>
                         @enderror
                     </div>
 
@@ -70,13 +78,13 @@
             </div>
         </div>
 
-        <div class="card-footer py-3 d-flex justify-content-end bg-transparent">
-            <a href="{{ route('admin.stok-masuk.index') }}" class="btn btn-outline-secondary px-4 mr-2" style="border-radius: 10px;">
+        <div class="card-footer border-0 py-4 d-flex justify-content-end bg-transparent">
+            <a href="{{ route('admin.stok-masuk.index') }}" class="btn btn-back-custom px-4 mr-3">
                 <i class="fas fa-arrow-left mr-1"></i> Kembali
             </a>
             
-            <button type="submit" class="btn btn-success px-4 shadow-sm" style="border-radius: 10px;">
-                <i class="fas fa-save mr-1"></i> Simpan Data
+            <button type="submit" class="btn btn-success px-4 shadow-sm btn-save-custom">
+                <i class="fas fa-save mr-1"></i> Simpan Stok
             </button>
         </div>
     </form>

@@ -166,22 +166,27 @@ class PemakaianController extends Controller
             // 3. Potong Stok Sementara
             $stokOutlet->decrement('stok', $request->jumlah);
 
-            // 4. Kirim Notifikasi ke Admin
-            $adminPusat = User::where('role', 'admin')->first();
-            if ($adminPusat) {
-                // Notifikasi Pesan (Chat System)
-                Message::create([
-                    'sender_id'   => $user->id,
-                    'receiver_id' => $adminPusat->id,
-                    'subject'     => 'NOTIFIKASI WASTE',
-                    'message'     => "[SISTEM] Laporan Waste Baru: {$stokOutlet->bahan->nama_bahan} dari {$user->outlet->nama_outlet}",
-                    'is_read'     => 0
-                ]);
+          // 4. Kirim Notifikasi ke Admin
+$adminPusat = User::where('role', 'admin')->first();
+if ($adminPusat) {
+    // Notifikasi Pesan (Chat System) dengan Format yang Lebih Jelas
+    Message::create([
+        'sender_id'   => $user->id,
+        'receiver_id' => $adminPusat->id,
+        'subject'     => '⚠️ PERLU VERIFIKASI: LAPORAN WASTE',
+        'message'     => "Halo Admin, ada laporan waste baru yang butuh verifikasi segera:\n\n" .
+                         "📍 Outlet: {$user->outlet->nama_outlet}\n" .
+                         "📦 Bahan: {$stokOutlet->bahan->nama_bahan}\n" .
+                         "🔢 Jumlah: {$request->jumlah} {$stokOutlet->bahan->satuan}\n" .
+                         "📝 Alasan: {$request->keterangan}\n\n" .
+                         "Mohon segera dicek dan lakukan verifikasi pada menu Manajemen Waste agar stok pusat tetap sinkron. Terima kasih!",
+        'is_read'     => 0
+    ]);
 
-                // Notifikasi Lonceng (Laravel Notification)
-                $waste->load(['outlet', 'stokOutlet.bahan']); // Penting: Load relasi agar notifikasi tidak error
-                $adminPusat->notify(new WasteBaruNotification($waste)); 
-            }
+    // Notifikasi Lonceng (Laravel Notification)
+    $waste->load(['outlet', 'stokOutlet.bahan']); 
+    $adminPusat->notify(new WasteBaruNotification($waste)); 
+}
 
             DB::commit();
             return redirect()->route('user.waste.index')->with('success', 'Laporan waste berhasil dikirim.');

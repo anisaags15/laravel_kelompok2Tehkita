@@ -5,7 +5,10 @@
 
 @section('content')
 
-<div class="card shadow-sm border-0"> <div class="card-header bg-white py-3"> <h3 class="card-title font-weight-bold text-dark">
+<div class="card shadow-sm border-0" style="border-radius: 15px;">
+    {{-- Header otomatis ikut warna tema --}}
+    <div class="card-header border-0 pt-4 bg-transparent">
+        <h3 class="card-title font-weight-bold m-0">
             <i class="fas fa-store-alt text-success mr-2"></i> Edit Outlet: {{ $outlet->nama_outlet }}
         </h3>
     </div>
@@ -14,15 +17,17 @@
         @csrf
         @method('PUT')
 
-        <div class="card-body bg-white">
+        <div class="card-body">
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group mb-4">
-                        <label class="font-weight-bold text-dark">Nama Outlet</label>
+                        <label class="font-weight-bold">Nama Outlet</label>
+                        {{-- Class 'bg-light' dan 'text-dark' di input biasanya bikin kacau di dark mode --}}
+                        {{-- Kita pakai class standar biar template yang atur warnanya --}}
                         <input type="text" name="nama_outlet" 
                                class="form-control form-control-lg @error('nama_outlet') is-invalid @enderror"
                                value="{{ old('nama_outlet', $outlet->nama_outlet) }}"
-                               style="border-radius: 8px;">
+                               style="border-radius: 10px;">
                         @error('nama_outlet')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -31,11 +36,11 @@
 
                 <div class="col-md-6">
                     <div class="form-group mb-4">
-                        <label class="font-weight-bold text-dark">Nomor HP</label>
+                        <label class="font-weight-bold">Nomor HP</label>
                         <input type="text" name="no_hp" 
                                class="form-control form-control-lg @error('no_hp') is-invalid @enderror"
                                value="{{ old('no_hp', $outlet->no_hp) }}"
-                               style="border-radius: 8px;">
+                               style="border-radius: 10px;">
                         @error('no_hp')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -44,10 +49,10 @@
             </div>
 
             <div class="form-group mb-4">
-                <label class="font-weight-bold text-dark">Alamat Lengkap</label>
+                <label class="font-weight-bold">Alamat Lengkap</label>
                 <textarea name="alamat" rows="3" 
                           class="form-control @error('alamat') is-invalid @enderror"
-                          style="border-radius: 8px;">{{ old('alamat', $outlet->alamat) }}</textarea>
+                          style="border-radius: 10px;">{{ old('alamat', $outlet->alamat) }}</textarea>
                 @error('alamat')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -59,21 +64,21 @@
                 </label>
                 <input type="number" name="target_pemakaian_harian" 
                        class="form-control form-control-lg @error('target_pemakaian_harian') is-invalid @enderror"
-                       value="{{ old('target_pemakaian_harian', $outlet->target_pemakaian_harian) }}" 
-                       style="border-radius: 8px;">
-                <small class="text-muted italic">Mengubah angka ini akan merubah batas progress bar di dashboard outlet terkait.</small>
+                       value="{{ old('target_pemakaian_harian', $outlet->target_pemakaian_harian) }}"
+                       style="border-radius: 10px;">
+                <small class="text-muted" style="font-style: italic;">Mengubah angka ini akan merubah batas progress bar di dashboard outlet terkait.</small>
                 @error('target_pemakaian_harian')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
         </div>
 
-        <div class="card-footer bg-light py-3 d-flex justify-content-end">
-            <a href="{{ route('admin.outlet.index') }}" class="btn btn-outline-secondary px-4 mr-2" style="border-radius: 10px;">
+        <div class="card-footer border-0 pb-4 bg-transparent d-flex justify-content-end">
+            <a href="{{ route('admin.outlet.index') }}" class="btn btn-outline-secondary px-4 mr-3" style="border-radius: 10px;">
                 <i class="fas fa-arrow-left mr-1"></i> Kembali
             </a>
             
-            <button type="submit" class="btn btn-success px-4 shadow-sm" style="border-radius: 10px; background-color: #28a745; border: none;">
+            <button type="submit" class="btn btn-success px-4 shadow-sm" style="border-radius: 10px; font-weight: 600;">
                 <i class="fas fa-check-circle mr-1"></i> Simpan Perubahan
             </button>
         </div>

@@ -107,66 +107,79 @@
             </div>
         </div>
     </div>
+    
+<div class="col-lg-4 mb-4">
+    <div class="card shadow-sm border-0 h-100 bg-white" style="border-radius: 12px;">
+        <div class="card-header bg-transparent border-0 py-3 px-4">
+            <h6 class="fw-bold mb-0 text-primary">
+                <i class="fas fa-bolt me-2"></i>Live Activity Feed
+            </h6>
+        </div>
+        <div class="card-body p-0"> {{-- P-0 biar scrollbar mepet ke pinggir kanan --}}
+            <div class="timeline-simple px-4" style="max-height: 400px; overflow-y: auto; overflow-x: hidden;">
+                @forelse($activityFeeds as $feed)
+                    @php
+                        $namaBahan = strtolower($feed->bahan->nama_bahan ?? 'bahan');
+                        $bgClass = 'bg-secondary';
+                        $iconDefault = 'fa-box';
+                        
+                        if (str_contains($namaBahan, 'cup')) {
+                            $bgClass = 'bg-primary'; $iconDefault = 'fa-glass-whiskey';
+                        } elseif (str_contains($namaBahan, 'gula') || str_contains($namaBahan, 'aren')) {
+                            $bgClass = 'bg-warning text-dark'; $iconDefault = 'fa-flask';
+                        } elseif (str_contains($namaBahan, 'teh')) {
+                            $bgClass = 'bg-success'; $iconDefault = 'fa-leaf';
+                        }
 
-    <div class="col-lg-4 mb-4">
-        <div class="card shadow-sm border-0 h-100">
-            <div class="card-header bg-white border-0 py-3">
-                <h6 class="fw-bold mb-0 text-primary"><i class="fas fa-bolt me-2"></i>Live Activity Feed</h6>
-            </div>
-            <div class="card-body p-3">
-                <div class="timeline-simple" style="max-height: 350px; overflow-y: auto; overflow-x: hidden;">
-                    @forelse($activityFeeds as $feed)
-                        @php
-                            $namaBahan = strtolower($feed->bahan->nama_bahan ?? 'bahan');
-                            $bgClass = 'bg-secondary';
-                            $iconDefault = 'fa-box';
-                            
-                            // Logika Ikon Berdasarkan Nama Bahan
-                            if (str_contains($namaBahan, 'cup')) {
-                                $bgClass = 'bg-primary'; $iconDefault = 'fa-glass-whiskey';
-                            } elseif (str_contains($namaBahan, 'gula') || str_contains($namaBahan, 'aren')) {
-                                $bgClass = 'bg-warning'; $iconDefault = 'fa-flask';
-                            } elseif (str_contains($namaBahan, 'teh')) {
-                                $bgClass = 'bg-success'; $iconDefault = 'fa-leaf';
-                            }
-
-                            // Cek jika aktivitas adalah Waste
-                            if (isset($feed->tipe) && $feed->tipe == 'waste') {
-                                $bgClass = 'bg-danger'; $iconClass = 'fa-trash-alt';
-                            } else {
-                                $iconClass = ($feed->tipe_aktivitas == 'distribusi') ? 'fa-truck' : $iconDefault;
-                            }
-                        @endphp
-                        <div class="d-flex mb-3 border-bottom pb-2">
-                            <div class="me-3 position-relative">
-                                <span class="btn btn-sm {{ $bgClass }} rounded-circle d-flex align-items-center justify-content-center text-white shadow-sm" style="width:40px;height:40px;">
+                        if (isset($feed->tipe) && $feed->tipe == 'waste') {
+                            $bgClass = 'bg-danger'; $iconClass = 'fa-trash-alt';
+                        } else {
+                            $iconClass = ($feed->tipe_aktivitas == 'distribusi') ? 'fa-truck' : $iconDefault;
+                        }
+                    @endphp
+                    
+                    {{-- Ditambah margin mb-4 dan padding-start supaya ikon tidak nempel tembok --}}
+                    <div class="d-flex mb-4 position-relative">
+                        <div class="me-3" style="min-width: 45px;">
+                            <div class="position-relative">
+                                <span class="btn btn-sm {{ $bgClass }} rounded-circle d-flex align-items-center justify-content-center text-white shadow-sm" style="width:42px;height:42px; border: 2px solid rgba(255,255,255,0.2);">
                                     <i class="fas {{ $iconClass }} fa-sm"></i>
                                 </span>
-                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-circle {{ $feed->tipe_aktivitas == 'pemakaian' ? 'bg-danger' : 'bg-success' }} p-1" style="border: 2px solid white;">
-                                    <i class="fas {{ $feed->tipe_aktivitas == 'pemakaian' ? 'fa-arrow-down' : 'fa-arrow-up' }}" style="font-size: 7px;"></i>
+                                {{-- Badge panah --}}
+                                <span class="position-absolute bottom-0 end-0 badge rounded-circle {{ $feed->tipe_aktivitas == 'pemakaian' ? 'bg-danger' : 'bg-success' }} p-1" style="border: 2px solid white; transform: translate(25%, 25%);">
+                                    <i class="fas {{ $feed->tipe_aktivitas == 'pemakaian' ? 'fa-arrow-down' : 'fa-arrow-up' }}" style="font-size: 8px;"></i>
                                 </span>
                             </div>
-                            <div class="w-100">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <strong class="small text-dark">{{ $feed->bahan->nama_bahan ?? 'Bahan' }}</strong>
-                                    <small class="text-muted" style="font-size: 9px;">{{ $feed->created_at->diffForHumans() }}</small>
-                                </div>
-                                <p class="mb-0 text-muted" style="font-size: 11px;">
-                                    <span class="fw-bold {{ (isset($feed->tipe) && $feed->tipe == 'waste') ? 'text-danger' : ($feed->tipe_aktivitas == 'pemakaian' ? 'text-warning' : 'text-info') }}">
-                                        {{ (isset($feed->tipe) && $feed->tipe == 'waste') ? 'Waste/Rusak' : ucfirst($feed->tipe_aktivitas) }}
-                                    </span> sebanyak <strong>{{ $feed->jumlah }} unit</strong>
-                                </p>
-                            </div>
                         </div>
-                    @empty
-                        <div class="text-center py-4 text-muted small">Belum ada aktivitas terekam.</div>
-                    @endforelse
-                </div>
+                        
+                        <div class="w-100 border-bottom pb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <strong class="small text-white-50" style="font-size: 13px; letter-spacing: 0.3px;">
+                                    {{ $feed->bahan->nama_bahan ?? 'Bahan' }}
+                                </strong>
+                                <small class="text-muted" style="font-size: 10px;">
+                                    <i class="far fa-clock me-1"></i>{{ $feed->created_at->diffForHumans() }}
+                                </small>
+                            </div>
+                            <p class="mb-0" style="font-size: 12px; line-height: 1.4;">
+                                <span class="fw-bold {{ (isset($feed->tipe) && $feed->tipe == 'waste') ? 'text-danger' : ($feed->tipe_aktivitas == 'pemakaian' ? 'text-warning' : 'text-info') }}">
+                                    {{ (isset($feed->tipe) && $feed->tipe == 'waste') ? 'Waste/Rusak' : ucfirst($feed->tipe_aktivitas) }}
+                                </span> 
+                                <span class="text-light">sebanyak</span> 
+                                <strong class="text-white">{{ $feed->jumlah }} unit</strong>
+                            </p>
+                        </div>
+                    </div>
+                @empty
+                    <div class="text-center py-5 text-muted small">
+                        <i class="fas fa-history d-block mb-2 fa-2x opacity-25"></i>
+                        Belum ada aktivitas terekam.
+                    </div>
+                @endforelse
             </div>
         </div>
     </div>
 </div>
-
 {{-- 4. Baris Tabel Bawah --}}
 <div class="row">
     {{-- Stok Saat Ini (Kiri) --}}
@@ -176,10 +189,12 @@
                 <h6 class="fw-bold mb-0 text-success">
                     <i class="fas fa-layer-group me-2"></i>Stok Saat Ini
                 </h6>
-                <a href="{{ route('user.stok-outlet.index') }}" class="btn btn-sm btn-outline-success rounded-pill px-3 shadow-sm" style="font-size: 11px; font-weight: 600; margin-left: auto;">
-                    Detail <i class="fas fa-chevron-right ms-1"></i>
-                </a>
-            </div>
+<a href="{{ route('user.stok-outlet.index') }}" 
+   class="btn btn-sm btn-outline-success rounded-pill px-3 shadow-sm" 
+   style="font-size: 11px; font-weight: 800; margin-left: auto; color: #28a745 !important; border: 2px solid #28a745 !important; background-color: transparent !important;">
+    Detail <i class="fas fa-chevron-right ms-1"></i>
+</a>   
+  </div>
             
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -252,11 +267,12 @@
                 <h6 class="fw-bold mb-0 text-warning">
                     <i class="fas fa-history me-2"></i>Riwayat Pemakaian Terbaru
                 </h6>
-                <a href="{{ route('user.riwayat_pemakaian') }}" class="btn btn-sm btn-outline-warning rounded-pill px-3 shadow-sm" style="font-size: 11px; font-weight: 600; margin-left: auto;">
-                    Lihat Semua <i class="fas fa-arrow-right ms-1"></i>
-                </a>
-            </div>
-            
+      <a href="{{ route('user.riwayat_pemakaian') }}" 
+   class="btn btn-sm btn-outline-warning rounded-pill px-3 shadow-sm" 
+   style="font-size: 11px; font-weight: 800; margin-left: auto; color: #ffc107 !important; border: 2px solid #ffc107 !important; background-color: transparent !important;">
+    Lihat Semua <i class="fas fa-arrow-right ms-1"></i>
+</a>
+     </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-hover mb-0 text-center align-middle">

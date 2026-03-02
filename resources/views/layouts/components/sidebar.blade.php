@@ -92,21 +92,24 @@
                     </a>
                 </li>
 
-                <li class="nav-item">
-                    <a href="{{ route('admin.waste.index') }}"
-                       class="nav-link {{ request()->routeIs('admin.waste.*') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-dumpster text-danger"></i>
-                        <p>
-                            Monitoring Waste
-                            @php
-                                $pendingCount = \App\Models\Pemakaian::where('tipe', 'waste')->where('status', 'pending')->count();
-                            @endphp
-                            @if($pendingCount > 0)
-                                <span class="right badge badge-danger">{{ $pendingCount }}</span>
-                            @endif
-                        </p>
-                    </a>
-                </li>
+             <li class="nav-item">
+    <a href="{{ route('admin.waste.index') }}"
+       class="nav-link {{ request()->routeIs('admin.waste.*') ? 'active' : '' }}">
+        <i class="nav-icon fas fa-dumpster text-danger"></i>
+        <p>
+            Monitoring Waste
+            @php
+                // Pastikan nama modelnya 'Waste' (sesuai tabel waste yang kita buat tadi)
+                // Kita hitung yang statusnya 'pending'
+                $pendingCount = \App\Models\Waste::where('status', 'pending')->count();
+            @endphp
+            
+            @if($pendingCount > 0)
+                <span class="right badge badge-danger shadow-sm anim-pulse">{{ $pendingCount }}</span>
+            @endif
+        </p>
+    </a>
+</li>>
                 
                 <li class="nav-item">
                     <a href="{{ route('admin.stok-kritis.index') }}" 
