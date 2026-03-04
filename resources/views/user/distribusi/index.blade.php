@@ -18,8 +18,10 @@
                         <i class="fas fa-store-alt mr-2"></i>{{ auth()->user()->outlet->nama_outlet ?? 'Outlet Aktif' }}
                     </div>
                     <div class="text-muted small">
-                        <i class="far fa-clock mr-1"></i> Perbaruan: {{ date('H:i') }} WIB
-                    </div>
+    <i class="far fa-clock mr-1"></i>
+    Perbaruan:
+    {{ $distribusis->last()?->created_at?->translatedFormat('d M Y, H:i') ?? '-' }} WIB
+</div>
                 </div>
             </div>
         </div>

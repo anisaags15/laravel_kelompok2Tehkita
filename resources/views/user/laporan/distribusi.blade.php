@@ -1,5 +1,9 @@
 @extends('layouts.main')
 
+@push('styles')
+<link rel="stylesheet" href="{{ asset('templates/dist/css/laporn-user.css') }}">
+@endpush
+
 @section('title', 'Laporan Distribusi Outlet')
 
 @section('content')
@@ -21,20 +25,20 @@
                     </p>
                 </div>
                 <div class="btn-group shadow-sm">
-                    {{-- Link PDF sudah otomatis membawa filter tanggal dari URL --}}
                     <a href="{{ route('user.laporan.distribusi.pdf', request()->query()) }}" class="btn btn-success px-4 fw-bold">
                         <i class="fas fa-file-pdf me-2"></i>Export PDF
                     </a>
                 </div>
             </div>
 
+            
             {{-- STATISTIC CARDS --}}
             <div class="row mb-4">
                 <div class="col-md-4">
                     <div class="card border-0 shadow-sm p-3">
                         <div class="d-flex align-items-center">
                             <div class="icon-box bg-soft-success me-3">
-                                <i class="fas fa-boxes fa-lg"></i>
+                                <i class="fas fa-boxes fa-lg text-success"></i>
                             </div>
                             <div>
                                 <small class="text-muted d-block small">Total Item Diterima</small>
@@ -43,11 +47,12 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="col-md-4">
                     <div class="card border-0 shadow-sm p-3">
                         <div class="d-flex align-items-center">
-                            <div class="icon-box bg-soft-info me-3">
-                                <i class="fas fa-truck-loading fa-lg"></i>
+                            <div class="icon-box bg-soft-success me-3">
+                                <i class="fas fa-truck-loading fa-lg text-success"></i>
                             </div>
                             <div>
                                 <small class="text-muted d-block small">Frekuensi Distribusi</small>
@@ -56,11 +61,12 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="col-md-4">
                     <div class="card border-0 shadow-sm p-3">
                         <div class="d-flex align-items-center">
-                            <div class="icon-box bg-soft-warning me-3">
-                                <i class="fas fa-calendar-check fa-lg"></i>
+                            <div class="icon-box bg-soft-success me-3">
+                                <i class="fas fa-calendar-check fa-lg text-success"></i>
                             </div>
                             <div>
                                 <small class="text-muted d-block small">Update Terakhir</small>
@@ -86,7 +92,7 @@
                             <input type="date" name="end_date" class="form-control form-control-sm border-light" value="{{ request('end_date') }}">
                         </div>
                         <div class="col-md-4">
-                            <button type="submit" class="btn btn-dark btn-sm w-100 fw-bold">
+                            <button type="submit" class="btn btn-success btn-sm w-100 fw-bold">
                                 <i class="fas fa-filter me-1"></i> Saring Laporan
                             </button>
                         </div>
@@ -96,9 +102,10 @@
 
             {{-- TABLE SECTION --}}
             <div class="card border-0 shadow-sm overflow-hidden">
-                <div class="card-header bg-white py-3">
-                    <h6 class="m-0 fw-bold text-dark">
-                        <i class="fas fa-table me-2 text-success"></i>Rincian Data Distribusi: {{ $outlet->nama_outlet }}
+
+                <div class="card-header bg-success bg-gradient text-white py-3">
+                    <h6 class="m-0 fw-bold">
+                        <i class="fas fa-truck me-2"></i>Log Distribusi Bulanan
                     </h6>
                 </div>
                 
@@ -108,35 +115,63 @@
                             <thead class="bg-light">
                                 <tr>
                                     <th class="ps-4 py-3 text-muted" width="5%">No</th>
-                                    <th class="py-3 text-muted" width="20%">Waktu Terima</th>
-                                    <th class="py-3 text-muted">Detail Bahan</th>
-                                    <th class="pe-4 py-3 text-muted text-end" width="25%">Jumlah Masuk</th>
+                                    <th class="py-3 text-muted" width="20%">Periode Bulan</th>
+                                    <th class="py-3 text-muted">Unit Outlet</th>
+                                    <th class="py-3 text-muted text-center" width="20%">Jumlah Barang Dikirim</th>
+                                    <th class="pe-4 py-3 text-muted text-end" width="20%">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse ($distribusi as $item)
+
+                                @php
+                                    $grouped = $distribusi->groupBy(function($item){
+                                        return \Carbon\Carbon::parse($item->tanggal)->format('F Y');
+                                    });
+                                @endphp
+
+                                @forelse ($grouped as $periode => $items)
                                 <tr>
                                     <td class="ps-4 text-muted small">{{ $loop->iteration }}</td>
+
                                     <td>
-                                        <div class="fw-bold text-dark">{{ \Carbon\Carbon::parse($item->tanggal)->translatedFormat('d F Y') }}</div>
-                                        <small class="text-muted" style="font-size: 0.7rem;">ID Transaksi: #DIST-{{ $item->id }}</small>
-                                    </td>
-                                    <td>
-                                        <div class="fw-bold text-dark">{{ $item->bahan->nama_bahan }}</div>
-                                        <span class="badge bg-light text-muted border py-1" style="font-size: 0.65rem;">
-                                            {{ $item->bahan->kategori ?? 'Bahan Baku' }}
+                                        <span class="fw-bold text-success">
+                                            {{ \Carbon\Carbon::parse($items->first()->tanggal)->translatedFormat('F Y') }}
                                         </span>
                                     </td>
-                                    <td class="pe-4 text-end">
-                                        <div class="fw-bold text-success fs-5">
-                                            + {{ number_format($item->jumlah, 0, ',', '.') }} 
-                                            <small class="fw-normal text-muted" style="font-size: 0.75rem;">{{ $item->bahan->satuan ?? 'Unit' }}</small>
-                                        </div>
+
+                                    <td class="fw-semibold text-dark">
+    {{ $items->first()->outlet->nama_outlet ?? '-' }}
+</td>
+
+                                    <td class="text-center">
+                                        <span class="badge bg-soft-success text-success px-3 py-2">
+                                            {{ number_format($items->sum('jumlah'),0,',','.') }} Item
+                                        </span>
                                     </td>
+
+                                   <td class="pe-4 text-end">
+
+    @php
+        $periodeParam = \Carbon\Carbon::parse($items->first()->tanggal)->format('Y-m');
+    @endphp
+
+    {{-- DETAIL --}}
+    <a href="{{ route('user.laporan.distribusi.detail', $periodeParam) }}" 
+       class="btn btn-sm btn-outline-success me-2">
+        <i class="fas fa-eye me-1"></i>
+    </a>
+
+    {{-- PDF PER BULAN --}}
+    <a href="{{ route('user.laporan.distribusi.detail.pdf', $periodeParam) }}" 
+       class="btn btn-sm btn-success">
+        <i class="fas fa-file-pdf me-1"></i>
+    </a>
+
+</td>
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="4" class="py-5 text-center">
+                                    <td colspan="5" class="py-5 text-center">
                                         <div class="mb-3">
                                             <i class="fas fa-box-open fa-3x text-light"></i>
                                         </div>
@@ -145,6 +180,7 @@
                                     </td>
                                 </tr>
                                 @endforelse
+
                             </tbody>
                         </table>
                     </div>
@@ -162,10 +198,5 @@
     </div>
 </div>
 
-<style>
-    .bg-soft-success { background-color: rgba(25, 135, 84, 0.1); color: #198754; }
-    .bg-soft-info { background-color: rgba(13, 202, 240, 0.1); color: #0dcaf0; }
-    .bg-soft-warning { background-color: rgba(255, 193, 7, 0.1); color: #ffc107; }
-    .icon-box { width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 12px; }
-</style>
+
 @endsection

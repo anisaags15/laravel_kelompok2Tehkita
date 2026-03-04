@@ -129,23 +129,41 @@ Route::prefix('user')->middleware(['auth', 'role:user'])->name('user.')->group(f
     Route::get('/waste/lapor', [PemakaianController::class, 'createWaste'])->name('waste.create');
     Route::post('/waste/simpan', [PemakaianController::class, 'storeWaste'])->name('waste.store');
 
-    // Distribusi & Stok
-    Route::get('/distribusi', [DistribusiController::class, 'indexUser'])->name('distribusi.index');
-    Route::match(['post', 'patch'], '/distribusi/{id}/terima', [DistribusiController::class, 'terima'])->name('distribusi.terima');
-    Route::get('/stok-outlet', [StokOutletController::class, 'indexUser'])->name('stok-outlet.index');
+// Distribusi & Stok
+Route::get('/distribusi', [DistribusiController::class, 'indexUser'])->name('distribusi.index');
+Route::match(['post', 'patch'], '/distribusi/{id}/terima', [DistribusiController::class, 'terima'])->name('distribusi.terima');
 
-    // Laporan User
-    Route::prefix('laporan')->name('laporan.')->group(function () {
-        Route::get('/', [UserLaporanController::class, 'index'])->name('index');
-        Route::get('/stok', [UserLaporanController::class, 'stok'])->name('stok');
-        Route::get('/stok/pdf', [UserLaporanController::class, 'cetakStok'])->name('stok.pdf');
-        Route::get('/distribusi', [UserLaporanController::class, 'distribusi'])->name('distribusi');
-        Route::get('/distribusi/pdf', [UserLaporanController::class, 'cetakDistribusi'])->name('distribusi.pdf');
-        Route::get('/waste', [UserLaporanController::class, 'waste'])->name('waste');
-        Route::get('/waste/pdf', [UserLaporanController::class, 'wastePdf'])->name('waste.pdf');
-        Route::get('/ringkasan', [UserLaporanController::class, 'ringkasan'])->name('ringkasan');
-        Route::get('/ringkasan/pdf', [UserLaporanController::class, 'cetakRingkasan'])->name('ringkasan.pdf');
-    });
+
+
+Route::get('/stok-outlet', [StokOutletController::class, 'indexUser'])->name('stok-outlet.index');
+ 
+// Laporan User
+  Route::prefix('laporan')->name('laporan.')->group(function () {
+
+    Route::get('/', [UserLaporanController::class, 'index'])->name('index');
+
+    Route::get('/stok', [UserLaporanController::class, 'stok'])->name('stok');
+    Route::get('/stok/pdf', [UserLaporanController::class, 'cetakStok'])->name('stok.pdf');
+
+    Route::get('/distribusi', [UserLaporanController::class, 'distribusi'])->name('distribusi');
+    Route::get('/distribusi/pdf', [UserLaporanController::class, 'cetakDistribusi'])->name('distribusi.pdf');
+
+    // ✅ DETAIL BULAN
+    Route::get('/distribusi/detail/{periode}', 
+        [DistribusiController::class, 'detail']
+    )->name('distribusi.detail');
+
+    // ✅ PDF DETAIL BULAN (INI YANG KURANG TADI)
+    Route::get('/distribusi/detail/{periode}/pdf', 
+        [DistribusiController::class, 'cetakDetail']
+    )->name('distribusi.detail.pdf');
+
+    Route::get('/waste', [UserLaporanController::class, 'waste'])->name('waste');
+    Route::get('/waste/pdf', [UserLaporanController::class, 'wastePdf'])->name('waste.pdf');
+
+    Route::get('/ringkasan', [UserLaporanController::class, 'ringkasan'])->name('ringkasan');
+    Route::get('/ringkasan/pdf', [UserLaporanController::class, 'cetakRingkasan'])->name('ringkasan.pdf');
+});
 
     // Profile User
     Route::prefix('profile')->name('profile.')->group(function () {
