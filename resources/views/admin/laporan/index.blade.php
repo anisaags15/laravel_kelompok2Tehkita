@@ -4,7 +4,7 @@
 @section('page', 'Ringkasan Laporan Bulanan')
 
 @section('content')
-<link rel="stylesheet" href="{{ asset('css/laporan-user.css') }}">
+<link rel="stylesheet" href="{{ asset('css/laporan-admin.css') }}">
 
 <div class="container-fluid py-4">
 
@@ -41,41 +41,35 @@
     </div>
 
     {{-- FILTER --}}
-    <div class="card filter-card shadow-lg no-print mx-3">
+    <div class="card shadow-sm no-print mx-3 border-0" style="border-radius: 16px;">
         <div class="card-body p-4">
             <form method="GET" action="{{ route('admin.laporan.index') }}" class="row align-items-end">
                 <div class="col-md-4 mb-3 mb-md-0">
-                    <label class="fs-xs fw-bold text-muted mb-2">Periode Analisis</label>
-                    <div class="input-group bg-light rounded-pill px-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text bg-transparent border-0"><i class="fas fa-calendar-alt text-primary"></i></span>
-                        </div>
-                        <select name="bulan" class="form-control border-0 bg-transparent font-weight-bold shadow-none">
-                            @for($m=1; $m<=12; $m++)
-                                <option value="{{ $m }}" @if($bulanAktif == $m) selected @endif>
-                                    {{ \Carbon\Carbon::create()->month($m)->translatedFormat('F') }}
-                                </option>
-                            @endfor
-                        </select>
-                    </div>
+                    <label class="small font-weight-bold text-muted mb-2">
+                        <i class="fas fa-calendar-alt text-primary mr-1"></i> Periode Analisis
+                    </label>
+                    <select name="bulan" class="form-control font-weight-bold" style="border-radius: 10px;">
+                        @for($m = 1; $m <= 12; $m++)
+                            <option value="{{ $m }}" @if($bulanAktif == $m) selected @endif>
+                                {{ \Carbon\Carbon::create()->month($m)->translatedFormat('F') }}
+                            </option>
+                        @endfor
+                    </select>
                 </div>
                 <div class="col-md-4 mb-3 mb-md-0">
-                    <label class="fs-xs fw-bold text-muted mb-2">Tahun Fiskal</label>
-                    <div class="input-group bg-light rounded-pill px-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text bg-transparent border-0"><i class="fas fa-university text-primary"></i></span>
-                        </div>
-                        <select name="tahun" class="form-control border-0 bg-transparent font-weight-bold shadow-none">
-                            @for($y = $tahunMulai; $y <= $tahunSelesai; $y++)
-                                <option value="{{ $y }}" @if($tahunAktif == $y) selected @endif>
-                                    {{ $y }}
-                                </option>
-                            @endfor
-                        </select>
-                    </div>
+                    <label class="small font-weight-bold text-muted mb-2">
+                        <i class="fas fa-university text-primary mr-1"></i> Tahun Fiskal
+                    </label>
+                    <select name="tahun" class="form-control font-weight-bold" style="border-radius: 10px;">
+                        @for($y = $tahunMulai; $y <= $tahunSelesai; $y++)
+                            <option value="{{ $y }}" @if($tahunAktif == $y) selected @endif>
+                                {{ $y }}
+                            </option>
+                        @endfor
+                    </select>
                 </div>
                 <div class="col-md-4">
-                    <button type="submit" class="btn btn-primary btn-block py-2 font-weight-bold shadow-sm rounded-pill">
+                    <button type="submit" class="btn btn-primary btn-block py-2 font-weight-bold shadow-sm" style="border-radius: 10px;">
                         <i class="fas fa-sync-alt mr-2"></i> Perbarui Visualisasi
                     </button>
                 </div>
@@ -84,24 +78,25 @@
     </div>
 
     {{-- KPI CARDS --}}
-    <div class="row mt-2 px-2">
+    <div class="row mt-3 px-2">
         @php
             $kpis = [
-                ['label'=>'Volume Distribusi','value'=>$totalDistribusi ?? 0,'icon'=>'fa-shipping-fast','color'=>'primary'],
-                ['label'=>'Alur Masuk Stok','value'=>$stokMasuk ?? 0,'icon'=>'fa-box-open','color'=>'success'],
-                ['label'=>'Jaringan Aktif','value'=>$outletAktif ?? 0,'icon'=>'fa-store-alt','color'=>'info'],
-                ['label'=>'Peringatan Kritis','value'=>$stokMenipis ?? 0,'icon'=>'fa-exclamation-triangle','color'=>'danger'],
+                ['label' => 'Volume Distribusi',  'value' => $totalDistribusi ?? 0, 'icon' => 'fa-shipping-fast',      'color' => 'primary'],
+                ['label' => 'Alur Masuk Stok',    'value' => $stokMasuk ?? 0,       'icon' => 'fa-box-open',           'color' => 'success'],
+                ['label' => 'Jaringan Aktif',      'value' => $outletAktif ?? 0,     'icon' => 'fa-store-alt',          'color' => 'info'],
+                ['label' => 'Peringatan Kritis',   'value' => $stokMenipis ?? 0,     'icon' => 'fa-exclamation-triangle','color' => 'danger'],
             ];
         @endphp
         @foreach($kpis as $kpi)
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-0 shadow-sm h-100 bg-white" style="border-radius: 15px;">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 15px;">
                 <div class="card-body">
-                    <div class="icon-box-modern mb-3" style="background: rgba(0,0,0,0.03); width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 10px;">
+                    <div class="mb-3 d-flex align-items-center justify-content-center"
+                         style="width: 45px; height: 45px; border-radius: 10px; background: rgba(0,0,0,0.05);">
                         <i class="fas {{ $kpi['icon'] }} text-{{ $kpi['color'] }}"></i>
                     </div>
-                    <h6 class="text-muted small fw-bold text-uppercase mb-1">{{ $kpi['label'] }}</h6>
-                    <h2 class="font-weight-bold text-dark mb-0">{{ number_format($kpi['value']) }}</h2>
+                    <h6 class="text-muted small font-weight-bold text-uppercase mb-1">{{ $kpi['label'] }}</h6>
+                    <h2 class="font-weight-bold mb-0">{{ number_format($kpi['value']) }}</h2>
                 </div>
             </div>
         </div>
@@ -110,15 +105,19 @@
 
     {{-- ANALITIK --}}
     <div class="row px-2">
+
+        {{-- Outlet Performa Terbaik --}}
         <div class="col-lg-7 mb-4">
             <div class="card border-0 shadow-sm h-100" style="border-radius: 20px; overflow: hidden;">
-                <div class="card-header bg-white border-0 py-4">
-                    <h5 class="m-0 font-weight-bold text-dark">Outlet Performa Terbaik</h5>
+                <div class="card-header border-0 py-4">
+                    <h5 class="m-0 font-weight-bold">
+                        <i class="fas fa-trophy text-warning mr-2"></i> Outlet Performa Terbaik
+                    </h5>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-hover mb-0">
-                            <thead class="bg-light">
+                            <thead>
                                 <tr>
                                     <th class="px-4 border-0">Outlet</th>
                                     <th class="text-center border-0">Aktivitas</th>
@@ -126,22 +125,32 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse ($outletTeraktif ?? [] as $item)
-                                @php 
-                                    $persen = min(($item->total / 100) * 100, 100); 
-                                    // REVISI ANTI MERAH: Satukan style ke dalam satu string PHP
+                                @forelse ($outletTeraktif ?? [] as $index => $item)
+                                @php
+                                    $maxTotal = ($outletTeraktif->max('total') > 0) ? $outletTeraktif->max('total') : 1;
+                                    $persen = min(($item->total / $maxTotal) * 100, 100);
                                     $inlineStyle = "width: " . $persen . "%";
                                 @endphp
                                 <tr>
                                     <td class="px-4">
-                                        <span class="font-weight-bold text-dark">{{ $item->nama_outlet }}</span>
+                                        <span class="font-weight-bold">{{ $item->nama_outlet }}</span>
                                     </td>
                                     <td class="text-center">
-                                        <span class="badge badge-soft-primary px-3">{{ $item->total }} Trans.</span>
+                                        <span class="badge badge-pill badge-primary px-3 py-1">{{ $item->total }} Trans.</span>
+                                    </td>
+                                    <td class="px-4">
+                                        <div class="progress" style="height: 6px; border-radius: 10px;">
+                                            <div class="progress-bar bg-primary" role="progressbar" style="{{ $inlineStyle }}"></div>
+                                        </div>
                                     </td>
                                 </tr>
                                 @empty
-                                <tr><td colspan="3" class="text-center py-5">Data tidak tersedia.</td></tr>
+                                <tr>
+                                    <td colspan="3" class="text-center py-5 text-muted">
+                                        <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
+                                        Data tidak tersedia.
+                                    </td>
+                                </tr>
                                 @endforelse
                             </tbody>
                         </table>
@@ -150,31 +159,42 @@
             </div>
         </div>
 
+        {{-- Bahan Paling Dibutuhkan --}}
         <div class="col-lg-5 mb-4">
-            <div class="card border-0 shadow-lg h-100 text-white" style="border-radius: 20px; background: #1e293b;">
-                <div class="card-header bg-transparent border-0 py-4">
-                    <h5 class="m-0 font-weight-bold">Bahan Paling Dibutuhkan</h5>
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 20px;">
+                <div class="card-header border-0 py-4">
+                    <h5 class="m-0 font-weight-bold">
+                        <i class="fas fa-boxes text-success mr-2"></i> Bahan Paling Dibutuhkan
+                    </h5>
                 </div>
                 <div class="card-body">
                     @forelse ($bahanTerbanyak ?? [] as $item)
+                    @php
+                        $maxBahan = ($bahanTerbanyak->max('total') > 0) ? $bahanTerbanyak->max('total') : 1;
+                        $persenBahan = min(($item->total / $maxBahan) * 100, 100);
+                    @endphp
                     <div class="mb-4">
-                        <div class="d-flex justify-content-between mb-2">
-                            <span class="text-white-50 small">{{ $item->nama_bahan }}</span>
-                            <span class="text-success small fw-bold">{{ number_format($item->total) }} Unit</span>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="small font-weight-bold">{{ $item->nama_bahan }}</span>
+                            <span class="small text-success font-weight-bold">{{ number_format($item->total) }} Unit</span>
                         </div>
-                        <div class="progress" style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px;">
+                        <div class="progress" style="height: 8px; border-radius: 10px;">
                             <div class="progress-bar bg-success" 
                                  role="progressbar" 
-                                 style="width: 70%">
+                                 style="width: {{ $persenBahan }}%">
                             </div>
                         </div>
                     </div>
                     @empty
-                    <div class="text-center py-5 opacity-50">Belum ada data.</div>
+                    <div class="text-center py-5 text-muted">
+                        <i class="fas fa-box-open fa-2x mb-2 d-block"></i>
+                        Belum ada data.
+                    </div>
                     @endforelse
                 </div>
             </div>
         </div>
+
     </div>
 </div>
 @endsection

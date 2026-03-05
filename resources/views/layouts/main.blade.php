@@ -14,6 +14,9 @@
     {{-- CSS Custom kamu tetap di sini --}}
     <link rel="stylesheet" href="{{ asset('templates/dist/css/custom-admin.css') }}">
     <link rel="stylesheet" href="{{ asset('templates/dist/css/custom-user.css') }}"> 
+    <link rel="stylesheet" href="{{ asset('css/laporan-admin.css') }}">
+<link rel="stylesheet" href="{{ asset('css/laporan-user.css') }}">
+
 
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
