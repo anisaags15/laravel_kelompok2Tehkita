@@ -14,15 +14,15 @@ use Illuminate\Support\Facades\DB;
 
 class DistribusiController extends Controller
 {
-    public function index()
-    {
-        // Distribusi terbaru tampil di bawah (sesuai request asc)
-        $distribusis = Distribusi::with(['bahan', 'outlet'])
-            ->orderBy('id', 'asc')
-            ->get();
 
-        return view('admin.distribusi.index', compact('distribusis'));
-    }
+public function index()
+{
+    $distribusis = Distribusi::with(['bahan', 'outlet'])
+        ->orderBy('id', 'asc')
+        ->get();
+
+    return view('admin.distribusi.index', compact('distribusis'));
+}
 
     public function create()
     {
@@ -48,7 +48,6 @@ class DistribusiController extends Controller
                     throw new \Exception('Stok gudang tidak mencukupi!');
                 }
 
-                // Kurangi stok di gudang pusat
                 $bahan->stok_awal -= $request->jumlah;
                 $bahan->save();
 
@@ -60,7 +59,6 @@ class DistribusiController extends Controller
                     'status'    => 'dikirim',
                 ]);
 
-                // Notifikasi ke semua user di outlet tujuan
                 $usersOutlet = User::where('outlet_id', $request->outlet_id)->get();
                 foreach ($usersOutlet as $user) {
                     $user->notify(new InfoPengirimanNotification($distribusi));
@@ -99,18 +97,15 @@ class DistribusiController extends Controller
             DB::transaction(function () use ($request, $id) {
                 $distribusi = Distribusi::findOrFail($id);
                 
-                // Balikkan stok lama ke gudang pusat dulu
                 $bahanLama = Bahan::find($distribusi->bahan_id);
                 $bahanLama->stok_awal += $distribusi->jumlah;
                 $bahanLama->save();
 
-                // Cek stok bahan baru
                 $bahanBaru = Bahan::find($request->bahan_id);
                 if ($bahanBaru->stok_awal < $request->jumlah) {
                     throw new \Exception('Stok gudang tidak cukup untuk perubahan ini!');
                 }
 
-                // Kurangi stok bahan baru
                 $bahanBaru->stok_awal -= $request->jumlah;
                 $bahanBaru->save();
 
@@ -138,7 +133,6 @@ class DistribusiController extends Controller
                     throw new \Exception('Data sudah diterima, tidak bisa dihapus.');
                 }
 
-                // Balikkan stok ke gudang pusat sebelum hapus
                 $bahan = Bahan::find($distribusi->bahan_id);
                 $bahan->stok_awal += $distribusi->jumlah;
                 $bahan->save();
@@ -159,7 +153,7 @@ class DistribusiController extends Controller
     {
         $distribusis = Distribusi::with('bahan')
             ->where('outlet_id', auth()->user()->outlet_id)
-            ->orderBy('id', 'asc')
+            ->orderBy('created_at', 'desc') // 🔥 INI YANG DIPERBAIKI
             ->get();
             
         return view('user.distribusi.index', compact('distribusis'));
@@ -173,16 +167,13 @@ class DistribusiController extends Controller
         try {
             $distribusi = Distribusi::findOrFail($id);
 
-            // Cek jika barang sudah pernah dikonfirmasi
             if ($distribusi->status === 'diterima') {
                 return back()->with('error', 'Barang ini sudah dikonfirmasi sebelumnya.');
             }
 
             DB::transaction(function () use ($distribusi) {
-                // 1. Update status distribusi menjadi diterima
                 $distribusi->update(['status' => 'diterima']);
 
-                // 2. Tambah stok di StokOutlet
                 $stokOutlet = StokOutlet::firstOrCreate(
                     [
                         'outlet_id' => $distribusi->outlet_id, 
@@ -190,10 +181,10 @@ class DistribusiController extends Controller
                     ],
                     ['stok' => 0]
                 );
+
                 $stokOutlet->stok += $distribusi->jumlah;
                 $stokOutlet->save();
 
-                // 3. Kirim notifikasi ke Admin bahwa barang sudah sampai
                 $admins = User::where('role', 'admin')->get();
                 foreach ($admins as $admin) {
                     $admin->notify(new PengirimanDiterimaNotification($distribusi));
@@ -206,4 +197,14 @@ class DistribusiController extends Controller
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
+public function detail($periode)
+{
+    $detail = Distribusi::with(['bahan','outlet'])
+        ->where('outlet_id', auth()->user()->outlet_id)
+        ->whereRaw("DATE_FORMAT(tanggal, '%Y-%m') = ?", [$periode])
+        ->orderBy('tanggal', 'asc')
+        ->get();
+
+    return view('user.laporan.detail', compact('detail','periode'));
+}
 }

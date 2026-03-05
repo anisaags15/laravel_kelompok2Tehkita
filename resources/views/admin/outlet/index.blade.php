@@ -24,7 +24,7 @@
                     <thead class="bg-light">
                         <tr>
                             <th class="text-center py-3 px-4 text-uppercase small font-weight-bold text-muted" width="5%">No</th>
-                            <th class="py-3 text-uppercase small font-weight-bold text-muted">Informasi Outlet</th>
+                            <th class="py-3 text-uppercase small font-weight-bold text-muted">Informasi Outlet & Admin</th>
                             <th class="py-3 text-uppercase small font-weight-bold text-muted">Alamat</th>
                             <th class="py-3 text-uppercase small font-weight-bold text-muted text-center" width="15%">No. HP</th>
                             <th class="py-3 text-uppercase small font-weight-bold text-muted text-center" width="15%">Aksi</th>
@@ -44,7 +44,20 @@
                                         <div class="font-weight-bold text-dark text-capitalize" style="font-size: 1rem;">
                                             {{ $outlet->nama_outlet }}
                                         </div>
-                                        <small class="text-muted text-uppercase">ID: OTL-{{ str_pad($outlet->id, 3, '0', STR_PAD_LEFT) }}</small>
+                                        
+                                        <div class="small mt-1">
+                                            @if($outlet->user)
+                                                <span class="text-primary font-weight-bold">
+                                                    <i class="fas fa-user-shield mr-1"></i> {{ $outlet->user->name }}
+                                                </span>
+                                            @else
+                                                <span class="text-secondary font-italic">
+                                                    <i class="fas fa-user-times mr-1"></i> Belum ada admin
+                                                </span>
+                                            @endif
+                                        </div>
+                                        
+                                        <small class="text-muted text-uppercase" style="font-size: 0.7rem;">ID: OTL-{{ str_pad($outlet->id, 3, '0', STR_PAD_LEFT) }}</small>
                                     </div>
                                 </div>
                             </td>
@@ -53,12 +66,12 @@
                                     <i class="fas fa-map-marker-alt text-danger mr-1"></i> {{ $outlet->alamat }}
                                 </span>
                             </td>
-                            <td class="text-center">
+                            <td class="text-center align-middle">
                                 <span class="badge px-3 py-2" style="background: #f0f2f5; color: #007bff; border-radius: 6px; font-weight: 600;">
                                     <i class="fas fa-phone-alt mr-1 small"></i> {{ $outlet->no_hp }}
                                 </span>
                             </td>
-                            <td class="text-center">
+                            <td class="text-center align-middle">
                                 <div class="d-flex justify-content-center">
                                     <a href="{{ route('admin.outlet.edit', $outlet->id) }}" 
                                        class="btn btn-sm btn-light text-warning border mr-2 action-btn" 
