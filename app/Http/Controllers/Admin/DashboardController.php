@@ -35,15 +35,22 @@ class DashboardController extends Controller
         $stokMasuk  = StokMasuk::count();
         $distribusi = Distribusi::count();
 
-        /*
+      /*
         |--------------------------------------------------------------------------
         | 2️⃣ RADAR STOK KRITIS (EARLY WARNING SYSTEM)
         |--------------------------------------------------------------------------
         */
+        // Peringatan Stok di OUTLET (untuk kirim barang)
         $stokKritis = StokOutlet::with(['outlet', 'bahan'])
             ->where('stok', '<=', 5)
             ->orderBy('stok', 'asc')
             ->get();
+
+        $stokKritisCount = $stokKritis->count(); 
+
+        // Peringatan Stok di GUDANG PUSAT (untuk belanja ke supplier)
+        // Kita anggap kritis jika total_stok bahan di pusat <= 50
+        $stokPusatKritis = Bahan::where('stok_awal', '<=', 50)->count();
 
         /*
         |--------------------------------------------------------------------------
@@ -186,9 +193,8 @@ class DashboardController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 8️⃣ DATA OUTLET TERAKTIF (PIALA / PERFORMA TERBAIK) - ADDED FIX! 🏆
+        | 8️⃣ DATA OUTLET TERAKTIF (PIALA / PERFORMA TERBAIK)
         |--------------------------------------------------------------------------
-        | Kita ambil total pemakaian selama 7 hari terakhir agar sinkron dengan grafik.
         */
         $outletTeraktif = Pemakaian::select('outlet_id', DB::raw('SUM(jumlah) as total'))
             ->with('outlet')
@@ -203,20 +209,54 @@ class DashboardController extends Controller
                     'total'       => (int) $item->total
                 ];
             });
+/*
+|--------------------------------------------------------------------------
+| 🔟 LOGIKA PREDIKSI STOK (SMART REORDER)
+|--------------------------------------------------------------------------
+*/
+$bahanPusat = Bahan::all();
+$rekomendasiRestock = [];
 
+foreach ($bahanPusat as $b) {
+    // 1. Hitung total distribusi bahan ini selama 7 hari terakhir
+    $totalKeluar = Distribusi::where('bahan_id', $b->id)
+        ->where('tanggal', '>=', now()->subDays(7))
+        ->sum('jumlah');
+
+    // 2. Hitung rata-rata pengeluaran per hari
+    $rataRataHarian = $totalKeluar / 7;
+
+    if ($rataRataHarian > 0) {
+        // 3. Estimasi sisa hari (Stok Pusat / Rata-rata)
+        $sisaHari = $b->stok_awal / $rataRataHarian;
+
+        // 4. Jika stok diprediksi habis dalam <= 3 hari, masukkan ke list rekomendasi
+        if ($sisaHari <= 3) {
+            $rekomendasiRestock[] = (object) [
+                'nama' => $b->nama_bahan,
+                'sisa_stok' => $b->stok_awal,
+                'estimasi' => round($sisaHari),
+// Ubah bagian ini di controller
+'saran_beli' => ceil(($rataRataHarian * 7) - $b->stok_awal) . ' ' . $b->satuan            ];
+        }
+    }
+}
         /*
         |--------------------------------------------------------------------------
         | 9️⃣ RETURN VIEW
         |--------------------------------------------------------------------------
         */
-        return view('admin.dashboard', compact(
-            'outlet', 'bahan', 'stokMasuk', 'distribusi',
-            'stokKritis',
-            'outlets', 'latestDistribusi', 'latestStokMasuk',
-            'unreadCount', 'latestChats',
-            'pemakaianChart', 'calendarEvents',
-            'monitoringOutlets',
-            'outletTeraktif' // Sekarang variabel ini sudah dikirim!
-        ));
+return view('admin.dashboard', compact(
+    // ... data yang sudah ada sebelumnya ...
+    'rekomendasiRestock', // <--- Tambah ini
+    'outlet', 'bahan', 'stokMasuk', 'distribusi',
+    'stokKritis', 'stokKritisCount', 
+    'stokPusatKritis',
+    'outlets', 'latestDistribusi', 'latestStokMasuk',
+    'unreadCount', 'latestChats',
+    'pemakaianChart', 'calendarEvents',
+    'monitoringOutlets',
+    'outletTeraktif'
+));
     }
 }

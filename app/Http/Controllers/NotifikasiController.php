@@ -11,16 +11,22 @@ class NotifikasiController extends Controller
      * NOTIFIKASI UNTUK ADMIN PUSAT
      * Menampilkan semua notifikasi masuk (Waste, Stok Kritis, Konfirmasi Terima)
      */
-    public function indexAdmin()
+    public function indexAdmin(Request $request)
     {
-        $notifications = Auth::user()->notifications()->latest()->paginate(10);
+        $query = Auth::user()->notifications()->latest();
+
+        // Filter by type kalau ada query ?type=waste dll
+        if ($request->filled('type') && $request->type !== 'semua') {
+            $query->where('data->type', $request->type);
+        }
+
+        $notifications = $query->paginate(10)->withQueryString();
 
         return view('admin.notifikasi.index', compact('notifications'));
     }
 
     /**
      * NOTIFIKASI UNTUK USER OUTLET
-     * Menampilkan info pengiriman dan peringatan stok outlet sendiri
      */
     public function index()
     {
@@ -31,7 +37,6 @@ class NotifikasiController extends Controller
 
     /**
      * FITUR HAPUS NOTIFIKASI (DELETE)
-     * Bisa digunakan oleh Admin maupun User
      */
     public function destroy($id)
     {
@@ -47,11 +52,27 @@ class NotifikasiController extends Controller
 
     /**
      * FITUR TANDAI SEMUA SUDAH DIBACA
-     * Menghilangkan tanda "unread" di database
      */
     public function markAllRead()
     {
         Auth::user()->unreadNotifications->markAsRead();
         return back()->with('success', 'Semua notifikasi telah ditandai dibaca.');
+    }
+
+    /**
+     * FITUR TANDAI SATU NOTIFIKASI DIBACA
+     * Dipanggil saat klik "Tindak Lanjut" atau tombol centang
+     */
+    public function markOneRead($id)
+    {
+        $notification = Auth::user()->notifications()->where('id', $id)->first();
+
+        if ($notification && is_null($notification->read_at)) {
+            $notification->markAsRead();
+        }
+
+        // Redirect ke URL tujuan notifikasi
+        $url = $notification->data['url'] ?? route('admin.notifikasi.index');
+        return redirect($url);
     }
 }

@@ -5,6 +5,48 @@
 
 @section('content')
 
+{{-- SMART PREDIKSI SECTION --}}
+@if(count($rekomendasiRestock) > 0)
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="smart-prediction-alert shadow-lg border-0">
+            <div class="row align-items-center">
+                {{-- Bagian Kiri: Branding AI --}}
+                <div class="col-lg-3 d-flex align-items-center">
+                    <div class="ai-icon-wrapper me-3">
+                        <i class="fas fa-robot text-white fa-lg"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-0 fw-bold">Asisten Prediksi</h6>
+                        <span class="small opacity-75">Habis dalam waktu dekat:</span>
+                    </div>
+                </div>
+
+                {{-- Bagian Kanan: Gabungan Item & Tombol --}}
+                <div class="col-lg-9 d-flex align-items-center justify-content-lg-end justify-content-start flex-wrap mt-3 mt-lg-0">
+                    {{-- List Bahan --}}
+                    <div class="d-flex flex-wrap justify-content-lg-end">
+                        @foreach($rekomendasiRestock as $rs)
+                            <div class="prediction-pill">
+                                <span class="fw-semibold text-uppercase">{{ $rs->nama }}</span>
+                                <span class="opacity-50 mx-1">|</span>
+                                <span>⏳ <b>{{ $rs->estimasi }} Hari</b></span>
+                                <span class="saran-badge ms-1">Minta: +{{ $rs->saran_beli }}</span>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    {{-- Tombol Restock --}}
+                    <a href="{{ route('admin.stok-masuk.create') }}" class="btn btn-primary btn-sm rounded-pill px-4 fw-bold shadow-sm ms-lg-3 mt-2 mt-lg-0">
+                        <i class="fas fa-shopping-cart me-2"></i>Restock
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
 {{-- 1. STATISTIC CARDS --}}
 <div class="row">
     <div class="col-lg-3 col-md-6 mb-4">

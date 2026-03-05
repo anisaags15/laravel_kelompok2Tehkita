@@ -59,11 +59,12 @@ Route::prefix('admin')
     // 1. HALAMAN KERJA OPERASIONAL STOK KRITIS
     Route::get('/stok-kritis', [StokKritisController::class, 'index'])->name('stok-kritis.index');
 
-    // Notifikasi Admin
+// Notifikasi Admin
     Route::get('/notifikasi', [NotifikasiController::class, 'indexAdmin'])->name('notifikasi.index');
     Route::post('/notifikasi/mark-all-read', [NotifikasiController::class, 'markAllRead'])->name('notifikasi.markAllRead');
+    Route::get('/notifikasi/{id}/read', [NotifikasiController::class, 'markOneRead'])->name('notifikasi.markOneRead');
     Route::delete('/notifikasi/{id}', [NotifikasiController::class, 'destroy'])->name('notifikasi.destroy');
-
+    
     // Resources Dasar
     Route::resource('outlet', OutletController::class);
     Route::resource('bahan', BahanController::class);

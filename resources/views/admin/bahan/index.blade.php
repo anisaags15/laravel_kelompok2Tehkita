@@ -36,7 +36,6 @@
                             <td class="text-center text-muted font-weight-500">{{ $loop->iteration }}</td>
                             <td>
                                 <div class="d-flex align-items-center">
-                                    {{-- IKON DIGANTI KE BOX (STOK) --}}
                                     <div class="bg-primary-light text-primary p-2 rounded-circle mr-3 d-flex align-items-center justify-content-center" 
                                          style="background: #e3f2fd; width: 40px; height: 40px;">
                                         <i class="fas fa-box"></i>
@@ -55,14 +54,24 @@
                                 </span>
                             </td>
                             <td class="text-center">
+                                {{-- DESIGN TETAP SAMA, LOGIKA DIUBAH --}}
                                 <div class="d-inline-block px-3 py-1" style="border-radius: 20px; background: #f8f9fa; border: 1px solid #edf2f7;">
                                     <span class="font-weight-bold {{ $bahan->stok_awal <= 10 ? 'text-danger' : 'text-primary' }}" style="font-size: 1.1rem;">
                                         {{ number_format($bahan->stok_awal, 0, ',', '.') }}
                                     </span>
                                 </div>
-                                @if($bahan->stok_awal <= 10)
+
+                                @if($bahan->stok_awal <= 0)
+                                    {{-- Jika stok benar-benar 0 --}}
                                     <div class="d-block mt-1">
-                                        <small class="text-danger font-italic" style="font-size: 0.7rem;">
+                                        <small class="text-danger font-weight-bold" style="font-size: 0.75rem;">
+                                            <i class="fas fa-times-circle"></i> Stok Habis!
+                                        </small>
+                                    </div>
+                                @elseif($bahan->stok_awal <= 50)
+                                    {{-- Jika stok di bawah 50 tapi di atas 0 --}}
+                                    <div class="d-block mt-1">
+                                        <small class="text-warning font-italic" style="font-size: 0.75rem; font-weight: 600;">
                                             <i class="fas fa-exclamation-triangle"></i> Stok Hampir Habis!
                                         </small>
                                     </div>

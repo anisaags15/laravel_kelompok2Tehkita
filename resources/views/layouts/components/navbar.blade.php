@@ -1,5 +1,4 @@
 <nav class="main-header navbar navbar-expand navbar-white navbar-light shadow-sm">
-
     {{-- LEFT SIDE --}}
     <ul class="navbar-nav align-items-center">
         <li class="nav-item">
@@ -7,7 +6,6 @@
                 <i class="fas fa-bars"></i>
             </a>
         </li>
-
         <li class="nav-item d-none d-sm-inline-block ml-2">
             <span class="navbar-brand font-weight-bold text-success mb-0" style="font-size: 1.05rem;">
                 @auth
@@ -38,16 +36,23 @@
 
         @auth
         @php
-            // Ambil notifikasi belum dibaca
             $unreadNotifications = auth()->user()->unreadNotifications;
             $notifCount = $unreadNotifications->count();
+            $pesanCount = \App\Models\Message::where('receiver_id', auth()->id())->where('is_read', 0)->count();
             
-            // Ambil pesan chat (jika ada)
-            $pesanCount = isset($unreadMessages) ? $unreadMessages->count() : 0;
-            
-            $totalNotif = $notifCount + $pesanCount;
+            // Hitung Stok Kritis Outlet
+            $navStokKritis = (auth()->user()->role === 'admin') 
+                ? \App\Models\StokOutlet::where('stok', '<=', 5)->count() 
+                : 0;
 
-            // Alamat dinamis untuk tombol "Lihat Semua"
+            // NEW: Hitung Stok Kritis Pusat
+            $navStokPusat = (auth()->user()->role === 'admin') 
+                ? \App\Models\Bahan::where('stok_awal', '<=', 50)->count() 
+                : 0;
+            
+            // Total angka yang muncul di icon lonceng (Ditambah stok pusat)
+            $totalNotif = $notifCount + $pesanCount + $navStokKritis + $navStokPusat;
+
             $notifUrl = (auth()->user()->role === 'admin') 
                         ? route('admin.notifikasi.index') 
                         : route('user.notifikasi.index');
@@ -58,7 +63,7 @@
             <a class="nav-link position-relative" data-toggle="dropdown" href="#">
                 <i class="far fa-bell fa-lg text-dark"></i>
                 @if($totalNotif > 0)
-                    <span class="badge badge-danger navbar-badge">{{ $totalNotif }}</span>
+                    <span class="badge badge-danger navbar-badge anim-pulse">{{ $totalNotif }}</span>
                 @endif
             </a>
 
@@ -69,29 +74,37 @@
 
                 <div class="dropdown-divider"></div>
 
-                {{-- LOOPING 5 NOTIFIKASI TERBARU --}}
-                @forelse($unreadNotifications->take(5) as $notification)
+                {{-- ALERT STOK KRITIS PUSAT --}}
+                @if($navStokPusat > 0)
+                    <a href="{{ route('admin.bahan.index') }}" class="dropdown-item bg-warning-light">
+                        <i class="fas fa-warehouse text-warning mr-2"></i>
+                        <span class="text-sm font-weight-bold text-dark">{{ $navStokPusat }} Stok Pusat Menipis!</span>
+                    </a>
+                    <div class="dropdown-divider"></div>
+                @endif
+
+                {{-- ALERT STOK KRITIS OUTLET --}}
+                @if($navStokKritis > 0)
+                    <a href="{{ route('admin.stok-kritis.index') }}" class="dropdown-item bg-light">
+                        <i class="fas fa-exclamation-triangle text-danger mr-2"></i>
+                        <span class="text-sm font-weight-bold text-danger">{{ $navStokKritis }} Stok Outlet Kritis!</span>
+                    </a>
+                    <div class="dropdown-divider"></div>
+                @endif
+
+                {{-- LOOPING NOTIFIKASI LAINNYA --}}
+                @forelse($unreadNotifications->take(3) as $notification)
                     <a href="{{ $notifUrl }}" class="dropdown-item">
-                        <div class="media">
-                            <div class="media-body">
-                                <p class="text-sm mb-0 text-wrap">
-                                    @php
-                                        $type = $notification->data['type'] ?? '';
-                                        $icon = ($type == 'waste') ? 'fa-trash-alt text-danger' : 'fa-exclamation-triangle text-warning';
-                                    @endphp
-                                    <i class="fas {{ $icon }} mr-2"></i>
-                                    <strong>{{ $notification->data['title'] ?? 'Notifikasi' }}</strong>
-                                </p>
-                                <p class="text-xs text-muted mb-0">{{ Str::limit($notification->data['message'] ?? '', 40) }}</p>
-                                <small class="text-xs text-gray-500">{{ $notification->created_at->diffForHumans() }}</small>
-                            </div>
-                        </div>
+                        <p class="text-sm mb-0">
+                            <i class="fas fa-info-circle mr-2 text-info"></i>
+                            {{ Str::limit($notification->data['title'] ?? 'Notifikasi Baru', 25) }}
+                        </p>
+                        <small class="text-xs text-muted">{{ $notification->created_at->diffForHumans() }}</small>
                     </a>
                     <div class="dropdown-divider"></div>
                 @empty
-                    @if($pesanCount == 0)
+                    @if($pesanCount == 0 && $navStokKritis == 0 && $navStokPusat == 0)
                         <div class="dropdown-item text-center text-muted py-3">
-                            <i class="fas fa-check-circle text-success mb-2 d-block" style="font-size: 1.5rem;"></i>
                             Tidak ada notifikasi baru
                         </div>
                     @endif
@@ -100,13 +113,10 @@
                 {{-- NOTIFIKASI PESAN CHAT --}}
                 @if($pesanCount > 0)
                     <a href="{{ route('chat.index') }}" class="dropdown-item text-center py-2">
-                        <i class="fas fa-envelope text-primary mr-2"></i>
-                        {{ $pesanCount }} Pesan belum dibaca
+                        <i class="fas fa-envelope text-primary mr-2"></i> {{ $pesanCount }} Pesan Baru
                     </a>
-                    <div class="dropdown-divider"></div>
                 @endif
 
-                {{-- TOMBOL LIHAT SEMUA (HALAMAN PUSAT PERHATIAN) --}}
                 <a href="{{ $notifUrl }}" class="dropdown-item dropdown-footer text-success font-weight-bold py-2">
                     Lihat Semua Pemberitahuan
                 </a>
@@ -118,35 +128,26 @@
             <a href="#" class="nav-link dropdown-toggle d-flex align-items-center" data-toggle="dropdown">
                 <img src="{{ auth()->user()->photo ? asset('uploads/profile/' . auth()->user()->photo) : asset('templates/dist/img/user2-160x160.jpg') }}"
                      class="img-circle elevation-1" style="width:32px;height:32px;object-fit:cover;" alt="User">
-                <span class="d-none d-md-inline text-dark font-weight-bold ml-2">
-                    {{ auth()->user()->name }}
-                </span>
+                <span class="d-none d-md-inline text-dark font-weight-bold ml-2">{{ auth()->user()->name }}</span>
             </a>
-
             <div class="dropdown-menu dropdown-menu-right shadow border-0">
                 <div class="dropdown-header text-center bg-light">
                     <strong>{{ auth()->user()->name }}</strong><br>
                     <small class="text-muted">{{ ucfirst(auth()->user()->role) }}</small>
                 </div>
                 <div class="dropdown-divider"></div>
-                
                 <a href="{{ auth()->user()->role === 'admin' ? route('admin.profile.edit') : route('user.profile.edit') }}" class="dropdown-item">
                     <i class="fas fa-user-edit mr-2 text-success"></i> Edit Profil
                 </a>
-                
                 <div class="dropdown-divider"></div>
-                
                 <div class="px-3 py-2">
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
-                        <button type="submit" class="btn btn-danger btn-sm btn-block rounded-pill">
-                            <i class="fas fa-sign-out-alt mr-1"></i> Keluar
-                        </button>
+                        <button type="submit" class="btn btn-danger btn-sm btn-block rounded-pill">Keluar</button>
                     </form>
                 </div>
             </div>
         </li>
         @endauth
-
     </ul>
 </nav>
