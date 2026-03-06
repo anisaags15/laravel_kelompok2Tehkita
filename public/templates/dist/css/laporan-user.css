@@ -6,6 +6,7 @@
     --bg-soft-success: #f0fdf4;
 }
 
+/* TYPOGRAPHY & UTILS */
 .fs-xs { 
     font-size: 0.72rem !important; 
     letter-spacing: 0.08em; 
@@ -16,7 +17,9 @@
 .italic { font-style: italic; }
 .opacity-50 { opacity: 0.5; }
 .mt-n4 { margin-top: -2.5rem !important; }
+.text-center { text-align: left !important; }
 
+/* HEADER CARDS */
 .executive-header {
     background: var(--primary-gradient);
     border-radius: 20px;
@@ -35,6 +38,7 @@
     box-shadow: 0 10px 25px rgba(0,0,0,0.1);
 }
 
+/* FILTER CARD */
 .filter-card {
     border: none;
     border-radius: 15px;
@@ -49,39 +53,42 @@
     backdrop-filter: blur(5px);
 }
 
+/* Update bagian CARD agar sama tinggi */
 .card { 
     border-radius: 18px !important; 
     border: none;
     background: #ffffff;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    height: 100%; /* Mengharuskan card memenuhi tinggi kolom */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Konten di tengah secara vertikal */
 }
 
-.stat-card-modern {
-    transition: all 0.3s ease;
-}
-
-.stat-card-modern:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important;
-}
-
-.icon-box-modern, 
-.avatar-box {
-    width: 50px;
-    height: 50px;
-    border-radius: 14px;
+//* Update bagian ICON BOX biar GEDE dan SEPADAN */
+.icon-box, .icon-box-modern {
+    width: 90px !important;  /* Diperbesar dari 65px ke 90px */
+    height: 90px !important; /* Diperbesar dari 65px ke 90px */
+    min-width: 90px;
+    border-radius: 20px;     /* Border radius lebih halus */
     display: flex;
     align-items: center;
     justify-content: center;
     background: var(--bg-soft-success);
     color: var(--success-premium);
+    margin-right: 20px;      /* Jarak ke teks ditambah biar lega */
 }
 
+.icon-box i, .icon-box-modern i {
+    font-size: 3rem !important; /* Icon naik drastis dari 1.6rem ke 3rem */
+}
+/* TABLE STYLING */
 .table-luxury thead th, 
 .table-premium thead th {
     background-color: #f0fdf4;
     color: #166534;
     font-size: 0.75rem;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     padding: 1.25rem;
@@ -97,9 +104,10 @@
 }
 
 .table-hover tbody tr:hover {
-    background-color: rgba(34, 197, 94, 0.05) !important;
+    background-color: rgba(34, 197, 94, 0.06) !important;
 }
 
+/* BADGES */
 .badge-soft-success { 
     background: #dcfce7; 
     color: #15803d; 
@@ -125,28 +133,22 @@
 }
 
 .badge-count-premium {
-    background: var(--bg-soft-success);
-    color: var(--success-premium);
-    padding: 0.6rem 1.2rem;
+    background: #dcfce7;
+    color: #15803d;
+    padding: 6px 14px;
     border-radius: 50px;
     font-weight: 700;
-    display: inline-block;
-    border: 1px solid #dcfce7;
+    border: 1px solid #bbf7d0;
 }
 
+/* BUTTONS */
 .btn { 
     border-radius: 10px !important; 
     font-weight: 600; 
     transition: all 0.2s ease-in-out; 
 }
 
-.btn-primary { 
-    background-color: #15803d !important; 
-    border-color: #15803d !important; 
-    color: #fff !important;
-}
-
-.btn-success { 
+.btn-primary, .btn-success { 
     background-color: #15803d !important; 
     border-color: #15803d !important; 
     color: #fff !important;
@@ -174,16 +176,13 @@
     transform: scale(1.1);
 }
 
-.btn-detail { 
-    background: #dcfce7; 
-    color: #15803d; 
-}
-
+.btn-detail, 
 .btn-print { 
     background: #dcfce7; 
     color: #15803d; 
 }
 
+/* SEARCH */
 .search-wrapper {
     position: relative;
     max-width: 300px;
@@ -204,6 +203,7 @@
     background: #f0fdf4;
 }
 
+/* PRINT STYLING */
 @media print {
     .no-print, 
     .btn, 
@@ -227,37 +227,35 @@
         border: 1px solid #eee !important; 
     }
 }
-.table-premium thead th {
-    background-color: #f0fdf4;
-    color: #166534;
+
+/* TANGGAL & JAM */
+.tanggal {
+    font-size: 13px;
+    color: #374151;
+}
+
+.jam {
+    font-size: 13px;
+    color: #2563eb;
+}
+/* Menyesuaikan ukuran teks agar mengisi box */
+.card h4 {
+    font-size: 2.2rem !important; /* Angka utama jadi sangat besar */
+    font-weight: 800 !important;
+    margin-bottom: 0;
+    line-height: 1.1;
+}
+
+.card small {
+    font-size: 1rem !important;   /* Judul kecil (Total Item...) jadi lebih jelas */
     font-weight: 600;
+    color: #64748b;
+    display: block;
+    margin-bottom: 5px;
 }
 
-.table-premium tbody td {
-    color: #14532d;
-}
-
-.table-hover tbody tr:hover {
-    background-color: rgba(34, 197, 94, 0.06) !important;
-}
-
-.badge-count-premium {
-    background: #dcfce7;
-    color: #15803d;
-    padding: 6px 14px;
-    border-radius: 50px;
+/* Khusus untuk box Update Terakhir agar tidak berantakan */
+.card .tanggal, .card .jam {
+    font-size: 1.1rem !important;
     font-weight: 700;
-    border: 1px solid #bbf7d0;
-}
-
-.icon-box-modern {
-    background: #dcfce7;
-    color: #15803d;
-}
-th, td {
-    text-align: left !important;
-}
-
-.text-center {
-    text-align: left !important;
 }

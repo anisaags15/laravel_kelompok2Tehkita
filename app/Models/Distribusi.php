@@ -9,31 +9,56 @@ class Distribusi extends Model
 {
     use HasFactory;
 
-    // nama tabel
     protected $table = 'distribusis';
 
-    // kolom yang boleh diisi
     protected $fillable = [
         'bahan_id',
         'outlet_id',
         'jumlah',
         'status',
         'tanggal',
+        'tanggal_diterima', // penting supaya bisa diupdate saat diterima
     ];
 
-    /**
-     * RELASI
-     */
+    protected $casts = [
+        'tanggal' => 'datetime',
+        'tanggal_diterima' => 'datetime',
+    ];
 
-    // distribusi milik satu bahan
+    // RELASI
     public function bahan()
     {
         return $this->belongsTo(Bahan::class);
     }
 
-    // distribusi milik satu outlet
     public function outlet()
     {
         return $this->belongsTo(Outlet::class);
+    }
+
+    // ACCESSOR supaya langsung format di view/PDF
+    public function getTanggalFormatAttribute()
+    {
+        return $this->tanggal
+            ? $this->tanggal->format('d M Y H:i') . ' WIB'
+            : '-';
+    }
+
+    public function getTanggalDiterimaFormatAttribute()
+    {
+        return $this->tanggal_diterima
+            ? $this->tanggal_diterima->format('d M Y H:i') . ' WIB'
+            : '-';
+    }
+
+ public function getBahanNamaAttribute()
+{
+    return $this->bahan->nama_bahan ?? 'Tidak ada bahan';
+}
+
+
+    public function getOutletNamaAttribute()
+    {
+        return $this->outlet->nama ?? 'Tidak ada outlet';
     }
 }
