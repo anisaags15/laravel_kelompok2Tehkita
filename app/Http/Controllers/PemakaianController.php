@@ -9,7 +9,7 @@ use App\Models\Message;
 use App\Models\User;
 use App\Models\Waste;
 use App\Notifications\WasteBaruNotification;
-use App\Notifications\StokKritisNotification;
+use App\Notifications\StokKritisNotification; // ✅ Sudah ada, pastikan tidak dihapus
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -26,9 +26,9 @@ class PemakaianController extends Controller
         $user = Auth::user();
         $pemakaians = Pemakaian::with('bahan')
             ->where('outlet_id', $user->outlet_id)
-            ->where('tipe', 'rutin') 
+            ->where('tipe', 'rutin')
             ->latest()
-            ->paginate(10); 
+            ->paginate(10);
 
         return view('user.pemakaian.index', compact('pemakaians'));
     }
@@ -74,7 +74,7 @@ class PemakaianController extends Controller
 
         $wasteBulanIni = Waste::where('outlet_id', $user->outlet_id)
             ->whereMonth('tanggal', now()->month)
-            ->count(); // Menghitung berapa kali laporan bulan ini
+            ->count();
 
         return view('user.pemakaian.create_waste', compact('stokOutlets', 'wasteBulanIni'));
     }
@@ -91,12 +91,14 @@ class PemakaianController extends Controller
         ]);
 
         $user = Auth::user();
-        
+
         try {
             DB::beginTransaction();
-            $stokOutlet = StokOutlet::with('bahan')->where('outlet_id', $user->outlet_id)
+
+            $stokOutlet = StokOutlet::with(['bahan', 'outlet'])
+                ->where('outlet_id', $user->outlet_id)
                 ->where('bahan_id', $request->bahan_id)
-                ->lockForUpdate() 
+                ->lockForUpdate()
                 ->first();
 
             if (!$stokOutlet || $stokOutlet->stok < $request->jumlah) {
@@ -104,19 +106,23 @@ class PemakaianController extends Controller
             }
 
             Pemakaian::create([
-                'bahan_id'   => $request->bahan_id,
-                'outlet_id'  => $user->outlet_id,
-                'jumlah'     => $request->jumlah,
-                'tanggal'    => $request->tanggal,
-                'tipe'       => 'rutin',
+                'bahan_id'  => $request->bahan_id,
+                'outlet_id' => $user->outlet_id,
+                'jumlah'    => $request->jumlah,
+                'tanggal'   => $request->tanggal,
+                'tipe'      => 'rutin',
             ]);
 
             $stokOutlet->decrement('stok', $request->jumlah);
-            
+
+            // Refresh nilai stok setelah decrement
+            $stokOutlet->refresh();
+
             $this->handleBotNotifications($user, $stokOutlet, $request->jumlah, $request->tanggal);
 
             DB::commit();
             return redirect()->route('user.riwayat_pemakaian')->with('success', 'Data pemakaian berhasil dicatat.');
+
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'Gagal: ' . $e->getMessage());
@@ -131,12 +137,12 @@ class PemakaianController extends Controller
         $request->validate([
             'stok_outlet_id' => 'required|exists:stok_outlets,id',
             'jumlah'         => 'required|numeric|min:0.01',
-            'keterangan'     => 'required|string', 
+            'keterangan'     => 'required|string',
             'foto'           => 'required|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         $user = Auth::user();
-        $stokOutlet = StokOutlet::with('bahan')->findOrFail($request->stok_outlet_id);
+        $stokOutlet = StokOutlet::with(['bahan', 'outlet'])->findOrFail($request->stok_outlet_id);
 
         if ($stokOutlet->stok < $request->jumlah) {
             return redirect()->back()->with('error', 'Gagal! Stok di outlet tidak mencukupi.');
@@ -163,37 +169,47 @@ class PemakaianController extends Controller
                 'status'         => 'pending',
             ]);
 
-            // 3. Potong Stok Sementara
+            // 3. Potong Stok
             $stokOutlet->decrement('stok', $request->jumlah);
 
-          // 4. Kirim Notifikasi ke Admin
-$adminPusat = User::where('role', 'admin')->first();
-if ($adminPusat) {
-    // Notifikasi Pesan (Chat System) dengan Format yang Lebih Jelas
-    Message::create([
-        'sender_id'   => $user->id,
-        'receiver_id' => $adminPusat->id,
-        'subject'     => '⚠️ PERLU VERIFIKASI: LAPORAN WASTE',
-        'message'     => "Halo Admin, ada laporan waste baru yang butuh verifikasi segera:\n\n" .
-                         "📍 Outlet: {$user->outlet->nama_outlet}\n" .
-                         "📦 Bahan: {$stokOutlet->bahan->nama_bahan}\n" .
-                         "🔢 Jumlah: {$request->jumlah} {$stokOutlet->bahan->satuan}\n" .
-                         "📝 Alasan: {$request->keterangan}\n\n" .
-                         "Mohon segera dicek dan lakukan verifikasi pada menu Manajemen Waste agar stok pusat tetap sinkron. Terima kasih!",
-        'is_read'     => 0
-    ]);
+            // Refresh nilai stok setelah decrement
+            $stokOutlet->refresh();
 
-    // Notifikasi Lonceng (Laravel Notification)
-    $waste->load(['outlet', 'stokOutlet.bahan']); 
-    $adminPusat->notify(new WasteBaruNotification($waste)); 
-}
+            // 4. Kirim Notifikasi ke Admin
+            $adminPusat = User::where('role', 'admin')->first();
+            if ($adminPusat) {
+                // Notifikasi Chat
+                Message::create([
+                    'sender_id'   => $user->id,
+                    'receiver_id' => $adminPusat->id,
+                    'subject'     => '⚠️ PERLU VERIFIKASI: LAPORAN WASTE',
+                    'message'     => "Halo Admin, ada laporan waste baru yang butuh verifikasi segera:\n\n" .
+                                     "📍 Outlet: {$user->outlet->nama_outlet}\n" .
+                                     "📦 Bahan: {$stokOutlet->bahan->nama_bahan}\n" .
+                                     "🔢 Jumlah: {$request->jumlah} {$stokOutlet->bahan->satuan}\n" .
+                                     "📝 Alasan: {$request->keterangan}\n\n" .
+                                     "Mohon segera dicek dan lakukan verifikasi pada menu Manajemen Waste. Terima kasih!",
+                    'is_read'     => 0
+                ]);
+
+                // Notifikasi Lonceng Waste
+                $waste->load(['outlet', 'stokOutlet.bahan']);
+                $adminPusat->notify(new WasteBaruNotification($waste));
+
+                // ✅ Cek & kirim notifikasi stok kritis setelah waste
+                if ($stokOutlet->stok <= 5) {
+                    $admins = User::where('role', 'admin')->get();
+                    foreach ($admins as $admin) {
+                        $admin->notify(new StokKritisNotification($stokOutlet));
+                    }
+                }
+            }
 
             DB::commit();
             return redirect()->route('user.waste.index')->with('success', 'Laporan waste berhasil dikirim.');
 
         } catch (\Exception $e) {
             DB::rollBack();
-            // Hapus foto jika DB gagal agar tidak menyampah di storage
             if ($fotoPath && Storage::disk('public')->exists($fotoPath)) {
                 Storage::disk('public')->delete($fotoPath);
             }
@@ -211,7 +227,7 @@ if ($adminPusat) {
             ->paginate(15);
 
         $totalPending = Waste::where('status', 'pending')->count();
-        $totalWaste = Waste::whereMonth('tanggal', now()->month)->sum('jumlah');
+        $totalWaste   = Waste::whereMonth('tanggal', now()->month)->sum('jumlah');
 
         return view('admin.waste.index', compact('allWastes', 'totalPending', 'totalWaste'));
     }
@@ -232,28 +248,33 @@ if ($adminPusat) {
     }
 
     /**
-     * BOT NOTIFICATION HANDLER (RUTIN)
+     * BOT NOTIFICATION HANDLER (PEMAKAIAN RUTIN)
+     * Dipanggil setelah stok di-decrement & di-refresh
      */
-    private function handleBotNotifications($user, $stokOutlet, $jumlah, $tanggal) 
+    private function handleBotNotifications($user, $stokOutlet, $jumlah, $tanggal)
     {
         $stokSekarang = $stokOutlet->stok;
-        $adminPusat = User::where('role', 'admin')->first();
-        
-        if(!$adminPusat) return;
+        $adminPusat   = User::where('role', 'admin')->first();
 
-        // Jika stok kritis atau habis
+        if (!$adminPusat) return;
+
+        // Kirim pesan chat sistem jika stok kritis/habis
         if ($stokSekarang <= 5) {
             $status = ($stokSekarang <= 0) ? "🚨 *STOK HABIS*" : "⚠️ *STOK KRITIS*";
-            
+
             Message::create([
-                'sender_id' => $user->id, 
+                'sender_id'   => $user->id,
                 'receiver_id' => $adminPusat->id,
-                'subject' => 'NOTIFIKASI SISTEM',
-                'message' => "[SISTEM NOTIFIKASI]\n\n{$status}\nOutlet: {$user->outlet->nama_outlet}\nBahan: {$stokOutlet->bahan->nama_bahan}\nSisa Stok: {$stokSekarang}",
-                'is_read' => 0
+                'subject'     => 'NOTIFIKASI SISTEM',
+                'message'     => "[SISTEM NOTIFIKASI]\n\n{$status}\nOutlet: {$user->outlet->nama_outlet}\nBahan: {$stokOutlet->bahan->nama_bahan}\nSisa Stok: {$stokSekarang}",
+                'is_read'     => 0
             ]);
 
-            // Bisa juga pemicu StokKritisNotification di sini jika diinginkan
+            // ✅ Kirim notifikasi lonceng stok kritis ke SEMUA admin
+            $admins = User::where('role', 'admin')->get();
+            foreach ($admins as $admin) {
+                $admin->notify(new StokKritisNotification($stokOutlet));
+            }
         }
     }
 }

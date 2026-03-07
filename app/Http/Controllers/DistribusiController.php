@@ -9,6 +9,7 @@ use App\Models\StokOutlet;
 use App\Models\User;
 use App\Notifications\PengirimanDiterimaNotification;
 use App\Notifications\InfoPengirimanNotification;
+use App\Notifications\StokKritisNotification; // ← TAMBAH INI
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -56,11 +57,9 @@ class DistribusiController extends Controller
                     throw new \Exception('Stok gudang tidak mencukupi!');
                 }
 
-                // kurangi stok gudang
                 $bahan->stok_awal -= $request->jumlah;
                 $bahan->save();
 
-                // simpan distribusi
                 $distribusi = Distribusi::create([
                     'bahan_id'  => $request->bahan_id,
                     'outlet_id' => $request->outlet_id,
@@ -70,7 +69,6 @@ class DistribusiController extends Controller
                     'tanggal_diterima' => null,
                 ]);
 
-                // notifikasi ke user outlet
                 $usersOutlet = User::where('outlet_id', $request->outlet_id)->get();
 
                 foreach ($usersOutlet as $user) {
@@ -120,12 +118,10 @@ class DistribusiController extends Controller
 
                 $distribusi = Distribusi::findOrFail($id);
 
-                // kembalikan stok lama
                 $bahanLama = Bahan::find($distribusi->bahan_id);
                 $bahanLama->stok_awal += $distribusi->jumlah;
                 $bahanLama->save();
 
-                // kurangi stok baru
                 $bahanBaru = Bahan::find($request->bahan_id);
 
                 if ($bahanBaru->stok_awal < $request->jumlah) {
@@ -135,7 +131,6 @@ class DistribusiController extends Controller
                 $bahanBaru->stok_awal -= $request->jumlah;
                 $bahanBaru->save();
 
-                // update distribusi
                 $distribusi->update([
                     'bahan_id'  => $request->bahan_id,
                     'outlet_id' => $request->outlet_id,
@@ -230,9 +225,21 @@ class DistribusiController extends Controller
                 $stokOutlet->stok += $distribusi->jumlah;
                 $stokOutlet->save();
 
-                // kirim notifikasi ke admin
-                $admins = User::where('role', 'admin')->get();
+                // ✅ Cek stok kritis SETELAH stok diupdate
+                // Threshold: stok <= 5 dianggap kritis
+                $STOK_KRITIS = 5;
+                if ($stokOutlet->stok <= $STOK_KRITIS) {
+                    // Load relasi yang dibutuhkan Notification agar tidak error
+                    $stokOutlet->load(['bahan', 'outlet']);
 
+                    $admins = User::where('role', 'admin')->get();
+                    foreach ($admins as $admin) {
+                        $admin->notify(new StokKritisNotification($stokOutlet));
+                    }
+                }
+
+                // Kirim notifikasi ke admin bahwa pengiriman diterima
+                $admins = User::where('role', 'admin')->get();
                 foreach ($admins as $admin) {
                     $admin->notify(new PengirimanDiterimaNotification($distribusi));
                 }
@@ -246,7 +253,6 @@ class DistribusiController extends Controller
             return back()->with('error', $e->getMessage());
         }
     }
-
 
 
     // =================== LAPORAN ===================
@@ -266,10 +272,8 @@ class DistribusiController extends Controller
     }
 
 
-
     public function cetakDetail($periode)
     {
-
         $distribusi = Distribusi::with(['bahan', 'outlet'])
             ->where('outlet_id', auth()->user()->outlet_id)
             ->whereRaw("DATE_FORMAT(tanggal, '%Y-%m') = ?", [$periode])
@@ -280,7 +284,6 @@ class DistribusiController extends Controller
                 $item->bahan_nama  = $item->bahan->nama_bahan ?? 'Tidak ada bahan';
                 $item->outlet_nama = $item->outlet->nama_outlet ?? 'Tidak ada outlet';
 
-                // tanggal kirim
                 $item->tanggal_format = $item->tanggal
                     ? \Carbon\Carbon::parse($item->tanggal)->format('d M Y')
                     . '<br><span style="color:#2563eb;font-size:11px;">'
@@ -288,7 +291,6 @@ class DistribusiController extends Controller
                     . ' WIB</span>'
                     : '-';
 
-                // tanggal diterima
                 $item->tanggal_diterima_format = $item->tanggal_diterima
                     ? \Carbon\Carbon::parse($item->tanggal_diterima)->format('d M Y H:i') . ' WIB'
                     : '-';

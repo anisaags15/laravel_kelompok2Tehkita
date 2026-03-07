@@ -41,11 +41,9 @@
     @php $activeType = request('type', 'semua'); @endphp
     <div class="mb-3 d-flex flex-wrap gap-2" style="gap: 8px;">
         @foreach([
-            'semua'      => ['label' => 'Semua',       'icon' => 'fa-th-list',             'color' => 'secondary'],
-            'waste'      => ['label' => 'Waste',        'icon' => 'fa-trash-alt',           'color' => 'warning'],
-            'stok_kritis'=> ['label' => 'Stok Kritis',  'icon' => 'fa-exclamation-triangle','color' => 'danger'],
-            'info'       => ['label' => 'Info',          'icon' => 'fa-info-circle',         'color' => 'info'],
-            'chat'       => ['label' => 'Chat',          'icon' => 'fa-comment-dots',        'color' => 'primary'],
+            'semua' => ['label' => 'Semua', 'icon' => 'fa-th-list',  'color' => 'secondary'],
+            'waste' => ['label' => 'Waste', 'icon' => 'fa-trash-alt','color' => 'warning'],
+            'info'  => ['label' => 'Info',  'icon' => 'fa-info-circle','color' => 'info'],
         ] as $key => $tab)
             <a href="{{ route('admin.notifikasi.index', ['type' => $key]) }}"
                class="btn btn-sm rounded-pill px-3 font-weight-bold mr-1 mb-2

@@ -126,30 +126,36 @@
                     </a>
                 </li>
 
-                <li class="nav-header">LAPORAN</li>
-                <li class="nav-item has-treeview {{ request()->routeIs('admin.laporan.*') ? 'menu-open' : '' }}">
-                    <a href="#" class="nav-link {{ request()->routeIs('admin.laporan.*') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-file-alt"></i>
-                        <p>Laporan <i class="right fas fa-angle-left"></i></p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="{{ route('admin.laporan.index') }}" class="nav-link {{ request()->routeIs('admin.laporan.index') ? 'active' : '' }}">
-                                <i class="far fa-circle nav-icon"></i><p>Semua Laporan</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('admin.laporan.stok-kritis') }}" class="nav-link {{ request()->routeIs('admin.laporan.stok-kritis') ? 'active' : '' }}">
-                                <i class="far fa-circle nav-icon text-danger"></i><p>Stok Kritis</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('admin.laporan.stok-outlet') }}" class="nav-link {{ request()->routeIs('admin.laporan.stok-outlet') ? 'active' : '' }}">
-                                <i class="far fa-circle nav-icon"></i><p>Stok Outlet</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
+               <li class="nav-header">LAPORAN</li>
+<li class="nav-item has-treeview {{ request()->routeIs('admin.laporan.*') ? 'menu-open' : '' }}">
+    <a href="#" class="nav-link {{ request()->routeIs('admin.laporan.*') ? 'active' : '' }}">
+        <i class="nav-icon fas fa-file-alt"></i>
+        <p>Laporan <i class="right fas fa-angle-left"></i></p>
+    </a>
+    <ul class="nav nav-treeview">
+        <li class="nav-item">
+            <a href="{{ route('admin.laporan.index') }}" class="nav-link {{ request()->routeIs('admin.laporan.index') ? 'active' : '' }}">
+                <i class="far fa-circle nav-icon"></i><p>Semua Laporan</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ route('admin.laporan.stok-kritis') }}" class="nav-link {{ request()->routeIs('admin.laporan.stok-kritis') ? 'active' : '' }}">
+                <i class="far fa-circle nav-icon text-danger"></i><p>Stok Kritis</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ route('admin.laporan.stok-outlet') }}" class="nav-link {{ request()->routeIs('admin.laporan.stok-outlet') ? 'active' : '' }}">
+                <i class="far fa-circle nav-icon text-success"></i><p>Stok Outlet</p>
+            </a>
+        </li>
+        {{-- Item baru --}}
+        <li class="nav-item">
+            <a href="{{ route('admin.laporan.distribusi') }}" class="nav-link {{ request()->routeIs('admin.laporan.distribusi') ? 'active' : '' }}">
+                <i class="far fa-circle nav-icon text-info"></i><p>Distribusi</p>
+            </a>
+        </li>
+    </ul>
+</li>
 
                 <li class="nav-header">AKUN</li>
                 <li class="nav-item">
