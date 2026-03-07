@@ -1,7 +1,14 @@
 /* ==========================================================================
-   SECTION 1: WEB DASHBOARD & UI COMPONENTS
+   TEH KITA SYSTEM - CONSOLIDATED PREMIUM REPORT STYLES
+   Author: Gemini AI Custom for Teh Kita
    ========================================================================== */
 
+/* --- SECTION 1: GLOBAL & LAYOUT --- */
+body {
+    background-color: #f4f7f6;
+}
+
+/* --- SECTION 2: WEB DASHBOARD STAT CARDS --- */
 .stat-card {
     border-radius: 15px;
     transition: all 0.3s ease;
@@ -26,164 +33,520 @@
 .bg-primary-soft { background-color: #e0e7ff; color: #4338ca; }
 .bg-success-soft { background-color: #dcfce7; color: #15803d; }
 
+/* --- SECTION 3: EXECUTIVE HEADER (Green Theme) --- */
+.executive-header {
+    background: linear-gradient(135deg, #1a7a4a 0%, #28a745 100%);
+    border-radius: 20px;
+    padding: 35px 30px 70px 30px;
+    margin: 0 10px -40px 10px;
+    color: white;
+    position: relative;
+    box-shadow: 0 10px 25px rgba(26, 122, 74, 0.2);
+}
+.executive-header h2, 
+.executive-header p { 
+    color: white !important; 
+}
+.executive-header .breadcrumb-item a, 
+.executive-header .breadcrumb-item.active {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+.executive-header .text-white-50 { 
+    color: rgba(255, 255, 255, 0.75) !important; 
+}
+
+/* --- SECTION 4: PREMIUM BUTTONS --- */
+/* Tombol Kembali Glassmorphism (Super Bagus) */
+
+    /* Styling Tombol Kembali - Super Bagus & Formal */
+    .btn-return-formal {
+        background: #ffffff;
+        color: #1a7a4a;
+        font-weight: 700;
+        border: 2px solid #1a7a4a;
+        border-radius: 8px;
+        padding: 8px 20px;
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .btn-return-formal:hover {
+        background: #1a7a4a;
+        color: #ffffff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(26, 122, 74, 0.25);
+        text-decoration: none;
+    }
+
+    .btn-return-formal i {
+        margin-right: 8px;
+        font-size: 0.9rem;
+    }
+
+    /* Menjaga konsistensi header */
+    .executive-header {
+        margin-bottom: 30px;
+        padding: 10px 15px;
+    }
+
+
+/* --- SECTION 5: CARDS & TABLES --- */
+.main-report-card {
+    border-radius: 24px;
+    background: #ffffff;
+    border: none;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+    z-index: 5;
+    position: relative;
+}
+
 .table-luxury thead th {
-    background-color: #f8f9fa;
+    background-color: #f8fafc;
     text-transform: uppercase;
     font-size: 0.75rem;
     letter-spacing: 1px;
-    color: #4a5568;
-    border-bottom: 3px solid #edf2f7;
-    padding: 15px 12px;
+    color: #64748b;
+    border-bottom: 2px solid #f1f5f9;
+    padding: 20px 15px;
 }
 .table-luxury td {
-    padding: 15px 12px;
+    padding: 20px 15px;
     vertical-align: middle;
-    color: #2d3748;
+    color: #1e293b;
     border-bottom: 1px solid #f1f5f9;
 }
-
-/* ==========================================================================
-   SECTION 1B: EXECUTIVE HEADER (Dashboard Laporan)
-   ========================================================================== */
-
-.executive-header {
-    background: linear-gradient(135deg, #1a7a4a 0%, #28a745 100%);
-    border-radius: 16px;
-    padding: 24px 28px;
-    margin: 0 12px 20px 12px;
-    color: white;
+.table-luxury tbody tr:hover {
+    background-color: #fcfcfd;
+    transition: 0.2s;
 }
 
-/* Pastiin teks tetap putih di atas gradient */
-.executive-header h2,
-.executive-header p {
-    color: white !important;
+/* --- SECTION 6: SEARCH & COMPONENTS --- */
+.search-wrapper-custom {
+    position: relative;
+    width: 280px;
+}
+.search-wrapper-custom i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    z-index: 10;
+}
+.search-wrapper-custom input {
+    border-radius: 12px;
+    padding-left: 40px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    height: 45px;
+    transition: all 0.3s ease;
+}
+.search-wrapper-custom input:focus {
+    background: white;
+    box-shadow: 0 0 0 4px rgba(26, 122, 74, 0.1);
+    border-color: #1a7a4a;
+    outline: none;
 }
 
-.executive-header .text-white-50 {
-    color: rgba(255, 255, 255, 0.65) !important;
+.badge-qty, .badge-count-premium {
+    background: #ecfdf5;
+    color: #065f46;
+    font-weight: 800;
+    padding: 8px 15px;
+    border-radius: 8px;
+    border: 1px solid #d1fae5;
 }
 
-.executive-header .bg-white-20 {
-    background-color: rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
+.avatar-box {
+    width: 50px; height: 50px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem; color: white;
+    background: rgba(26, 122, 74, 0.2); /* Soft Green */
+}
+.avatar-box i { color: #1a7a4a; }
+
+.badge-soft-success {
+    background-color: #dcfce7; color: #15803d;
+    font-weight: 600; padding: 5px 15px; border-radius: 50px;
+}
+.text-time { font-family: 'Inter', sans-serif; font-weight: 600; color: #64748b; font-size: 0.8rem; }
+.status-received { color: #16a34a; font-weight: 700; font-size: 0.75rem; margin-top: 5px; display: block; }
+
+/* --- SECTION 7: PDF SPECIFIC LOGO (CIRCULAR) --- */
+/* Digunakan saat export PDF atau cetak */
+.logo-circle-container {
+    width: 100px;
+    height: 100px;
+    background-color: white;
+    border: 2px solid #1a7a4a;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.logo-circle-img {
+    width: 80%;
+    height: auto;
+    object-fit: contain;
 }
 
-/* Dark mode: gradient lebih gelap dikit biar tetap enak dilihat */
-.dark-mode .executive-header {
-    background: linear-gradient(135deg, #0f4d2e 0%, #1a7a4a 100%);
-}
-
-/* ==========================================================================
-   SECTION 2: PDF & PRINT REPORT COMMON STYLES
-   ========================================================================== */
-
+/* --- SECTION 8: PRINT OPTIMIZATION --- */
 @media print {
     @page { margin: 1.5cm; }
     .no-print { display: none !important; }
-    .pdf-body {
-        font-family: 'Helvetica', 'Arial', sans-serif;
-        font-size: 11px;
-        color: #333;
-        line-height: 1.6;
+    .executive-header {
+        background: #1a7a4a !important;
+        color: white !important;
+        padding: 20px !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+    }
+    .main-report-card {
+        box-shadow: none !important;
+        border: 1px solid #eee !important;
     }
 }
 
-/* Base Report Settings */
-.report-body {
-    font-family: 'Helvetica', 'Arial', sans-serif;
-    font-size: 11pt;
-    line-height: 1.5;
-    color: #333;
+    /* SLIM HEADER OPTIMIZATION DI LAPORAN STOK OUTLET */
+    /* FORMAL EXECUTIVE STYLING */
+    .executive-header {
+        background: linear-gradient(135deg, #1a7a4a 0%, #145c38 100%);
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    .btn-ekspor-rekap {
+        background: #ffffff !important;
+        color: #1a7a4a !important;
+        font-weight: 700;
+        border-radius: 10px;
+        padding: 10px 20px;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255,255,255,0.2);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        text-transform: uppercase;
+        font-size: 0.8rem;
+    }
+
+    .btn-ekspor-rekap:hover {
+        background: #f8fafc !important;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+    }
+
+    .stats-overlap {
+        margin-top: -40px;
+        position: relative;
+        z-index: 2;
+        padding: 0 15px;
+    }
+
+    .stat-card-custom {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        transition: transform 0.3s ease;
+    }
+
+    .stat-card-custom:hover {
+        transform: translateY(-5px);
+    }
+
+    /* TABLE FORMAL REFINEMENT */
+    .main-report-card {
+        border-radius: 15px;
+        overflow: hidden;
+        margin-top: 20px;
+        background: white;
+    }
+
+    .table thead th {
+        background-color: #f8fafb;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        color: #64748b;
+        border-top: none;
+        border-bottom: 2px solid #edf2f7;
+    }
+
+    .address-text {
+        color: #94a3b8;
+        font-size: 0.75rem;
+        line-height: 1.4;
+        display: block;
+        margin-top: 2px;
+        max-width: 500px;
+    }
+
+    .badge-pill-custom {
+        padding: 6px 16px;
+        font-weight: 600;
+        border-radius: 50px;
+        font-size: 0.75rem;
+    }
+
+    .avatar-icon-box {
+        width: 45px; 
+        height: 45px; 
+        flex-shrink: 0; 
+        border: 1px solid #edf2f7;
+        background: #f8fafb;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+   /* Digunakan detail stok outlet */
+    /* PRESTIGE DESIGN SYSTEM */
+    .detail-container { 
+        background: #f4f7f6; 
+        min-height: 100vh; 
+        padding-bottom: 50px;
+    }
+    
+    /* GLASS-EFFECT TOP NAV */
+    .header-prestige {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 20px 30px;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.02);
+    }
+
+    .btn-kembali-premium {
+        background: #ffffff;
+        color: #1a7a4a;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        border: 2px solid #e9ecef;
+        border-radius: 14px;
+        padding: 12px 25px;
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .btn-kembali-premium:hover {
+        background: #1a7a4a;
+        color: #ffffff !important;
+        border-color: #1a7a4a;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(26, 122, 74, 0.2);
+    }
+
+    /* MASTER INFO CARD */
+    .info-card-prestige {
+        background: #ffffff;
+        border: none;
+        border-radius: 24px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.03);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .info-card-prestige::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; width: 8px; height: 100%;
+        background: linear-gradient(to bottom, #28a745, #1a7a4a);
+    }
+
+    .outlet-icon-diamond {
+        width: 75px;
+        height: 75px;
+        background: linear-gradient(135deg, #1a7a4a 0%, #0d3d25 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        border-radius: 22px;
+        box-shadow: 0 10px 20px rgba(13, 61, 37, 0.15);
+    }
+
+    /* TABLE ELITE STYLE */
+    .card-table-elite {
+        border-radius: 24px;
+        border: none;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.04);
+        background: #ffffff;
+    }
+
+    .table-elite thead th {
+        background: #fafbfc;
+        color: #8e9aac;
+        font-weight: 800;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 1.2px;
+        padding: 25px;
+        border: none;
+    }
+
+    .table-elite tbody td {
+        padding: 22px 25px;
+        border-bottom: 1px solid #f1f4f8;
+        vertical-align: middle;
+    }
+
+    .log-container {
+        background: #f8fafc;
+        padding: 10px 15px;
+        border-radius: 12px;
+        border: 1px solid #edf2f7;
+        display: inline-block;
+        text-align: left;
+    }
+
+    .stock-visual {
+        padding: 10px 20px;
+        border-radius: 15px;
+        font-weight: 800;
+        font-size: 1.1rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .visual-safe { background: #e6f6ec; color: #0e6231; border: 1px solid #c3e6cb; }
+    .visual-warning { background: #fff1f2; color: #be123c; border: 1px solid #fecdd3; }
+
+    .pulse-dot {
+        height: 8px; width: 8px; border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
+        70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(40, 167, 69, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+    }
+
+      /* Digunakan seluruh laporan */
+    /* --- TEH KITA PRESTIGE DESIGN SYSTEM --- */
+:root {
+    --primary-green: #1a7a4a;
+    --dark-green: #0d3d25;
+    --soft-green: #ecfdf5;
+    --glass-white: rgba(255, 255, 255, 0.98);
 }
 
-/* Header & Titles */
-.header-table {
-    width: 100%;
-    border-bottom: 2px solid #000;
-    padding-bottom: 10px;
-    margin-bottom: 20px;
-}
-.title {
-    font-size: 18pt;
-    font-weight: bold;
-    margin: 0;
-    color: #1a1a1a;
-}
-.subtitle {
-    font-size: 10pt;
-    color: #666;
-    margin: 0;
+/* Background utama halaman */
+body {
+    background-color: #f4f7f6;
+    color: #2d3748;
+    font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
 }
 
-/* Detail Info Section */
-.info-table { width: 100%; margin-bottom: 20px; }
-.info-table td { vertical-align: top; padding: 2px 0; }
-.label { width: 120px; font-weight: bold; }
-.separator { width: 10px; }
-
-/* ==========================================================================
-   SECTION 3 & 4: SPECIFIC PDF REPORTS (Stok & Distribusi)
-   ========================================================================== */
-
-.stok-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
+/* --- HEADER EKSEKUTIF --- */
+.executive-header {
+    background: linear-gradient(135deg, var(--dark-green) 0%, var(--primary-green) 100%);
+    border-radius: 0 0 35px 35px;
+    padding: 50px 40px 110px 40px;
+    margin: -25px -25px 0 -25px;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(13, 61, 37, 0.2);
 }
-.stok-table th {
-    background-color: #f2f2f2;
-    border: 1px solid #333;
-    padding: 8px;
-    text-align: center;
-    font-weight: bold;
+
+.header-icon-glass {
+    width: 60px; height: 60px;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(8px);
+    border-radius: 15px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* --- FLOATING KPI CARDS --- */
+.stats-overlap {
+    margin-top: -70px;
+    padding: 0 15px;
+    position: relative;
+    z-index: 5;
+}
+
+.prestige-card {
+    background: white;
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+
+.prestige-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(26, 122, 74, 0.12);
+}
+
+.icon-box-premium {
+    width: 45px; height: 45px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+}
+
+/* --- FILTER TOOLBAR --- */
+.filter-toolbar {
+    background: white;
+    border-radius: 18px;
+    padding: 20px 25px;
+    border: 1px solid #edf2f7;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+}
+
+.custom-select-premium {
+    height: 45px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    background-color: #f8fafc;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+/* --- LUXURY TABLE --- */
+.table-prestige thead th {
+    background: #f8fafc;
+    color: #64748b;
     text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 1.2px;
+    font-weight: 700;
+    padding: 18px 20px;
+    border: none;
 }
-.stok-table td {
-    border: 1px solid #333;
-    padding: 8px;
+
+.table-prestige tbody td {
+    padding: 20px;
     vertical-align: middle;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 0.95rem;
 }
 
-/* Zebra Striping & Utilities */
-.table-zebra tr:nth-child(even) { background-color: #fafafa; }
-.text-center { text-align: center; }
-.text-right  { text-align: right; }
-.text-danger { color: #d9534f; font-weight: bold; }
-
-/* Badges */
-.badge-id              { font-family: monospace; font-weight: bold; }
-.badge-id-stok         { color: #28a745; }
-.badge-id-distribusi   { color: #007bff; }
-
-/* Outlet Section */
-.outlet-section  { margin-bottom: 30px; page-break-inside: avoid; }
-.outlet-name {
-    background: #f4f4f4;
-    padding: 10px 15px;
-    font-size: 14px;
-    font-weight: bold;
-    border-left: 4px solid #28a745;
-    margin-bottom: 5px;
+/* --- PROGRESS & BADGES --- */
+.progress-prestige {
+    height: 7px;
+    background-color: #f1f5f9;
+    border-radius: 10px;
 }
 
-/* Signature & Footer */
-.signature-wrapper { margin-top: 50px; width: 100%; }
-.signature-box     { float: left; width: 200px; text-align: center; }
-.footer-note {
-    clear: both;
-    margin-top: 50px;
-    font-size: 9pt;
-    font-style: italic;
-    color: #777;
-    border-top: 1px solid #eee;
-    padding-top: 10px;
+.badge-prestige {
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.75rem;
 }
-.footer-fixed {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    text-align: right;
-    font-size: 9px;
-    color: #777;
-}
+
+.bg-soft-green { background-color: #ecfdf5; color: #065f46; }
