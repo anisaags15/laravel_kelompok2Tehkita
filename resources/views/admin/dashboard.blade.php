@@ -365,14 +365,16 @@
 {{-- CHAT TERBARU --}}
 <div class="col-lg-5 mb-4">
     <div class="card shadow-sm border-0 h-100">
-        <div class="card-header py-3 border-0 d-flex justify-content-between align-items-center bg-transparent">
-            <h5 class="fw-bold mb-0 title-text-adaptive">
-                <i class="fas fa-comments text-primary me-2"></i> Chat Terbaru
-            </h5>
-            @if($unreadCount > 0)
-                <span class="badge bg-danger rounded-pill">{{ $unreadCount }} Baru</span>
-            @endif
-        </div>
+      <div class="card-header py-3 border-0 d-flex justify-content-between align-items-center bg-transparent">
+    <h5 class="fw-bold mb-0 title-text-adaptive">
+        <i class="fas fa-comments text-primary me-2"></i> Chat Terbaru
+    </h5>
+    @if($unreadCount > 0)
+        <span class="badge bg-danger rounded-pill" style="margin-left: auto;">
+            {{ $unreadCount }} Baru
+        </span>
+    @endif
+</div>
 
         <div class="card-body p-0" style="max-height: 380px; overflow-y: auto;">
             <div class="list-group list-group-flush list-group-dark-custom">
@@ -427,43 +429,53 @@
 @push('js')
 <script>
 document.addEventListener("DOMContentLoaded", function () {
+
+    // =========================================================
+    // 1. GRAFIK PEMAKAIAN
+    // =========================================================
     const ctx = document.getElementById('pemakaianChart');
     if (ctx) {
-        // Deteksi mode gelap
-        const isDark = document.body.classList.contains('dark-mode');
-        
-        // --- SETTING WARNA SUPER KONTRAS ---
-        // Kalau mode terang, kita pakai abu-abu yang lebih berani (#DDD) biar garisnya muncul!
-        const textColor = isDark ? '#E0E0E0' : '#333333'; 
-        const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : '#E5E5E5'; // Abu-abu solid di mode terang
-        const tooltipBg = isDark ? '#2D3436' : '#FFFFFF';
-
         const chartData = @json($pemakaianChart ?? []);
 
-        new Chart(ctx, {
+        function getChartColors() {
+            const isDark = document.body.classList.contains('dark-mode');
+            return {
+                textColor : isDark ? '#E0E0E0' : '#333333',
+                gridColor : isDark ? 'rgba(255,255,255,0.1)' : '#E5E5E5',
+                pointBorder: isDark ? '#1E1E2D' : '#FFFFFF',
+            };
+        }
+
+        function buildDatasets(pointBorderColor) {
+            return (chartData.datasets || []).map(ds => ({
+                ...ds,
+                fill: true,
+                tension: 0.4,
+                backgroundColor: ds.borderColor + '22',
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                pointBackgroundColor: ds.borderColor,
+                pointBorderColor: pointBorderColor,
+                pointBorderWidth: 2,
+            }));
+        }
+
+        let colors = getChartColors();
+
+        const pemakaianChart = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: chartData.labels,
-                datasets: (chartData.datasets || []).map((ds) => ({
-                    ...ds,
-                    fill: true,
-                    tension: 0.4,
-                    backgroundColor: ds.borderColor + '22', // Area bawah garis sedikit berwarna
-                    pointRadius: 5,
-                    pointHoverRadius: 7,
-                    pointBackgroundColor: ds.borderColor,
-                    pointBorderColor: isDark ? '#1E1E2D' : '#FFF',
-                    pointBorderWidth: 2,
-                }))
+                datasets: buildDatasets(colors.pointBorder),
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { 
-                    legend: { 
+                plugins: {
+                    legend: {
                         position: 'bottom',
-                        labels: { 
-                            color: textColor,
+                        labels: {
+                            color: colors.textColor,
                             usePointStyle: true,
                             padding: 25,
                             font: { family: 'Poppins', size: 12, weight: '600' }
@@ -473,31 +485,19 @@ document.addEventListener("DOMContentLoaded", function () {
                 scales: {
                     y: {
                         beginAtZero: true,
-                        grid: {
-                            color: gridColor, // Ini kuncinya! Garis horizontal sekarang solid
-                            drawTicks: false,
-                        },
-                        border: {
-                            display: true,
-                            color: gridColor, // Garis pinggir kiri (Y axis)
-                        },
-                        ticks: { 
-                            color: textColor,
+                        grid: { color: colors.gridColor, drawTicks: false },
+                        border: { display: true, color: colors.gridColor },
+                        ticks: {
+                            color: colors.textColor,
                             font: { family: 'Poppins', weight: 'bold', size: 11 },
                             padding: 10
                         }
                     },
                     x: {
-                        grid: {
-                            display: true, // Kita nyalakan grid X biar kotak-kotaknya lengkap!
-                            color: gridColor,
-                        },
-                        border: {
-                            display: true,
-                            color: gridColor, // Garis pinggir bawah (X axis)
-                        },
-                        ticks: { 
-                            color: textColor,
+                        grid: { display: true, color: colors.gridColor },
+                        border: { display: true, color: colors.gridColor },
+                        ticks: {
+                            color: colors.textColor,
                             font: { family: 'Poppins', weight: 'bold', size: 11 },
                             padding: 10
                         }
@@ -505,21 +505,81 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             }
         });
+
+        // Update warna chart tiap kali dark mode di-toggle
+        function updateChartColors() {
+            const c = getChartColors();
+            pemakaianChart.options.plugins.legend.labels.color = c.textColor;
+            pemakaianChart.options.scales.y.grid.color         = c.gridColor;
+            pemakaianChart.options.scales.y.border.color       = c.gridColor;
+            pemakaianChart.options.scales.y.ticks.color        = c.textColor;
+            pemakaianChart.options.scales.x.grid.color         = c.gridColor;
+            pemakaianChart.options.scales.x.border.color       = c.gridColor;
+            pemakaianChart.options.scales.x.ticks.color        = c.textColor;
+            pemakaianChart.data.datasets.forEach(ds => {
+                ds.pointBorderColor = c.pointBorder;
+            });
+            pemakaianChart.update();
+        }
+
+        // Observer: pantau perubahan class 'dark-mode' di body
+        const chartObserver = new MutationObserver(mutations => {
+            mutations.forEach(m => {
+                if (m.attributeName === 'class') updateChartColors();
+            });
+        });
+        chartObserver.observe(document.body, { attributes: true });
     }
 
-    // --- KALENDER ---
+    // =========================================================
+    // 2. KALENDER DISTRIBUSI
+    // =========================================================
     const calendarEl = document.getElementById('calendar');
     if (calendarEl) {
-        const isDarkMode = document.body.classList.contains('dark-mode');
         const calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
+            locale: 'id',
             height: 'auto',
-            dayHeaderTextColor: isDarkMode ? '#FFFFFF' : '#333333',
-            eventTextColor: '#ffffff',
+            headerToolbar: {
+                left  : 'prev,next today',
+                center: 'title',
+                right : 'dayGridMonth,listMonth'
+            },
+            buttonText: {
+                today     : 'Hari Ini',
+                month     : 'Bulan',
+                listMonth : 'List',
+            },
+            eventTextColor   : '#ffffff',
+            eventBorderColor : 'transparent',
             events: @json($calendarEvents ?? []),
+            eventDidMount: function(info) {
+                // Tooltip nama event saat hover
+                info.el.setAttribute('title', info.event.title);
+            }
         });
+
         calendar.render();
+
+        // Update warna header kalender saat dark mode toggle
+        function updateCalendarColors() {
+            const isDark = document.body.classList.contains('dark-mode');
+            const color  = isDark ? '#E0E0E0' : '#333333';
+            calendarEl.querySelectorAll('.fc-toolbar-title, .fc-col-header-cell-cushion, .fc-daygrid-day-number')
+                .forEach(el => el.style.color = color);
+        }
+
+        const calObserver = new MutationObserver(mutations => {
+            mutations.forEach(m => {
+                if (m.attributeName === 'class') updateCalendarColors();
+            });
+        });
+        calObserver.observe(document.body, { attributes: true });
+
+        // Jalankan sekali saat load
+        updateCalendarColors();
     }
-});
+
+}); // ← SATU DOMContentLoaded, semua di dalam sini
 </script>
 @endpush
