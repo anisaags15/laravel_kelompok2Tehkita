@@ -135,8 +135,7 @@
                         <p>
                             Chat Center
                             @php
-                                // Menghitung pesan yang belum dibaca (asumsi kolom 'is_read' di model Chat)
-                                $sidebarUnreadChat = \App\Models\Chat::where('receiver_id', auth()->id())->where('is_read', false)->count();
+                                $sidebarUnreadChat = \App\Models\Message::where('receiver_id', auth()->id())->where('is_read', false)->count();
                             @endphp
                             @if($sidebarUnreadChat > 0)
                                 <span class="right badge badge-primary anim-pulse">{{ $sidebarUnreadChat }}</span>
