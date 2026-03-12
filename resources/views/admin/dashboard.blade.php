@@ -11,7 +11,6 @@
     <div class="col-12">
         <div class="smart-prediction-alert shadow-lg border-0">
             <div class="row align-items-center">
-                {{-- Bagian Kiri: Branding AI --}}
                 <div class="col-lg-3 d-flex align-items-center">
                     <div class="ai-icon-wrapper me-3">
                         <i class="fas fa-robot text-white fa-lg"></i>
@@ -21,10 +20,7 @@
                         <span class="small opacity-75">Habis dalam waktu dekat:</span>
                     </div>
                 </div>
-
-                {{-- Bagian Kanan: Gabungan Item & Tombol --}}
                 <div class="col-lg-9 d-flex align-items-center justify-content-lg-end justify-content-start flex-wrap mt-3 mt-lg-0">
-                    {{-- List Bahan --}}
                     <div class="d-flex flex-wrap justify-content-lg-end">
                         @foreach($rekomendasiRestock as $rs)
                             <div class="prediction-pill">
@@ -35,8 +31,6 @@
                             </div>
                         @endforeach
                     </div>
-
-                    {{-- Tombol Restock --}}
                     <a href="{{ route('admin.stok-masuk.create') }}" class="btn btn-primary btn-sm rounded-pill px-4 fw-bold shadow-sm ms-lg-3 mt-2 mt-lg-0">
                         <i class="fas fa-shopping-cart me-2"></i>Restock
                     </a>
@@ -48,8 +42,8 @@
 @endif
 
 {{-- 1. STATISTIC CARDS --}}
-<div class="row">
-    <div class="col-lg-3 col-md-6 mb-4">
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
         <a href="{{ route('admin.outlet.index') }}" class="text-decoration-none">
             <div class="card dashboard-card shadow-sm border-0 h-100">
                 <div class="card-body d-flex justify-content-between align-items-center">
@@ -64,8 +58,7 @@
             </div>
         </a>
     </div>
-
-    <div class="col-lg-3 col-md-6 mb-4">
+    <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
         <a href="{{ route('admin.bahan.index') }}" class="text-decoration-none">
             <div class="card dashboard-card shadow-sm border-0 h-100">
                 <div class="card-body d-flex justify-content-between align-items-center">
@@ -80,8 +73,7 @@
             </div>
         </a>
     </div>
-
-    <div class="col-lg-3 col-md-6 mb-4">
+    <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
         <a href="{{ route('admin.stok-masuk.index') }}" class="text-decoration-none">
             <div class="card dashboard-card shadow-sm border-0 h-100">
                 <div class="card-body d-flex justify-content-between align-items-center">
@@ -96,8 +88,7 @@
             </div>
         </a>
     </div>
-
-    <div class="col-lg-3 col-md-6 mb-4">
+    <div class="col-lg-3 col-md-6 mb-0">
         <a href="{{ route('admin.distribusi.index') }}" class="text-decoration-none">
             <div class="card dashboard-card shadow-sm border-0 h-100">
                 <div class="card-body d-flex justify-content-between align-items-center">
@@ -114,10 +105,9 @@
     </div>
 </div>
 
-{{-- 2. MONITORING & ANALITIK --}}
+{{-- 2. MONITORING & PERFORMA TERBAIK --}}
 <div class="row mb-4">
-    {{-- MONITORING REAL-TIME (Kiri) --}}
-    <div class="col-lg-8">
+    <div class="col-lg-8 mb-4 mb-lg-0">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
                 <h5 class="fw-bold mb-0 text-dark"><i class="fas fa-desktop text-primary me-2"></i> Monitoring Pemakaian Hari Ini</h5>
@@ -139,7 +129,6 @@
                             <td class="fw-bold text-dark">{{ $m->nama }}</td>
                             <td>
                                 @php
-                                    // Bikin warna progress bar makin cerdas
                                     $barColor = 'success';
                                     if($m->persentase > 80) $barColor = 'danger';
                                     elseif($m->persentase > 50) $barColor = 'warning';
@@ -166,7 +155,6 @@
         </div>
     </div>
 
-    {{-- OUTLET PERFORMA TERBAIK (Kanan) --}}
     <div class="col-lg-4">
         <div class="card border-0 shadow-sm h-100" style="border-radius: 20px;">
             <div class="card-header bg-white border-0 py-3">
@@ -176,7 +164,6 @@
                 <ul class="list-group list-group-flush">
                     @forelse ($outletTeraktif ?? [] as $index => $item)
                     @php 
-                        // Hitung progress dominasi
                         $maxTotal = count($outletTeraktif) > 0 ? $outletTeraktif->max('total') : 100;
                         $persen = ($item->total / ($maxTotal ?: 1)) * 100;
                     @endphp
@@ -203,9 +190,10 @@
         </div>
     </div>
 </div>
-{{-- 4. GRAFIK & KALENDER --}}
-<div class="row">
-    <div class="col-lg-8 mb-4">
+
+{{-- 3. GRAFIK & KALENDER --}}
+<div class="row mb-4">
+    <div class="col-lg-8 mb-4 mb-lg-0">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-header border-0 py-3">
                 <h5 class="fw-semibold mb-0 title-text-adaptive">Grafik Pemakaian 5 Outlet Dalam 7 Hari</h5>
@@ -218,13 +206,13 @@
         </div>
     </div>
 
-    <div class="col-lg-4 mb-4">
+    <div class="col-lg-4">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-header border-0 py-3">
                 <h5 class="fw-semibold mb-0 title-text-adaptive">Kalender Distribusi</h5>
             </div>
             <div class="card-body">
-                <div id="calendar-container" style="height: 350px;">
+                <div id="calendar-container" style="height: 350px; overflow-y: auto; overflow-x: hidden;">
                     <div id="calendar"></div>
                 </div>
             </div>
@@ -232,9 +220,9 @@
     </div>
 </div>
 
-{{-- 5. TABLE SECTION --}}
-<div class="row">
-    <div class="col-lg-6 mb-4">
+{{-- 4. TABLE SECTION (Outlet Terbaru & Stok Terbaru) --}}
+<div class="row mb-4">
+    <div class="col-lg-6 mb-4 mb-lg-0">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-header border-0 py-3">
                 <h5 class="fw-semibold mb-0 title-text-adaptive">Data Outlet Terbaru</h5>
@@ -259,44 +247,42 @@
             </div>
         </div>
     </div>
-<div class="col-lg-6 mb-4">
-    <div class="card shadow-sm border-0 h-100">
-        <div class="card-header border-0 py-3">
-            <h5 class="fw-semibold mb-0 title-text-adaptive">Stok Masuk Terbaru</h5>
-        </div>
-        <div class="card-body table-responsive">
-            <table class="table table-hover align-middle">
-                <thead>
-                    <tr>
-                        <th>Bahan</th>
-                        <th>Jumlah</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($latestStokMasuk as $s)
-                    <tr>
-                        <td class="fw-semibold">{{ $s->bahan->nama_bahan ?? '-' }}</td>
-                        <td><span class="badge bg-success">{{ $s->jumlah }}</span></td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
+
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header border-0 py-3">
+                <h5 class="fw-semibold mb-0 title-text-adaptive">Stok Masuk Terbaru</h5>
+            </div>
+            <div class="card-body table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Bahan</th>
+                            <th>Jumlah</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($latestStokMasuk as $s)
+                        <tr>
+                            <td class="fw-semibold">{{ $s->bahan->nama_bahan ?? '-' }}</td>
+                            <td><span class="badge bg-success">{{ $s->jumlah }}</span></td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
-</div>
-{{-- 3. RADAR STOK KRITIS + CHAT SEJAJAR --}}
-<div class="row mb-4">
 
-    {{-- RADAR STOK KRITIS --}}
-    <div class="col-lg-7 mb-4">
+{{-- 5. RADAR STOK KRITIS & CHAT SEJAJAR --}}
+<div class="row">
+    <div class="col-lg-7 mb-4 mb-lg-0">
         <div class="card border-0 shadow-sm h-100 rounded-4">
-
             <div class="card-header bg-white border-0 py-4 px-4">
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center">
-                        <div class="rounded-circle bg-danger bg-opacity-10 text-danger d-flex align-items-center justify-content-center me-3"
-                             style="width:48px;height:48px;">
+                        <div class="rounded-circle bg-danger bg-opacity-10 text-danger d-flex align-items-center justify-content-center me-3" style="width:48px;height:48px;">
                             <i class="fas fa-exclamation-triangle"></i>
                         </div>
                         <div>
@@ -304,15 +290,11 @@
                             <small class="text-muted">Monitoring stok ≤ 5 unit</small>
                         </div>
                     </div>
-
-                <a href="{{ route('admin.stok-kritis.index') }}"
-   class="btn btn-sm btn-outline-success rounded-pill px-3 shadow-sm"
-   style="font-size: 11px; font-weight: 600; margin-left: auto;">
-    Detail <i class="fas fa-chevron-right ms-1"></i>
-</a>
+                    <a href="{{ route('admin.stok-kritis.index') }}" class="btn btn-sm btn-outline-success rounded-pill px-3 shadow-sm" style="font-size: 11px; font-weight: 600;">
+                        Detail <i class="fas fa-chevron-right ms-1"></i>
+                    </a>
                 </div>
             </div>
-
             <div class="card-body px-4 pb-4 pt-2">
                 <div class="table-responsive">
                     <table class="table align-middle mb-0">
@@ -327,103 +309,67 @@
                         <tbody>
                             @forelse($stokKritis as $sk)
                             <tr class="border-bottom">
-                                <td class="fw-semibold text-dark py-3">
-                                    {{ $sk->outlet->nama_outlet ?? 'N/A' }}
-                                </td>
-                                <td class="text-muted py-3">
-                                    {{ $sk->bahan->nama_bahan ?? 'N/A' }}
+                                <td class="fw-semibold text-dark py-3">{{ $sk->outlet->nama_outlet ?? 'N/A' }}</td>
+                                <td class="text-muted py-3">{{ $sk->bahan->nama_bahan ?? 'N/A' }}</td>
+                                <td class="text-center py-3">
+                                    <span class="badge rounded-pill px-3 py-2" style="background:#f8d7da; color:#dc3545;">{{ $sk->stok }}</span>
                                 </td>
                                 <td class="text-center py-3">
-                                    <span class="badge rounded-pill px-3 py-2"
-                                          style="background:#f8d7da; color:#dc3545;">
-                                        {{ $sk->stok }}
-                                    </span>
-                                </td>
-                                <td class="text-center py-3">
-                                    <span class="badge rounded-pill px-3 py-2"
-                                          style="background:#ffe5e5; color:#dc3545;">
-                                        Kritis
-                                    </span>
+                                    <span class="badge rounded-pill px-3 py-2" style="background:#ffe5e5; color:#dc3545;">Kritis</span>
                                 </td>
                             </tr>
                             @empty
-                            <tr>
-                                <td colspan="4" class="text-center py-5 text-muted">
-                                    <i class="fas fa-check-circle me-2 text-success"></i>
-                                    Semua stok outlet dalam kondisi aman
-                                </td>
-                            </tr>
+                            <tr><td colspan="4" class="text-center py-5 text-muted"><i class="fas fa-check-circle me-2 text-success"></i> Aman</td></tr>
                             @endforelse
                         </tbody>
                     </table>
                 </div>
             </div>
-
         </div>
     </div>
 
-{{-- CHAT TERBARU --}}
-<div class="col-lg-5 mb-4">
-    <div class="card shadow-sm border-0 h-100">
-      <div class="card-header py-3 border-0 d-flex justify-content-between align-items-center bg-transparent">
-    <h5 class="fw-bold mb-0 title-text-adaptive">
-        <i class="fas fa-comments text-primary me-2"></i> Chat Terbaru
-    </h5>
-    @if($unreadCount > 0)
-        <span class="badge bg-danger rounded-pill" style="margin-left: auto;">
-            {{ $unreadCount }} Baru
-        </span>
-    @endif
-</div>
-
-        <div class="card-body p-0" style="max-height: 380px; overflow-y: auto;">
-            <div class="list-group list-group-flush list-group-dark-custom">
-                @forelse($latestChats as $chat)
-                    @php
-                        $isMe = $chat->sender_id === auth()->id();
-                        $opponent = $isMe ? $chat->receiver : $chat->sender;
-                        $displayName = $opponent->outlet ? $opponent->outlet->nama_outlet : $opponent->name;
-                    @endphp
-
-                    <a href="{{ route('chat.show', $opponent->id) }}"
-                       class="list-group-item list-group-item-action border-0 px-3 py-3 bg-transparent border-bottom-custom">
-                        <div class="d-flex w-100 justify-content-between align-items-center">
-                            <div class="d-flex align-items-center">
-                                <div class="bg-soft-primary text-primary rounded-circle d-flex justify-content-center align-items-center fw-bold me-3"
-                                     style="width: 40px; height: 40px; font-size: 0.8rem;">
-                                    {{ strtoupper(substr($displayName, 0, 1)) }}
+    <div class="col-lg-5">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header py-3 border-0 d-flex justify-content-between align-items-center bg-transparent">
+                <h5 class="fw-bold mb-0 title-text-adaptive"><i class="fas fa-comments text-primary me-2"></i> Chat Terbaru</h5>
+                @if($unreadCount > 0)
+                    <span class="badge bg-danger rounded-pill">{{ $unreadCount }} Baru</span>
+                @endif
+            </div>
+            <div class="card-body p-0" style="max-height: 380px; overflow-y: auto;">
+                <div class="list-group list-group-flush">
+                    @forelse($latestChats as $chat)
+                        @php
+                            $isMe = $chat->sender_id === auth()->id();
+                            $opponent = $isMe ? $chat->receiver : $chat->sender;
+                            $displayName = $opponent->outlet ? $opponent->outlet->nama_outlet : $opponent->name;
+                        @endphp
+                        <a href="{{ route('chat.show', $opponent->id) }}" class="list-group-item list-group-item-action border-0 px-3 py-3 bg-transparent border-bottom">
+                            <div class="d-flex w-100 justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-soft-primary text-primary rounded-circle d-flex justify-content-center align-items-center fw-bold me-3" style="width: 40px; height: 40px; font-size: 0.8rem;">
+                                        {{ strtoupper(substr($displayName, 0, 1)) }}
+                                    </div>
+                                    <div style="max-width: 180px;">
+                                        <h6 class="mb-0 fw-bold title-text-adaptive" style="font-size: 0.9rem;">{{ $displayName }}</h6>
+                                        <p class="mb-0 text-muted text-truncate small">{{ $isMe ? 'Anda: ' : '' }}{{ $chat->message }}</p>
+                                    </div>
                                 </div>
-                                <div style="max-width: 180px;">
-                                    <h6 class="mb-0 fw-bold title-text-adaptive" style="font-size: 0.9rem;">
-                                        {{ $displayName }}
-                                    </h6>
-                                    <p class="mb-0 text-muted text-truncate small">
-                                        {{ $isMe ? 'Anda: ' : '' }}{{ $chat->message }}
-                                    </p>
-                                </div>
+                                <small class="text-muted" style="font-size: 0.7rem;">{{ $chat->created_at->diffForHumans(null, true) }}</small>
                             </div>
-                            <small class="text-muted" style="font-size: 0.7rem;">
-                                {{ $chat->created_at->diffForHumans(null, true) }}
-                            </small>
-                        </div>
-                    </a>
-                @empty
-                    <div class="text-center py-5">
-                        <i class="fas fa-comment-slash fa-2x text-muted mb-2"></i>
-                        <p class="text-muted small">Tidak ada pesan</p>
-                    </div>
-                @endforelse
+                        </a>
+                    @empty
+                        <div class="text-center py-5 text-muted small"><i class="fas fa-comment-slash fa-2x mb-2"></i><br>Tidak ada pesan</div>
+                    @endforelse
+                </div>
+            </div>
+            <div class="card-footer border-0 text-center py-3 bg-transparent">
+                <a href="{{ route('chat.index') }}" class="text-primary fw-bold text-decoration-none small">Lihat Semua <i class="fas fa-arrow-right ms-1"></i></a>
             </div>
         </div>
-
-        <div class="card-footer border-0 text-center py-3 bg-transparent border-top-custom">
-            <a href="{{ route('chat.index') }}"
-               class="text-primary fw-bold text-decoration-none small">
-                Lihat Semua Pesan <i class="fas fa-arrow-right ms-1"></i>
-            </a>
-        </div>
     </div>
 </div>
+
 @endsection
 
 @push('js')
@@ -431,7 +377,7 @@
 document.addEventListener("DOMContentLoaded", function () {
 
     // =========================================================
-    // 1. GRAFIK PEMAKAIAN
+    // 1. GRAFIK PEMAKAIAN 
     // =========================================================
     const ctx = document.getElementById('pemakaianChart');
     if (ctx) {
@@ -506,7 +452,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
-        // Update warna chart tiap kali dark mode di-toggle
         function updateChartColors() {
             const c = getChartColors();
             pemakaianChart.options.plugins.legend.labels.color = c.textColor;
@@ -522,7 +467,6 @@ document.addEventListener("DOMContentLoaded", function () {
             pemakaianChart.update();
         }
 
-        // Observer: pantau perubahan class 'dark-mode' di body
         const chartObserver = new MutationObserver(mutations => {
             mutations.forEach(m => {
                 if (m.attributeName === 'class') updateChartColors();
@@ -532,14 +476,17 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // =========================================================
-    // 2. KALENDER DISTRIBUSI
+    // 2. KALENDER DISTRIBUSI (HANYA DITAMBAH CONTENTHEIGHT)
     // =========================================================
     const calendarEl = document.getElementById('calendar');
     if (calendarEl) {
         const calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             locale: 'id',
-            height: 'auto',
+            // Ini tetap auto seperti maumu
+            height: 'auto', 
+            // Tambahkan ini agar dia merender isi sesuai kebutuhan
+            contentHeight: 'auto', 
             headerToolbar: {
                 left  : 'prev,next today',
                 center: 'title',
@@ -554,14 +501,12 @@ document.addEventListener("DOMContentLoaded", function () {
             eventBorderColor : 'transparent',
             events: @json($calendarEvents ?? []),
             eventDidMount: function(info) {
-                // Tooltip nama event saat hover
                 info.el.setAttribute('title', info.event.title);
             }
         });
 
         calendar.render();
 
-        // Update warna header kalender saat dark mode toggle
         function updateCalendarColors() {
             const isDark = document.body.classList.contains('dark-mode');
             const color  = isDark ? '#E0E0E0' : '#333333';
@@ -576,10 +521,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
         calObserver.observe(document.body, { attributes: true });
 
-        // Jalankan sekali saat load
         updateCalendarColors();
     }
 
-}); // ← SATU DOMContentLoaded, semua di dalam sini
+}); 
 </script>
 @endpush

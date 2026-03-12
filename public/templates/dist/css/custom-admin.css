@@ -712,3 +712,32 @@ body:not(.dark-mode) .prediction-pill {
     /* Atur line-height agar teks deskripsi di bawahnya pas jaraknya */
     line-height: 1.2 !important; 
 }
+    /* Custom Scrollbar Premium */
+    #calendar-container::-webkit-scrollbar {
+        width: 5px;
+    }
+    #calendar-container::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    #calendar-container::-webkit-scrollbar-thumb {
+        background: rgba(16, 185, 129, 0.2);
+        border-radius: 10px;
+    }
+    #calendar-container::-webkit-scrollbar-thumb:hover {
+        background: #10b981;
+    }
+
+    /* Styling FullCalendar agar serasi */
+    .fc .fc-toolbar-title { font-size: 1.1rem !important; font-weight: 700 !important; }
+    .fc .fc-button-primary { 
+        background-color: #10b981 !important; 
+        border-color: transparent !important; 
+        text-transform: capitalize !important;
+        border-radius: 8px !important;
+    }
+    .fc .fc-button-primary:hover { background-color: #059669 !important; }
+    .fc .fc-col-header-cell-cushion { font-size: 0.85rem; font-weight: 600; text-decoration: none !important; }
+    .fc .fc-daygrid-day-number { font-size: 0.85rem; text-decoration: none !important; padding: 8px !important; }
+    
+    /* Warna event teh kita */
+    .fc-event { border-radius: 4px !important; padding: 2px 5px !important; font-size: 0.75rem !important; border: none !important; }

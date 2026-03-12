@@ -19,17 +19,23 @@
         </li>
     </ul>
 
-    {{-- SEARCH --}}
-    <form class="form-inline mx-auto d-none d-md-flex" style="width:30%;">
-        <div class="input-group input-group-sm w-100">
-            <input class="form-control border-0 bg-light" type="search" placeholder="Cari data..." aria-label="Search">
-            <div class="input-group-append">
-                <button class="btn btn-success border-0" type="submit">
-                    <i class="fas fa-search"></i>
-                </button>
-            </div>
+{{-- SEARCH --}}
+<form action="{{ route('admin.dashboard') }}" method="GET" class="form-inline mx-auto d-none d-md-flex" style="width:30%;">
+    <div class="input-group input-group-sm w-100">
+        {{-- TAMBAHKAN name="search" DAN value biar teksnya gak ilang pas di-enter --}}
+        <input class="form-control border-0 bg-light" 
+               name="search" 
+               type="search" 
+               placeholder="Cari data..." 
+               value="{{ request('search') }}"
+               aria-label="Search">
+        <div class="input-group-append">
+            <button class="btn btn-success border-0" type="submit">
+                <i class="fas fa-search"></i>
+            </button>
         </div>
-    </form>
+    </div>
+</form>
 
     {{-- RIGHT SIDE --}}
     <ul class="navbar-nav ml-auto align-items-center">

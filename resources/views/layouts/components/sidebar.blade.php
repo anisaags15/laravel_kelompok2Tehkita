@@ -42,10 +42,10 @@
                         <p>
                             Log Notifikasi
                             @php
-                                $unreadCount = auth()->user()->unreadNotifications->count();
+                                $unreadNotifCount = auth()->user()->unreadNotifications->count();
                             @endphp
-                            @if($unreadCount > 0)
-                                <span class="right badge badge-warning">{{ $unreadCount }}</span>
+                            @if($unreadNotifCount > 0)
+                                <span class="right badge badge-warning">{{ $unreadNotifCount }}</span>
                             @endif
                         </p>
                     </a>
@@ -61,21 +61,21 @@
                     </a>
                 </li>
 
-              <li class="nav-item">
-    <a href="{{ route('admin.bahan.index') }}" class="nav-link {{ request()->routeIs('admin.bahan.*') ? 'active' : '' }}">
-        <i class="nav-icon fas fa-box"></i>
-        <p>
-            Data Bahan Baku
-            @php
-                $sidePusat = \App\Models\Bahan::where('stok_awal', '<=', 50)->count();
-            @endphp
-            @if($sidePusat > 0)
-                {{-- Titik merah kecil di pojok kanan menu --}}
-                <span class="right badge badge-danger border-circle" style="width: 10px; height: 10px; padding: 0; border-radius: 50%; margin-top: 5px;">&nbsp;</span>
-            @endif
-        </p>
-    </a>
-</li>
+                <li class="nav-item">
+                    <a href="{{ route('admin.bahan.index') }}" class="nav-link {{ request()->routeIs('admin.bahan.*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-box"></i>
+                        <p>
+                            Data Bahan Baku
+                            @php
+                                $sidePusat = \App\Models\Bahan::where('stok_awal', '<=', 50)->count();
+                            @endphp
+                            @if($sidePusat > 0)
+                                <span class="right badge badge-danger border-circle" style="width: 10px; height: 10px; padding: 0; border-radius: 50%; margin-top: 5px;">&nbsp;</span>
+                            @endif
+                        </p>
+                    </a>
+                </li>
+
                 <li class="nav-header">TRANSAKSI</li>
 
                 <li class="nav-item">
@@ -126,36 +126,54 @@
                     </a>
                 </li>
 
-               <li class="nav-header">LAPORAN</li>
-<li class="nav-item has-treeview {{ request()->routeIs('admin.laporan.*') ? 'menu-open' : '' }}">
-    <a href="#" class="nav-link {{ request()->routeIs('admin.laporan.*') ? 'active' : '' }}">
-        <i class="nav-icon fas fa-file-alt"></i>
-        <p>Laporan <i class="right fas fa-angle-left"></i></p>
-    </a>
-    <ul class="nav nav-treeview">
-        <li class="nav-item">
-            <a href="{{ route('admin.laporan.index') }}" class="nav-link {{ request()->routeIs('admin.laporan.index') ? 'active' : '' }}">
-                <i class="far fa-circle nav-icon"></i><p>Semua Laporan</p>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{{ route('admin.laporan.stok-kritis') }}" class="nav-link {{ request()->routeIs('admin.laporan.stok-kritis') ? 'active' : '' }}">
-                <i class="far fa-circle nav-icon text-danger"></i><p>Stok Kritis</p>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{{ route('admin.laporan.stok-outlet') }}" class="nav-link {{ request()->routeIs('admin.laporan.stok-outlet') ? 'active' : '' }}">
-                <i class="far fa-circle nav-icon text-success"></i><p>Stok Outlet</p>
-            </a>
-        </li>
-        {{-- Item baru --}}
-        <li class="nav-item">
-            <a href="{{ route('admin.laporan.distribusi') }}" class="nav-link {{ request()->routeIs('admin.laporan.distribusi') ? 'active' : '' }}">
-                <i class="far fa-circle nav-icon text-info"></i><p>Distribusi</p>
-            </a>
-        </li>
-    </ul>
-</li>
+                {{-- BAGIAN CHAT TERBARU --}}
+                <li class="nav-header">KOMUNIKASI</li>
+                <li class="nav-item">
+                    <a href="{{ route('chat.index') }}"
+                       class="nav-link {{ request()->routeIs('chat.*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-comments text-primary"></i>
+                        <p>
+                            Chat Center
+                            @php
+                                // Menghitung pesan yang belum dibaca (asumsi kolom 'is_read' di model Chat)
+                                $sidebarUnreadChat = \App\Models\Chat::where('receiver_id', auth()->id())->where('is_read', false)->count();
+                            @endphp
+                            @if($sidebarUnreadChat > 0)
+                                <span class="right badge badge-primary anim-pulse">{{ $sidebarUnreadChat }}</span>
+                            @endif
+                        </p>
+                    </a>
+                </li>
+
+                <li class="nav-header">LAPORAN</li>
+                <li class="nav-item has-treeview {{ request()->routeIs('admin.laporan.*') ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ request()->routeIs('admin.laporan.*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-file-alt"></i>
+                        <p>Laporan <i class="right fas fa-angle-left"></i></p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('admin.laporan.index') }}" class="nav-link {{ request()->routeIs('admin.laporan.index') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i><p>Semua Laporan</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.laporan.stok-kritis') }}" class="nav-link {{ request()->routeIs('admin.laporan.stok-kritis') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon text-danger"></i><p>Stok Kritis</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.laporan.stok-outlet') }}" class="nav-link {{ request()->routeIs('admin.laporan.stok-outlet') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon text-success"></i><p>Stok Outlet</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.laporan.distribusi') }}" class="nav-link {{ request()->routeIs('admin.laporan.distribusi') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon text-info"></i><p>Distribusi</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
 
                 <li class="nav-header">AKUN</li>
                 <li class="nav-item">
