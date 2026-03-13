@@ -359,8 +359,8 @@
                     </table>
                 </div>
             </div>
-        </div>yt
-    </div>0-
+        </div>
+    </div>
 </div>
 
 @endsection

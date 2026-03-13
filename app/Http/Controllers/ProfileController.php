@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProfileUpdateRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
@@ -23,20 +21,32 @@ class ProfileController extends Controller
     }
 
     // Update profile info
-    public function update(ProfileUpdateRequest $request)
+    public function update(Request $request)
     {
+        // ✅ Validasi manual — tidak pakai ProfileUpdateRequest
+        // karena ProfileUpdateRequest bawaan Breeze cuma validate name & email
+        $request->validate([
+            'name'     => ['required', 'string', 'max:255'],
+            'username' => ['required', 'string', 'max:255'],
+            'email'    => ['required', 'email', 'max:255'],
+            'no_hp'    => ['nullable', 'string', 'max:20'],
+            'photo'    => ['nullable', 'image', 'max:2048'],
+        ]);
+
         $user = $request->user();
-        $data = $request->validated();
+
+        // ✅ Ambil semua field yang relevan, bukan dari validated() Breeze
+        $data = $request->only(['name', 'username', 'email', 'no_hp']);
 
         // Handle foto profile
         if ($request->hasFile('photo')) {
-            $file = $request->file('photo');
+            $file     = $request->file('photo');
             $filename = time() . '_' . $file->getClientOriginalName();
             $file->move(public_path('uploads/profile'), $filename);
 
             // Hapus foto lama jika ada
-            if ($user->photo && file_exists(public_path('uploads/profile/'.$user->photo))) {
-                @unlink(public_path('uploads/profile/'.$user->photo));
+            if ($user->photo && file_exists(public_path('uploads/profile/' . $user->photo))) {
+                @unlink(public_path('uploads/profile/' . $user->photo));
             }
 
             $data['photo'] = $filename;
@@ -49,9 +59,8 @@ class ProfileController extends Controller
 
         $user->update($data);
 
-        // Redirect ke halaman profil sesuai role
         $route = $user->role === 'admin' ? 'admin.profile.edit' : 'user.profile.edit';
-        return redirect()->route($route)->with('success', 'Profile berhasil diperbarui');
+        return redirect()->route($route)->with('success', 'Profile berhasil diperbarui!');
     }
 
     // Update password
@@ -66,7 +75,7 @@ class ProfileController extends Controller
         $user->save();
 
         $route = $user->role === 'admin' ? 'admin.profile.edit' : 'user.profile.edit';
-        return redirect()->route($route)->with('success', 'Password berhasil diperbarui');
+        return redirect()->route($route)->with('success', 'Password berhasil diperbarui!');
     }
 
     // Hapus akun
@@ -78,9 +87,8 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
-        // Hapus foto jika ada
-        if ($user->photo && file_exists(public_path('uploads/profile/'.$user->photo))) {
-            @unlink(public_path('uploads/profile/'.$user->photo));
+        if ($user->photo && file_exists(public_path('uploads/profile/' . $user->photo))) {
+            @unlink(public_path('uploads/profile/' . $user->photo));
         }
 
         Auth::logout();
