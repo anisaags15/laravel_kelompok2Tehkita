@@ -5,163 +5,220 @@
 
 @section('content')
 <style>
-    /* --- LIGHT MODE STYLES --- */
-    .chat-index-card { 
-        border-radius: 24px !important; 
-        box-shadow: 0 10px 30px rgba(0,0,0,0.05) !important; 
+    .chat-index-card {
+        border-radius: 24px !important;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.06) !important;
+        border: none !important;
+        overflow: hidden;
     }
-    
     .chat-header-index {
-        background-color: #ffffff;
-        border-bottom: 1px solid #f0f0f0;
+        background: linear-gradient(135deg, #0d6efd 0%, #0043a8 100%);
+        padding: 22px 28px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .chat-header-index h5 {
+        color: white; font-weight: 800; margin: 0 0 3px; font-size: 1.1rem;
+    }
+    .chat-header-index p {
+        color: rgba(255,255,255,0.72); margin: 0; font-size: 0.8rem;
+    }
+    .chat-kontak-pill {
+        background: rgba(255,255,255,0.15);
+        border: 1.5px solid rgba(255,255,255,0.3);
+        color: white;
+        border-radius: 50px;
+        padding: 6px 16px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        white-space: nowrap;
+        flex-shrink: 0;
     }
 
-    .bg-soft-primary { background-color: #eef4ff; color: #0d6efd; }
-    
-    .hover-chat-item {
-        transition: all 0.2s ease-in-out;
+    /* List item */
+    .chat-item {
+        border-bottom: 1px solid #f3f3f3 !important;
+        transition: background 0.15s, transform 0.15s;
         border-left: 4px solid transparent;
+        padding: 14px 22px;
+        display: flex;
+        align-items: center;
+        text-decoration: none !important;
+        color: inherit !important;
+    }
+    .chat-item:hover {
+        background: #eef4ff !important;
+        border-left-color: #0d6efd;
+        transform: translateX(3px);
+    }
+    .chat-item.unread { background: rgba(13,110,253,0.04) !important; }
+
+    /* Avatar */
+    .chat-avatar-wrap { position: relative; flex-shrink: 0; }
+    .chat-avatar-img {
+        width: 50px; height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #e0e8ff;
+        display: block;
+    }
+    .chat-avatar-letter {
+        width: 50px; height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #0d6efd, #0043a8);
+        color: white;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 800; font-size: 1.15rem;
+        border: 2px solid #e0e8ff;
+        flex-shrink: 0;
+    }
+    .online-dot {
+        position: absolute; bottom: 1px; right: 1px;
+        width: 12px; height: 12px;
+        background: #2ecc71;
+        border: 2px solid white;
+        border-radius: 50%;
     }
 
-    .hover-chat-item:hover { 
-        background-color: #f8f9fa; 
-        transform: translateX(5px);
-        border-left: 4px solid #0d6efd;
+    /* Text */
+    .chat-content { flex: 1; min-width: 0; margin-left: 14px; }
+    .chat-row-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 4px;
+    }
+    .chat-name {
+        font-weight: 700;
+        font-size: 0.93rem;
+        color: #1a1a1a;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 200px;
+    }
+    .chat-name.unread { color: #0d6efd; }
+    .chat-time { font-size: 0.7rem; color: #bbb; white-space: nowrap; flex-shrink: 0; margin-left: 8px; }
+    .chat-row-bottom { display: flex; align-items: center; justify-content: space-between; }
+    .chat-preview {
+        font-size: 0.8rem;
+        color: #999;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        flex: 1;
+        min-width: 0;
+    }
+    .preview-system { color: #e65100; font-weight: 600; }
+    .badge-unread {
+        background: #0d6efd;
+        color: white;
+        border-radius: 50px;
+        padding: 2px 9px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        flex-shrink: 0;
+        margin-left: 8px;
     }
 
-    .bg-unread-active { 
-        background-color: rgba(13, 110, 253, 0.04) !important; 
-    }
+    /* Empty */
+    .empty-chat { text-align: center; padding: 60px 20px; color: #ccc; }
+    .empty-chat i { font-size: 3rem; display: block; margin-bottom: 14px; }
 
-    /* --- DARK MODE OVERRIDES --- */
-    .dark-mode .chat-index-card { 
-        background-color: #1a1a1a !important; 
-        border: 1px solid #333 !important;
-    }
-
-    .dark-mode .chat-header-index {
-        background-color: #1a1a1a !important;
-        border-bottom: 1px solid #333 !important;
-    }
-
-    .dark-mode .chat-header-index h5 { color: #ffffff !important; }
-
-    .dark-mode .list-group-item {
-        background-color: transparent !important;
-        border-bottom: 1px solid #333 !important;
-        color: #e9edef !important;
-    }
-
-    .dark-mode .hover-chat-item:hover {
-        background-color: #252525 !important;
-    }
-
-    .dark-mode .bg-unread-active {
-        background-color: rgba(13, 110, 253, 0.1) !important;
-    }
-
-    .dark-mode .text-dark { color: #ffffff !important; }
-    .dark-mode .text-muted { color: #8696a0 !important; }
-
-    .dark-mode .bg-soft-primary {
-        background-color: #2d2d2d !important;
-        color: #3b9bff !important;
-    }
+    /* Dark mode */
+    .dark-mode .chat-index-card { background: #1a1a1a !important; border: 1px solid #2a2a2a !important; }
+    .dark-mode .chat-header-index { background: linear-gradient(135deg, #0a4ebd, #0033a0); }
+    .dark-mode .chat-item { border-bottom-color: #252525 !important; color: #e0e0e0 !important; }
+    .dark-mode .chat-item:hover { background: #1a2035 !important; }
+    .dark-mode .chat-item.unread { background: rgba(13,110,253,0.08) !important; }
+    .dark-mode .chat-name { color: #e0e0e0; }
+    .dark-mode .chat-name.unread { color: #5b9bff; }
+    .dark-mode .chat-preview { color: #666; }
+    .dark-mode .chat-time { color: #444; }
+    .dark-mode .chat-avatar-img,
+    .dark-mode .chat-avatar-letter { border-color: #1a2a50; }
 </style>
 
 <div class="container-fluid py-4">
     <div class="row justify-content-center">
         <div class="col-md-10 col-lg-8">
-            <div class="card chat-index-card border-0 overflow-hidden">
-                {{-- Header Section --}}
-                <div class="card-header chat-header-index py-4 px-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h5 class="fw-bold mb-1 text-dark">Pesan Terbaru</h5>
-                            <p class="text-muted small mb-0">
-                                <i class="fas fa-sync-alt me-1"></i> Kelola koordinasi stok dan waste secara real-time.
-                            </p>
-                        </div>
-                        <span class="badge bg-soft-primary rounded-pill px-3 py-2 fw-bold">
-                            {{ $users->count() }} Kontak
-                        </span>
+            <div class="card chat-index-card">
+
+                {{-- Header --}}
+                <div class="chat-header-index">
+                    <div>
+                        <h5><i class="fas fa-comments me-2"></i>Pesan Terbaru</h5>
+                        <p>Kelola koordinasi stok dan waste secara real-time</p>
+                    </div>
+                    <div class="chat-kontak-pill">
+                        <i class="fas fa-store me-1"></i> {{ $users->count() }} Outlet
                     </div>
                 </div>
 
-                {{-- Body Section --}}
+                {{-- List --}}
                 <div class="card-body p-0">
-                    <div class="list-group list-group-flush">
-                        @forelse($users as $user)
-                            @php $hasUnread = $user->unread_count > 0; @endphp
-                            
-                            <a href="{{ route('chat.show', $user->id) }}" 
-                               class="list-group-item list-group-item-action px-4 py-4 d-flex align-items-center hover-chat-item {{ $hasUnread ? 'bg-unread-active' : '' }}">
-                                
-                                {{-- Avatar Section --}}
-                                <div class="position-relative">
-                                    @if($user->photo)
-                                        <img src="{{ asset('uploads/profile/' . $user->photo) }}" 
-                                             class="rounded-circle shadow-sm object-fit-cover" 
-                                             style="width: 58px; height: 58px; border: 2px solid #fff;"
-                                             onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&color=719ece&background=eef4ff';">
-                                    @else
-                                        <div class="bg-soft-primary rounded-circle d-flex justify-content-center align-items-center fw-bold" 
-                                             style="width: 58px; height: 58px; font-size: 1.3rem; border: 2px solid #fff;">
-                                            {{ strtoupper(substr($user->outlet ? $user->outlet->nama_outlet : $user->name, 0, 1)) }}
-                                        </div>
-                                    @endif
+                    @forelse($users as $user)
+                        @php $hasUnread = $user->unread_count > 0; @endphp
+                        <a href="{{ route('chat.show', $user->id) }}"
+                           class="chat-item {{ $hasUnread ? 'unread' : '' }}">
 
-                                    {{-- Green Online Dot --}}
-                                    <span class="position-absolute bottom-0 end-0 p-1 bg-success border border-white rounded-circle" 
-                                          style="width: 14px; height: 14px;" title="Online"></span>
-                                </div>
-
-                                {{-- Text Content --}}
-                                <div class="ms-4 flex-grow-1 overflow-hidden">
-                                    <div class="d-flex justify-content-between align-items-center mb-1">
-                                        <h6 class="mb-0 fw-bold {{ $hasUnread ? 'text-primary' : 'text-dark' }}">
-                                            {{ $user->outlet ? $user->outlet->nama_outlet : $user->name }}
-                                        </h6>
-                                        @if($user->last_message)
-                                            <small class="text-muted" style="font-size: 0.75rem;">
-                                                {{ $user->last_message->created_at->diffForHumans(null, true) }}
-                                            </small>
-                                        @endif
+                            {{-- Avatar --}}
+                            <div class="chat-avatar-wrap">
+                                @if($user->photo)
+                                    <img src="{{ asset('uploads/profile/' . $user->photo) }}"
+                                         class="chat-avatar-img"
+                                         onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=0d6efd&color=fff'">
+                                @else
+                                    <div class="chat-avatar-letter">
+                                        {{ strtoupper(substr($user->outlet ? $user->outlet->nama_outlet : $user->name, 0, 1)) }}
                                     </div>
-                                    
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <p class="mb-0 text-muted text-truncate small pe-3" style="max-width: 85%;">
-                                            @if($user->last_message)
-                                                @if(str_contains($user->last_message->message, '[SISTEM NOTIFIKASI STOK]'))
-                                                    <span class="text-danger fw-bold"><i class="fas fa-robot me-1"></i> Notifikasi Stok</span>
-                                                @else
-                                                    {{ $user->last_message->sender_id == auth()->id() ? 'Anda: ' : '' }}{{ $user->last_message->message }}
-                                                @endif
-                                            @else
-                                                <span class="fst-italic opacity-50">Belum ada percakapan...</span>
-                                            @endif
-                                        </p>
-                                        
-                                        @if($hasUnread)
-                                            <span class="badge bg-primary rounded-pill small animate-pulse">
-                                                {{ $user->unread_count }}
-                                            </span>
-                                        @endif
-                                    </div>
-                                </div>
-                            </a>
-                        @empty
-                            {{-- Empty State --}}
-                            <div class="text-center py-5 my-4">
-                                <div class="mb-3">
-                                    <i class="fas fa-comment-slash fa-4x text-muted opacity-25"></i>
-                                </div>
-                                <h6 class="fw-bold text-muted">Belum ada percakapan</h6>
-                                <p class="text-muted small">Hubungi outlet atau pusat untuk memulai koordinasi.</p>
+                                @endif
+                                <span class="online-dot"></span>
                             </div>
-                        @endforelse
-                    </div>
+
+                            {{-- Content --}}
+                            <div class="chat-content">
+                                <div class="chat-row-top">
+                                    <span class="chat-name {{ $hasUnread ? 'unread' : '' }}">
+                                        {{ $user->outlet ? $user->outlet->nama_outlet : $user->name }}
+                                    </span>
+                                    <span class="chat-time">
+                                        {{ $user->last_message ? $user->last_message->created_at->diffForHumans(null, true) : '' }}
+                                    </span>
+                                </div>
+                                <div class="chat-row-bottom">
+                                    <span class="chat-preview">
+                                        @if($user->last_message)
+                                            @if(str_contains($user->last_message->message, '[SISTEM'))
+                                                <span class="preview-system">
+                                                    <i class="fas fa-robot me-1"></i>Notifikasi Sistem
+                                                </span>
+                                            @else
+                                                @if($user->last_message->sender_id == auth()->id())
+                                                    <span style="color:#aaa;">Anda: </span>
+                                                @endif
+                                                {{ Str::limit($user->last_message->message, 55) }}
+                                            @endif
+                                        @else
+                                            <span class="fst-italic" style="opacity:0.4;">Belum ada percakapan...</span>
+                                        @endif
+                                    </span>
+                                    @if($hasUnread)
+                                        <span class="badge-unread">{{ $user->unread_count }}</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </a>
+                    @empty
+                        <div class="empty-chat">
+                            <i class="fas fa-comment-slash"></i>
+                            <p class="fw-bold mb-1">Belum ada percakapan</p>
+                            <small>Hubungi outlet atau pusat untuk memulai koordinasi</small>
+                        </div>
+                    @endforelse
                 </div>
+
             </div>
         </div>
     </div>

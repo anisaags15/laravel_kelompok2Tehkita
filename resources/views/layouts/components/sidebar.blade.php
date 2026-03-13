@@ -88,10 +88,15 @@
     <a href="{{ route('admin.waste.index') }}"
        class="nav-link {{ request()->routeIs('admin.waste.*') ? 'active' : '' }}">
         <i class="nav-icon fas fa-dumpster text-danger"></i>
-        <p>Monitoring Waste</p>
+        <p>
+            Monitoring Waste
+            @php $pendingWaste = \App\Models\Waste::where('status', 'pending')->count(); @endphp
+            @if($pendingWaste > 0)
+                <span class="badge badge-danger right">{{ $pendingWaste }}</span>
+            @endif
+        </p>
     </a>
 </li>
-
                 <li class="nav-item">
                     <a href="{{ route('admin.stok-kritis.index') }}"
                        class="nav-link {{ request()->routeIs('admin.stok-kritis.*') ? 'active' : '' }}">

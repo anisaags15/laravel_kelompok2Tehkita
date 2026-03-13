@@ -9,7 +9,7 @@ use App\Models\Message;
 use App\Models\User;
 use App\Models\Waste;
 use App\Notifications\WasteBaruNotification;
-use App\Notifications\StokKritisNotification; // ✅ Sudah ada, pastikan tidak dihapus
+use App\Notifications\StokKritisNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -114,8 +114,6 @@ class PemakaianController extends Controller
             ]);
 
             $stokOutlet->decrement('stok', $request->jumlah);
-
-            // Refresh nilai stok setelah decrement
             $stokOutlet->refresh();
 
             $this->handleBotNotifications($user, $stokOutlet, $request->jumlah, $request->tanggal);
@@ -141,7 +139,7 @@ class PemakaianController extends Controller
             'foto'           => 'required|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
-        $user = Auth::user();
+        $user       = Auth::user();
         $stokOutlet = StokOutlet::with(['bahan', 'outlet'])->findOrFail($request->stok_outlet_id);
 
         if ($stokOutlet->stok < $request->jumlah) {
@@ -171,19 +169,18 @@ class PemakaianController extends Controller
 
             // 3. Potong Stok
             $stokOutlet->decrement('stok', $request->jumlah);
-
-            // Refresh nilai stok setelah decrement
             $stokOutlet->refresh();
 
             // 4. Kirim Notifikasi ke Admin
             $adminPusat = User::where('role', 'admin')->first();
             if ($adminPusat) {
-                // Notifikasi Chat
+
+                // ✅ Notifikasi Chat — pakai tag [SISTEM WASTE] biar kedetect sebagai bot di blade
                 Message::create([
                     'sender_id'   => $user->id,
                     'receiver_id' => $adminPusat->id,
                     'subject'     => '⚠️ PERLU VERIFIKASI: LAPORAN WASTE',
-                    'message'     => "Halo Admin, ada laporan waste baru yang butuh verifikasi segera:\n\n" .
+                    'message'     => "[SISTEM WASTE]\n\nHalo Admin, ada laporan waste baru yang butuh verifikasi segera:\n\n" .
                                      "📍 Outlet: {$user->outlet->nama_outlet}\n" .
                                      "📦 Bahan: {$stokOutlet->bahan->nama_bahan}\n" .
                                      "🔢 Jumlah: {$request->jumlah} {$stokOutlet->bahan->satuan}\n" .
@@ -196,7 +193,7 @@ class PemakaianController extends Controller
                 $waste->load(['outlet', 'stokOutlet.bahan']);
                 $adminPusat->notify(new WasteBaruNotification($waste));
 
-                // ✅ Cek & kirim notifikasi stok kritis setelah waste
+                // Cek & kirim notifikasi stok kritis setelah waste
                 if ($stokOutlet->stok <= 5) {
                     $admins = User::where('role', 'admin')->get();
                     foreach ($admins as $admin) {
@@ -249,7 +246,6 @@ class PemakaianController extends Controller
 
     /**
      * BOT NOTIFICATION HANDLER (PEMAKAIAN RUTIN)
-     * Dipanggil setelah stok di-decrement & di-refresh
      */
     private function handleBotNotifications($user, $stokOutlet, $jumlah, $tanggal)
     {
@@ -258,7 +254,6 @@ class PemakaianController extends Controller
 
         if (!$adminPusat) return;
 
-        // Kirim pesan chat sistem jika stok kritis/habis
         if ($stokSekarang <= 5) {
             $status = ($stokSekarang <= 0) ? "🚨 *STOK HABIS*" : "⚠️ *STOK KRITIS*";
 
@@ -270,7 +265,6 @@ class PemakaianController extends Controller
                 'is_read'     => 0
             ]);
 
-            // ✅ Kirim notifikasi lonceng stok kritis ke SEMUA admin
             $admins = User::where('role', 'admin')->get();
             foreach ($admins as $admin) {
                 $admin->notify(new StokKritisNotification($stokOutlet));
