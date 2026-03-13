@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-// Model Utama
 use App\Models\Outlet;
 use App\Models\Bahan;
 use App\Models\StokMasuk;
@@ -13,9 +12,8 @@ use App\Models\Distribusi;
 use App\Models\Pemakaian;
 use App\Models\StokOutlet;
 use App\Models\User;
-use App\Models\Message; 
+use App\Models\Message;
 
-// Support & Utilities
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -23,11 +21,14 @@ use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
-    public function dashboard()
+    public function dashboard(Request $request)
     {
+        // ✅ SEARCH QUERY
+        $search = $request->get('search');
+
         /*
         |--------------------------------------------------------------------------
-        | 1️⃣ STATISTIK UTAMA
+        | 1. STATISTIK UTAMA
         |--------------------------------------------------------------------------
         */
         $outlet     = Outlet::count();
@@ -35,43 +36,53 @@ class DashboardController extends Controller
         $stokMasuk  = StokMasuk::count();
         $distribusi = Distribusi::count();
 
-      /*
+        /*
         |--------------------------------------------------------------------------
-        | 2️⃣ RADAR STOK KRITIS (EARLY WARNING SYSTEM)
+        | 2. RADAR STOK KRITIS
         |--------------------------------------------------------------------------
         */
-        // Peringatan Stok di OUTLET (untuk kirim barang)
         $stokKritis = StokOutlet::with(['outlet', 'bahan'])
             ->where('stok', '<=', 5)
             ->orderBy('stok', 'asc')
             ->get();
 
-        $stokKritisCount = $stokKritis->count(); 
-
-        // Peringatan Stok di GUDANG PUSAT (untuk belanja ke supplier)
-        // Kita anggap kritis jika total_stok bahan di pusat <= 50
+        $stokKritisCount = $stokKritis->count();
         $stokPusatKritis = Bahan::where('stok_awal', '<=', 50)->count();
 
         /*
         |--------------------------------------------------------------------------
-        | 3️⃣ DATA TERBARU
+        | 3. DATA TERBARU — filter by search jika ada
         |--------------------------------------------------------------------------
         */
-        $outlets = Outlet::latest()->take(5)->get();
+        $outletsQuery = Outlet::latest();
+        if ($search) {
+            $outletsQuery->where('nama_outlet', 'like', "%{$search}%");
+        }
+        $outlets = $outletsQuery->take(5)->get();
 
-        $latestDistribusi = Distribusi::with(['outlet', 'bahan'])
-            ->latest()
-            ->take(5)
-            ->get();
+        $latestDistribusiQuery = Distribusi::with(['outlet', 'bahan'])->latest();
+        if ($search) {
+            $latestDistribusiQuery->where(function($q) use ($search) {
+                $q->whereHas('outlet', fn($o) => $o->where('nama_outlet', 'like', "%{$search}%"))
+                  ->orWhereHas('bahan',  fn($b) => $b->where('nama_bahan',  'like', "%{$search}%"));
+            });
+        }
+        $latestDistribusi = $latestDistribusiQuery->take(5)->get();
 
-        $latestStokMasuk = StokMasuk::with('bahan')
-            ->latest('tanggal')
-            ->take(5)
-            ->get();
+        $latestStokMasukQuery = StokMasuk::with('bahan')->latest('tanggal');
+        if ($search) {
+            $latestStokMasukQuery->whereHas('bahan', fn($b) => $b->where('nama_bahan', 'like', "%{$search}%"));
+        }
+        $latestStokMasuk = $latestStokMasukQuery->take(5)->get();
+
+        // ✅ Search result: bahan
+        $searchBahan = $search
+            ? Bahan::where('nama_bahan', 'like', "%{$search}%")->take(5)->get()
+            : collect();
 
         /*
         |--------------------------------------------------------------------------
-        | 4️⃣ DATA CHAT
+        | 4. DATA CHAT
         |--------------------------------------------------------------------------
         */
         $unreadCount = 0;
@@ -94,52 +105,50 @@ class DashboardController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 5️⃣ DATA GRAFIK PEMAKAIAN (DINAMIS - 7 HARI TERAKHIR)
+        | 5. DATA GRAFIK PEMAKAIAN (7 HARI TERAKHIR)
         |--------------------------------------------------------------------------
         */
         $labelsRaw = [];
         $labelsFormatted = [];
         for ($i = 6; $i >= 0; $i--) {
             $date = now()->subDays($i);
-            $labelsRaw[] = $date->format('Y-m-d'); 
-            $labelsFormatted[] = $date->format('d M'); 
+            $labelsRaw[]       = $date->format('Y-m-d');
+            $labelsFormatted[] = $date->format('d M');
         }
 
         $outletList = Outlet::take(5)->get();
-        $datasets = [];
-        $colors = ['#198754', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'];
+        $datasets   = [];
+        $colors     = ['#198754', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'];
 
         foreach ($outletList as $index => $o) {
             $dataPemakaian = [];
             foreach ($labelsRaw as $tgl) {
                 $total = Pemakaian::where('outlet_id', $o->id)
-                    ->whereDate('tanggal', $tgl) 
-                    ->sum('jumlah'); 
-                $dataPemakaian[] = (int) $total; 
+                    ->whereDate('tanggal', $tgl)
+                    ->sum('jumlah');
+                $dataPemakaian[] = (int) $total;
             }
-
-            $color = $colors[$index] ?? '#' . substr(md5($o->id), 0, 6);
-
+            $color      = $colors[$index] ?? '#' . substr(md5($o->id), 0, 6);
             $datasets[] = [
-                'label'           => $o->nama_outlet,
-                'data'            => $dataPemakaian,
-                'borderColor'     => $color,
-                'backgroundColor' => $color . '33', 
-                'tension'         => 0.4,
-                'fill'            => true,
-                'pointRadius'     => 4,
-                'pointHoverRadius'=> 6,
+                'label'            => $o->nama_outlet,
+                'data'             => $dataPemakaian,
+                'borderColor'      => $color,
+                'backgroundColor'  => $color . '33',
+                'tension'          => 0.4,
+                'fill'             => true,
+                'pointRadius'      => 4,
+                'pointHoverRadius' => 6,
             ];
         }
 
         $pemakaianChart = [
             'labels'   => $labelsFormatted,
-            'datasets' => $datasets
+            'datasets' => $datasets,
         ];
 
         /*
         |--------------------------------------------------------------------------
-        | 6️⃣ DATA KALENDER DISTRIBUSI
+        | 6. DATA KALENDER DISTRIBUSI
         |--------------------------------------------------------------------------
         */
         $calendarEvents = Distribusi::with('outlet')
@@ -162,15 +171,14 @@ class DashboardController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 7️⃣ MONITORING REAL-TIME OUTLET
+        | 7. MONITORING REAL-TIME OUTLET
         |--------------------------------------------------------------------------
         */
-        $monitoringOutlets = Outlet::withSum(['pemakaian' => function($query) {
+        $monitoringOutlets = Outlet::withSum(['pemakaian' => function ($query) {
             $query->whereDate('tanggal', today());
-        }], 'jumlah')->get()->map(function($outlet) {
-            
-            $target = $outlet->target_pemakaian_harian ?? 100;
-            $realisasi = $outlet->pemakaian_sum_jumlah ?? 0;
+        }], 'jumlah')->get()->map(function ($outlet) {
+            $target     = $outlet->target_pemakaian_harian ?? 100;
+            $realisasi  = $outlet->pemakaian_sum_jumlah ?? 0;
             $persentase = ($target > 0) ? ($realisasi / $target) * 100 : 0;
 
             if ($persentase >= 100) {
@@ -187,13 +195,13 @@ class DashboardController extends Controller
                 'realisasi'  => $realisasi,
                 'persentase' => $persentase,
                 'status'     => $status,
-                'warna'      => $warna
+                'warna'      => $warna,
             ];
         });
 
         /*
         |--------------------------------------------------------------------------
-        | 8️⃣ DATA OUTLET TERAKTIF (PIALA / PERFORMA TERBAIK)
+        | 8. OUTLET TERAKTIF
         |--------------------------------------------------------------------------
         */
         $outletTeraktif = Pemakaian::select('outlet_id', DB::raw('SUM(jumlah) as total'))
@@ -203,60 +211,54 @@ class DashboardController extends Controller
             ->orderBy('total', 'desc')
             ->take(5)
             ->get()
-            ->map(function($item) {
-                return (object) [
-                    'nama_outlet' => $item->outlet->nama_outlet ?? 'Unknown Outlet',
-                    'total'       => (int) $item->total
-                ];
-            });
-/*
-|--------------------------------------------------------------------------
-| 🔟 LOGIKA PREDIKSI STOK (SMART REORDER)
-|--------------------------------------------------------------------------
-*/
-$bahanPusat = Bahan::all();
-$rekomendasiRestock = [];
+            ->map(fn($item) => (object) [
+                'nama_outlet' => $item->outlet->nama_outlet ?? 'Unknown Outlet',
+                'total'       => (int) $item->total,
+            ]);
 
-foreach ($bahanPusat as $b) {
-    // 1. Hitung total distribusi bahan ini selama 7 hari terakhir
-    $totalKeluar = Distribusi::where('bahan_id', $b->id)
-        ->where('tanggal', '>=', now()->subDays(7))
-        ->sum('jumlah');
-
-    // 2. Hitung rata-rata pengeluaran per hari
-    $rataRataHarian = $totalKeluar / 7;
-
-    if ($rataRataHarian > 0) {
-        // 3. Estimasi sisa hari (Stok Pusat / Rata-rata)
-        $sisaHari = $b->stok_awal / $rataRataHarian;
-
-        // 4. Jika stok diprediksi habis dalam <= 3 hari, masukkan ke list rekomendasi
-        if ($sisaHari <= 3) {
-            $rekomendasiRestock[] = (object) [
-                'nama' => $b->nama_bahan,
-                'sisa_stok' => $b->stok_awal,
-                'estimasi' => round($sisaHari),
-// Ubah bagian ini di controller
-'saran_beli' => ceil(($rataRataHarian * 7) - $b->stok_awal) . ' ' . $b->satuan            ];
-        }
-    }
-}
         /*
         |--------------------------------------------------------------------------
-        | 9️⃣ RETURN VIEW
+        | 9. PREDIKSI STOK (SMART REORDER)
         |--------------------------------------------------------------------------
         */
-return view('admin.dashboard', compact(
-    // ... data yang sudah ada sebelumnya ...
-    'rekomendasiRestock', // <--- Tambah ini
-    'outlet', 'bahan', 'stokMasuk', 'distribusi',
-    'stokKritis', 'stokKritisCount', 
-    'stokPusatKritis',
-    'outlets', 'latestDistribusi', 'latestStokMasuk',
-    'unreadCount', 'latestChats',
-    'pemakaianChart', 'calendarEvents',
-    'monitoringOutlets',
-    'outletTeraktif'
-));
+        $bahanPusat          = Bahan::all();
+        $rekomendasiRestock  = [];
+
+        foreach ($bahanPusat as $b) {
+            $totalKeluar   = Distribusi::where('bahan_id', $b->id)
+                ->where('tanggal', '>=', now()->subDays(7))
+                ->sum('jumlah');
+            $rataRataHarian = $totalKeluar / 7;
+
+            if ($rataRataHarian > 0) {
+                $sisaHari = $b->stok_awal / $rataRataHarian;
+                if ($sisaHari <= 3) {
+                    $rekomendasiRestock[] = (object) [
+                        'nama'       => $b->nama_bahan,
+                        'sisa_stok'  => $b->stok_awal,
+                        'estimasi'   => round($sisaHari),
+                        'saran_beli' => ceil(($rataRataHarian * 7) - $b->stok_awal) . ' ' . $b->satuan,
+                    ];
+                }
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | RETURN VIEW
+        |--------------------------------------------------------------------------
+        */
+        return view('admin.dashboard', compact(
+            'rekomendasiRestock',
+            'outlet', 'bahan', 'stokMasuk', 'distribusi',
+            'stokKritis', 'stokKritisCount',
+            'stokPusatKritis',
+            'outlets', 'latestDistribusi', 'latestStokMasuk',
+            'unreadCount', 'latestChats',
+            'pemakaianChart', 'calendarEvents',
+            'monitoringOutlets',
+            'outletTeraktif',
+            'search', 'searchBahan'  // ✅ search vars
+        ));
     }
 }

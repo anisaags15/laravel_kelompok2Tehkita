@@ -41,6 +41,30 @@
 </div>
 @endif
 
+{{-- ✅ SEARCH RESULT ALERT --}}
+@if($search)
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="alert d-flex align-items-center justify-content-between mb-0"
+             style="border-radius:14px; background:#eef4ff; border:1.5px solid #c2d6ff; color:#1a3a6b;">
+            <span style="font-size:0.9rem;">
+                <i class="fas fa-search me-2" style="color:#0d6efd;"></i>
+                Hasil pencarian untuk <strong>"{{ $search }}"</strong> —
+                <strong>{{ $outlets->count() }}</strong> outlet,
+                <strong>{{ $latestDistribusi->count() }}</strong> distribusi,
+                <strong>{{ $latestStokMasuk->count() }}</strong> stok masuk,
+                <strong>{{ $searchBahan->count() }}</strong> bahan ditemukan
+            </span>
+            <a href="{{ route('admin.dashboard') }}"
+               class="btn btn-sm rounded-pill ms-3"
+               style="background:#0d6efd; color:white; font-size:0.78rem; padding:4px 14px; white-space:nowrap;">
+                <i class="fas fa-times me-1"></i> Reset
+            </a>
+        </div>
+    </div>
+</div>
+@endif
+
 {{-- 1. STATISTIC CARDS --}}
 <div class="row mb-4">
     <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">

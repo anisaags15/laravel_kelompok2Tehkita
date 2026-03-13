@@ -25,6 +25,28 @@
     </div>
 </div>
 
+{{-- ✅ SEARCH RESULT ALERT --}}
+@if($search)
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="alert d-flex align-items-center justify-content-between mb-0"
+             style="border-radius:14px; background:#f0fff4; border:1.5px solid #b2dfdb; color:#1b5e3b;">
+            <span style="font-size:0.9rem;">
+                <i class="fas fa-search me-2" style="color:#28a745;"></i>
+                Hasil pencarian untuk <strong>"{{ $search }}"</strong> —
+                <strong>{{ $stokOutlets->count() }}</strong> stok bahan,
+                <strong>{{ $pemakaians->count() }}</strong> riwayat pemakaian ditemukan
+            </span>
+            <a href="{{ route('user.dashboard') }}"
+               class="btn btn-sm rounded-pill ms-3"
+               style="background:#28a745; color:white; font-size:0.78rem; padding:4px 14px; white-space:nowrap;">
+                <i class="fas fa-times me-1"></i> Reset
+            </a>
+        </div>
+    </div>
+</div>
+@endif
+
 {{-- 2. Statistik Cards --}}
 <div class="row mb-4">
     <div class="col-md-4 mb-3">

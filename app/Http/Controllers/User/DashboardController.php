@@ -7,14 +7,14 @@ use Illuminate\Http\Request;
 use App\Models\StokOutlet;
 use App\Models\Pemakaian;
 use App\Models\Distribusi;
-use App\Models\JadwalDistribusi; 
+use App\Models\JadwalDistribusi;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
 
@@ -23,59 +23,94 @@ class DashboardController extends Controller
         }
 
         $outletId = $user->outlet_id;
-        $hariIni = Carbon::today();
-        
-        // --- 1. STATISTIK UTAMA ---
-        $totalStok = StokOutlet::where('outlet_id', $outletId)->sum('stok');
-        $pemakaianHariIni = Pemakaian::where('outlet_id', $outletId)->whereDate('tanggal', $hariIni)->sum('jumlah');
-        $distribusiTotal = Distribusi::where('outlet_id', $outletId)
-                            ->whereMonth('created_at', Carbon::now()->month)
-                            ->sum('jumlah');
+        $hariIni  = Carbon::today();
 
-        // --- 2. LOGIKA STATUS STOK & INFO MASUK ---
-        $statusStok = ($totalStok < 50) ? 'Perlu Order' : 'Stok Aman';
-        $warnaStatusStok = ($totalStok < 50) ? 'text-danger' : 'text-success';
+        // ✅ SEARCH QUERY
+        $search = $request->get('search');
+
+        /*
+        |--------------------------------------------------------------------------
+        | 1. STATISTIK UTAMA
+        |--------------------------------------------------------------------------
+        */
+        $totalStok         = StokOutlet::where('outlet_id', $outletId)->sum('stok');
+        $pemakaianHariIni  = Pemakaian::where('outlet_id', $outletId)->whereDate('tanggal', $hariIni)->sum('jumlah');
+        $distribusiTotal   = Distribusi::where('outlet_id', $outletId)
+                                ->whereMonth('created_at', Carbon::now()->month)
+                                ->sum('jumlah');
+
+        /*
+        |--------------------------------------------------------------------------
+        | 2. STATUS STOK & INFO MASUK
+        |--------------------------------------------------------------------------
+        */
+        $statusStok       = ($totalStok < 50) ? 'Perlu Order' : 'Stok Aman';
+        $warnaStatusStok  = ($totalStok < 50) ? 'text-danger' : 'text-success';
 
         $distribusiTerakhir = Distribusi::where('outlet_id', $outletId)->latest()->first();
-        $infoMasuk = $distribusiTerakhir ? $distribusiTerakhir->created_at->diffForHumans() : 'Belum ada data';
+        $infoMasuk          = $distribusiTerakhir ? $distribusiTerakhir->created_at->diffForHumans() : 'Belum ada data';
 
-        // --- 3. LOGIKA TARGET PEMAKAIAN ---
-        $target = $user->outlet->target_pemakaian_harian ?? 100;
-        $persentaseTarget = ($target > 0) ? ($pemakaianHariIni / $target) * 100 : 0;
-        
-        $warnaProgress = 'bg-success'; 
-        if ($persentaseTarget >= 90) {
-            $warnaProgress = 'bg-danger';
-        } elseif ($persentaseTarget >= 70) {
-            $warnaProgress = 'bg-warning';
-        }
+        /*
+        |--------------------------------------------------------------------------
+        | 3. TARGET PEMAKAIAN
+        |--------------------------------------------------------------------------
+        */
+        $target            = $user->outlet->target_pemakaian_harian ?? 100;
+        $persentaseTarget  = ($target > 0) ? ($pemakaianHariIni / $target) * 100 : 0;
 
-        // --- 4. LOGIKA CHART.JS (7 HARI TERAKHIR) ---
+        $warnaProgress = 'bg-success';
+        if ($persentaseTarget >= 90)      $warnaProgress = 'bg-danger';
+        elseif ($persentaseTarget >= 70)  $warnaProgress = 'bg-warning';
+
+        /*
+        |--------------------------------------------------------------------------
+        | 4. CHART 7 HARI TERAKHIR
+        |--------------------------------------------------------------------------
+        */
         $chartLabels = [];
-        $chartData = [];
-
+        $chartData   = [];
         for ($i = 6; $i >= 0; $i--) {
-            $date = Carbon::today()->subDays($i);
-            $chartLabels[] = $date->translatedFormat('D'); 
-            $chartData[] = (int) Pemakaian::where('outlet_id', $outletId)
+            $date          = Carbon::today()->subDays($i);
+            $chartLabels[] = $date->translatedFormat('D');
+            $chartData[]   = (int) Pemakaian::where('outlet_id', $outletId)
                                 ->whereDate('tanggal', $date)
                                 ->sum('jumlah');
         }
 
-        // --- 5. DATA TABEL & ACTIVITY FEED ---
-        $stokOutlets = StokOutlet::with('bahan')->where('outlet_id', $outletId)->get();
-        
-        $pemakaians = Pemakaian::with('bahan')->where('outlet_id', $outletId)->latest()->take(5)->get();
-        
-        $feedPemakaian = Pemakaian::with('bahan', 'outlet')->where('outlet_id', $outletId)
-            ->select('*', DB::raw("'pemakaian' as tipe_aktivitas"))->latest()->take(5)->get();
-        
-        $feedDistribusi = Distribusi::with('bahan', 'outlet')->where('outlet_id', $outletId)
-            ->select('*', DB::raw("'distribusi' as tipe_aktivitas"))->latest()->take(5)->get();
-            
+        /*
+        |--------------------------------------------------------------------------
+        | 5. TABEL & ACTIVITY FEED — filter by search jika ada
+        |--------------------------------------------------------------------------
+        */
+        $stokOutletsQuery = StokOutlet::with('bahan')->where('outlet_id', $outletId);
+        if ($search) {
+            $stokOutletsQuery->whereHas('bahan', fn($b) => $b->where('nama_bahan', 'like', "%{$search}%"));
+        }
+        $stokOutlets = $stokOutletsQuery->get();
+
+        $pemakaianQuery = Pemakaian::with('bahan')->where('outlet_id', $outletId)->latest();
+        if ($search) {
+            $pemakaianQuery->whereHas('bahan', fn($b) => $b->where('nama_bahan', 'like', "%{$search}%"));
+        }
+        $pemakaians = $pemakaianQuery->take(5)->get();
+
+        $feedPemakaian = Pemakaian::with('bahan', 'outlet')
+            ->where('outlet_id', $outletId)
+            ->select('*', DB::raw("'pemakaian' as tipe_aktivitas"))
+            ->latest()->take(5)->get();
+
+        $feedDistribusi = Distribusi::with('bahan', 'outlet')
+            ->where('outlet_id', $outletId)
+            ->select('*', DB::raw("'distribusi' as tipe_aktivitas"))
+            ->latest()->take(5)->get();
+
         $activityFeeds = $feedPemakaian->concat($feedDistribusi)->sortByDesc('created_at')->take(6);
 
-        // --- 6. ✅ JADWAL DISTRIBUSI BERIKUTNYA ---
+        /*
+        |--------------------------------------------------------------------------
+        | 6. JADWAL DISTRIBUSI BERIKUTNYA
+        |--------------------------------------------------------------------------
+        */
         $jadwalBerikutnya = JadwalDistribusi::where('status', 'upcoming')
             ->where('tanggal_rencana', '>=', Carbon::today())
             ->orderBy('tanggal_rencana', 'asc')
@@ -83,22 +118,23 @@ class DashboardController extends Controller
 
         return view('user.dashboard', compact(
             'totalStok', 'statusStok', 'warnaStatusStok', 'pemakaianHariIni', 'infoMasuk',
-            'distribusiTotal', 'stokOutlets', 'pemakaians', 'chartLabels', 'chartData', 
+            'distribusiTotal', 'stokOutlets', 'pemakaians', 'chartLabels', 'chartData',
             'activityFeeds', 'persentaseTarget', 'target', 'warnaProgress',
-            'jadwalBerikutnya' // ✅ TAMBAHAN
+            'jadwalBerikutnya',
+            'search'  // ✅ search var
         ));
     }
 
     /**
-     * Halaman Khusus Riwayat Pemakaian (Full Data)
+     * Riwayat Pemakaian
      */
     public function riwayatPemakaian(Request $request)
     {
         $outletId = Auth::user()->outlet_id;
-        $query = Pemakaian::with('bahan')->where('outlet_id', $outletId);
+        $query    = Pemakaian::with('bahan')->where('outlet_id', $outletId);
 
         if ($request->has('search')) {
-            $query->whereHas('bahan', function($q) use ($request) {
+            $query->whereHas('bahan', function ($q) use ($request) {
                 $q->where('nama_bahan', 'like', '%' . $request->search . '%');
             });
         }
@@ -108,15 +144,15 @@ class DashboardController extends Controller
     }
 
     /**
-     * Halaman Khusus Riwayat Distribusi/Stok Masuk (Full Data)
+     * Riwayat Distribusi
      */
     public function riwayatDistribusi(Request $request)
     {
         $outletId = Auth::user()->outlet_id;
-        $query = Distribusi::with('bahan')->where('outlet_id', $outletId);
+        $query    = Distribusi::with('bahan')->where('outlet_id', $outletId);
 
         if ($request->has('search')) {
-            $query->whereHas('bahan', function($q) use ($request) {
+            $query->whereHas('bahan', function ($q) use ($request) {
                 $q->where('nama_bahan', 'like', '%' . $request->search . '%');
             });
         }

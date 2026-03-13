@@ -20,7 +20,7 @@
     </ul>
 
 {{-- SEARCH --}}
-<form action="{{ route('admin.dashboard') }}" method="GET" class="form-inline mx-auto d-none d-md-flex" style="width:30%;">
+<form action="{{ auth()->user()->role === 'admin' ? route('admin.dashboard') : route('user.dashboard') }}" method="GET" class="form-inline mx-auto d-none d-md-flex" style="width:30%;">
     <div class="input-group input-group-sm w-100">
         {{-- TAMBAHKAN name="search" DAN value biar teksnya gak ilang pas di-enter --}}
         <input class="form-control border-0 bg-light" 
