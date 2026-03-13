@@ -64,6 +64,15 @@
                     </a>
                 </li>
 
+                {{-- ✅ JADWAL DISTRIBUSI --}}
+                <li class="nav-item">
+                    <a href="{{ route('user.jadwal-distribusi.index') }}"
+                       class="nav-link {{ request()->routeIs('user.jadwal-distribusi.*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-calendar-alt"></i>
+                        <p>Jadwal Distribusi</p>
+                    </a>
+                </li>
+
                 <li class="nav-header">MONITORING & DATA</li>
 
                 {{-- RIWAYAT LOG --}}

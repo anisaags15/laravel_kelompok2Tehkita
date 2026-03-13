@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\StokOutlet;
 use App\Models\Pemakaian;
 use App\Models\Distribusi;
+use App\Models\JadwalDistribusi; 
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -64,7 +65,6 @@ class DashboardController extends Controller
         // --- 5. DATA TABEL & ACTIVITY FEED ---
         $stokOutlets = StokOutlet::with('bahan')->where('outlet_id', $outletId)->get();
         
-        // Hanya ambil 5 data terbaru untuk ringkasan di dashboard
         $pemakaians = Pemakaian::with('bahan')->where('outlet_id', $outletId)->latest()->take(5)->get();
         
         $feedPemakaian = Pemakaian::with('bahan', 'outlet')->where('outlet_id', $outletId)
@@ -75,10 +75,17 @@ class DashboardController extends Controller
             
         $activityFeeds = $feedPemakaian->concat($feedDistribusi)->sortByDesc('created_at')->take(6);
 
+        // --- 6. ✅ JADWAL DISTRIBUSI BERIKUTNYA ---
+        $jadwalBerikutnya = JadwalDistribusi::where('status', 'upcoming')
+            ->where('tanggal_rencana', '>=', Carbon::today())
+            ->orderBy('tanggal_rencana', 'asc')
+            ->first();
+
         return view('user.dashboard', compact(
             'totalStok', 'statusStok', 'warnaStatusStok', 'pemakaianHariIni', 'infoMasuk',
             'distribusiTotal', 'stokOutlets', 'pemakaians', 'chartLabels', 'chartData', 
-            'activityFeeds', 'persentaseTarget', 'target', 'warnaProgress'
+            'activityFeeds', 'persentaseTarget', 'target', 'warnaProgress',
+            'jadwalBerikutnya' // ✅ TAMBAHAN
         ));
     }
 
@@ -90,7 +97,6 @@ class DashboardController extends Controller
         $outletId = Auth::user()->outlet_id;
         $query = Pemakaian::with('bahan')->where('outlet_id', $outletId);
 
-        // Fitur Pencarian berdasarkan nama bahan
         if ($request->has('search')) {
             $query->whereHas('bahan', function($q) use ($request) {
                 $q->where('nama_bahan', 'like', '%' . $request->search . '%');

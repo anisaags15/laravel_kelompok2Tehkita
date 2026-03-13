@@ -95,7 +95,68 @@
     </div>
 </div>
 
-{{-- 3. Chart & Activity Feed --}}
+{{-- ✅ 3. CARD JADWAL DISTRIBUSI BERIKUTNYA --}}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card shadow-sm border-0" style="border-radius: 14px; border-left: 4px solid #28a745 !important; overflow: hidden;">
+            <div class="card-body py-3 px-4">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+
+                    {{-- Ikon + Info --}}
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="d-flex align-items-center justify-content-center rounded-3"
+                             style="width:48px; height:48px; background: rgba(40,167,69,0.1); flex-shrink:0;">
+                            <i class="fas fa-calendar-check text-success" style="font-size:1.3rem;"></i>
+                        </div>
+                        <div>
+                            <p class="text-muted mb-0" style="font-size:0.78rem; text-transform:uppercase; letter-spacing:0.5px; font-weight:600;">
+                                Distribusi Berikutnya
+                            </p>
+                            @if($jadwalBerikutnya)
+                                <h6 class="fw-bold mb-0 text-adaptive">{{ $jadwalBerikutnya->keterangan }}</h6>
+                                @if($jadwalBerikutnya->catatan)
+                                    <small class="text-muted">{{ $jadwalBerikutnya->catatan }}</small>
+                                @endif
+                            @else
+                                <h6 class="fw-bold mb-0 text-muted">Belum ada jadwal</h6>
+                                <small class="text-muted">Admin pusat belum menjadwalkan distribusi berikutnya</small>
+                            @endif
+                        </div>
+                    </div>
+
+                    {{-- Tanggal + Tombol --}}
+                    <div class="d-flex align-items-center gap-3">
+                        @if($jadwalBerikutnya)
+                            <div class="text-end">
+                                <div class="fw-bold text-success" style="font-size:1.05rem;">
+                                    <i class="far fa-calendar-alt me-1"></i>
+                                    {{ $jadwalBerikutnya->tanggal_rencana->format('d M Y') }}
+                                </div>
+                                <small class="text-muted">
+                                    {{ $jadwalBerikutnya->tanggal_rencana->diffForHumans() }}
+                                </small>
+                            </div>
+                            <a href="{{ route('user.jadwal-distribusi.index') }}"
+                               class="btn btn-sm btn-outline-success rounded-pill px-3"
+                               style="font-size:0.8rem; font-weight:700; white-space:nowrap;">
+                                Lihat Semua <i class="fas fa-chevron-right ms-1"></i>
+                            </a>
+                        @else
+                            <a href="{{ route('user.jadwal-distribusi.index') }}"
+                               class="btn btn-sm btn-outline-secondary rounded-pill px-3"
+                               style="font-size:0.8rem; font-weight:700; white-space:nowrap;">
+                                Lihat Jadwal <i class="fas fa-chevron-right ms-1"></i>
+                            </a>
+                        @endif
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- 4. Chart & Activity Feed --}}
 <div class="row mb-4">
     <div class="col-lg-8 mb-4">
         <div class="card shadow-sm border-0 h-100">
@@ -108,80 +169,79 @@
         </div>
     </div>
     
-<div class="col-lg-4 mb-4">
-    <div class="card shadow-sm border-0 h-100" style="border-radius: 12px;">
-        <div class="card-header bg-transparent border-0 py-3 px-4">
-            <h6 class="fw-bold mb-0 text-primary">
-                <i class="fas fa-bolt me-2"></i>Live Activity Feed
-            </h6>
-        </div>
-        <div class="card-body p-0">
-            <div class="timeline-simple px-4" style="max-height: 400px; overflow-y: auto; overflow-x: hidden;">
-                @forelse($activityFeeds as $feed)
-                    @php
-                        $namaBahan = strtolower($feed->bahan->nama_bahan ?? 'bahan');
-                        $bgClass = 'bg-secondary';
-                        $iconDefault = 'fa-box';
-                        
-                        if (str_contains($namaBahan, 'cup')) {
-                            $bgClass = 'bg-primary'; $iconDefault = 'fa-glass-whiskey';
-                        } elseif (str_contains($namaBahan, 'gula') || str_contains($namaBahan, 'aren')) {
-                            $bgClass = 'bg-warning text-dark'; $iconDefault = 'fa-flask';
-                        } elseif (str_contains($namaBahan, 'teh')) {
-                            $bgClass = 'bg-success'; $iconDefault = 'fa-leaf';
-                        }
+    <div class="col-lg-4 mb-4">
+        <div class="card shadow-sm border-0 h-100" style="border-radius: 12px;">
+            <div class="card-header bg-transparent border-0 py-3 px-4">
+                <h6 class="fw-bold mb-0 text-primary">
+                    <i class="fas fa-bolt me-2"></i>Live Activity Feed
+                </h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="timeline-simple px-4" style="max-height: 400px; overflow-y: auto; overflow-x: hidden;">
+                    @forelse($activityFeeds as $feed)
+                        @php
+                            $namaBahan = strtolower($feed->bahan->nama_bahan ?? 'bahan');
+                            $bgClass = 'bg-secondary';
+                            $iconDefault = 'fa-box';
+                            
+                            if (str_contains($namaBahan, 'cup')) {
+                                $bgClass = 'bg-primary'; $iconDefault = 'fa-glass-whiskey';
+                            } elseif (str_contains($namaBahan, 'gula') || str_contains($namaBahan, 'aren')) {
+                                $bgClass = 'bg-warning text-dark'; $iconDefault = 'fa-flask';
+                            } elseif (str_contains($namaBahan, 'teh')) {
+                                $bgClass = 'bg-success'; $iconDefault = 'fa-leaf';
+                            }
 
-                        if (isset($feed->tipe) && $feed->tipe == 'waste') {
-                            $bgClass = 'bg-danger'; $iconClass = 'fa-trash-alt';
-                        } else {
-                            $iconClass = ($feed->tipe_aktivitas == 'distribusi') ? 'fa-truck' : $iconDefault;
-                        }
-                    @endphp
-                    
-                    <div class="d-flex mb-4 position-relative">
-                        <div class="me-3" style="min-width: 45px;">
-                            <div class="position-relative">
-                                <span class="btn btn-sm {{ $bgClass }} rounded-circle d-flex align-items-center justify-content-center text-white shadow-sm" style="width:42px;height:42px; border: 2px solid rgba(255,255,255,0.2);">
-                                    <i class="fas {{ $iconClass }} fa-sm"></i>
-                                </span>
-                                <span class="position-absolute bottom-0 end-0 badge rounded-circle {{ $feed->tipe_aktivitas == 'pemakaian' ? 'bg-danger' : 'bg-success' }} p-1" style="border: 2px solid white; transform: translate(25%, 25%);">
-                                    <i class="fas {{ $feed->tipe_aktivitas == 'pemakaian' ? 'fa-arrow-down' : 'fa-arrow-up' }}" style="font-size: 8px;"></i>
-                                </span>
-                            </div>
-                        </div>
+                            if (isset($feed->tipe) && $feed->tipe == 'waste') {
+                                $bgClass = 'bg-danger'; $iconClass = 'fa-trash-alt';
+                            } else {
+                                $iconClass = ($feed->tipe_aktivitas == 'distribusi') ? 'fa-truck' : $iconDefault;
+                            }
+                        @endphp
                         
-                        <div class="w-100 border-bottom pb-3">
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                {{-- ✅ text-white-50 → text-adaptive --}}
-                                <strong class="small text-adaptive" style="font-size: 13px; letter-spacing: 0.3px;">
-                                    {{ $feed->bahan->nama_bahan ?? 'Bahan' }}
-                                </strong>
-                                <small class="text-muted" style="font-size: 10px;">
-                                    <i class="far fa-clock me-1"></i>{{ $feed->created_at->diffForHumans() }}
-                                </small>
+                        <div class="d-flex mb-4 position-relative">
+                            <div class="me-3" style="min-width: 45px;">
+                                <div class="position-relative">
+                                    <span class="btn btn-sm {{ $bgClass }} rounded-circle d-flex align-items-center justify-content-center text-white shadow-sm" style="width:42px;height:42px; border: 2px solid rgba(255,255,255,0.2);">
+                                        <i class="fas {{ $iconClass }} fa-sm"></i>
+                                    </span>
+                                    <span class="position-absolute bottom-0 end-0 badge rounded-circle {{ $feed->tipe_aktivitas == 'pemakaian' ? 'bg-danger' : 'bg-success' }} p-1" style="border: 2px solid white; transform: translate(25%, 25%);">
+                                        <i class="fas {{ $feed->tipe_aktivitas == 'pemakaian' ? 'fa-arrow-down' : 'fa-arrow-up' }}" style="font-size: 8px;"></i>
+                                    </span>
+                                </div>
                             </div>
-                            <p class="mb-0" style="font-size: 12px; line-height: 1.4;">
-                                <span class="fw-bold {{ (isset($feed->tipe) && $feed->tipe == 'waste') ? 'text-danger' : ($feed->tipe_aktivitas == 'pemakaian' ? 'text-warning' : 'text-info') }}">
-                                    {{ (isset($feed->tipe) && $feed->tipe == 'waste') ? 'Waste/Rusak' : ucfirst($feed->tipe_aktivitas) }}
-                                </span> 
-                                {{-- ✅ text-light → text-muted --}}
-                                <span class="text-muted">sebanyak</span> 
-                                {{-- ✅ text-white → text-adaptive --}}
-                                <strong class="text-adaptive">{{ $feed->jumlah }} unit</strong>
-                            </p>
+                            
+                            <div class="w-100 border-bottom pb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <strong class="small text-adaptive" style="font-size: 13px; letter-spacing: 0.3px;">
+                                        {{ $feed->bahan->nama_bahan ?? 'Bahan' }}
+                                    </strong>
+                                    <small class="text-muted" style="font-size: 10px;">
+                                        <i class="far fa-clock me-1"></i>{{ $feed->created_at->diffForHumans() }}
+                                    </small>
+                                </div>
+                                <p class="mb-0" style="font-size: 12px; line-height: 1.4;">
+                                    <span class="fw-bold {{ (isset($feed->tipe) && $feed->tipe == 'waste') ? 'text-danger' : ($feed->tipe_aktivitas == 'pemakaian' ? 'text-warning' : 'text-info') }}">
+                                        {{ (isset($feed->tipe) && $feed->tipe == 'waste') ? 'Waste/Rusak' : ucfirst($feed->tipe_aktivitas) }}
+                                    </span> 
+                                    <span class="text-muted">sebanyak</span> 
+                                    <strong class="text-adaptive">{{ $feed->jumlah }} unit</strong>
+                                </p>
+                            </div>
                         </div>
-                    </div>
-                @empty
-                    <div class="text-center py-5 text-muted small">
-                        <i class="fas fa-history d-block mb-2 fa-2x opacity-25"></i>
-                        Belum ada aktivitas terekam.
-                    </div>
-                @endforelse
+                    @empty
+                        <div class="text-center py-5 text-muted small">
+                            <i class="fas fa-history d-block mb-2 fa-2x opacity-25"></i>
+                            Belum ada aktivitas terekam.
+                        </div>
+                    @endforelse
+                </div>
             </div>
         </div>
     </div>
 </div>
-{{-- 4. Baris Tabel Bawah --}}
+
+{{-- 5. Baris Tabel Bawah --}}
 <div class="row">
     {{-- Stok Saat Ini (Kiri) --}}
     <div class="col-lg-5 mb-4">
@@ -190,90 +250,79 @@
                 <h6 class="fw-bold mb-0 text-success">
                     <i class="fas fa-layer-group me-2"></i>Stok Saat Ini
                 </h6>
-<a href="{{ route('user.stok-outlet.index') }}" 
-   class="btn btn-sm btn-outline-success rounded-pill px-3 shadow-sm" 
-   style="font-size: 11px; font-weight: 800; margin-left: auto; color: #28a745 !important; border: 2px solid #28a745 !important; background-color: transparent !important;">
-    Detail <i class="fas fa-chevron-right ms-1"></i>
-</a>   
-  </div>
-            
+                <a href="{{ route('user.stok-outlet.index') }}" 
+                   class="btn btn-sm btn-outline-success rounded-pill px-3 shadow-sm" 
+                   style="font-size: 11px; font-weight: 800; margin-left: auto; color: #28a745 !important; border: 2px solid #28a745 !important; background-color: transparent !important;">
+                    Detail <i class="fas fa-chevron-right ms-1"></i>
+                </a>   
+            </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
-<table class="table table-hover mb-0 align-middle" style="width: 100%; table-layout: fixed; border-collapse: collapse;">
-    <thead style="background-color: #f8faf9;">
-        <tr>
-            {{-- 1. Nama Bahan --}}
-            <th class="ps-3 py-3 border-0 text-muted small fw-bold" style="width: 40%;">Bahan</th>
-            
-            {{-- 2. Stok --}}
-            <th class="py-3 border-0 text-muted small fw-bold text-center" style="width: 25%;">Stok</th>
-            
-            {{-- 3. Status (Disesuaikan agar sejajar dengan badge) --}}
-            <th class="py-3 border-0 text-muted small fw-bold text-center" style="width: 35%;">
-                <div style="padding-left: 20px;">Status</div>
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach($stokOutlets as $s)
-        <tr onclick="window.location='{{ route('user.stok-outlet.index') }}'" style="cursor: pointer; border-bottom: 1px solid #f8faf9;">
-            {{-- Nama Bahan --}}
-            <td class="ps-3 py-3">
-                <span class="fw-bold text-dark d-block text-truncate">{{ $s->bahan->nama_bahan ?? 'Unknown' }}</span>
-            </td>
-
-            {{-- Angka Stok --}}
-            <td class="py-3 text-center">
-                <span class="fw-bold text-secondary" style="font-size: 15px;">
-                    {{ number_format($s->stok, 0, ',', '.') }}
-                </span>
-            </td>
-
-            {{-- Status Badge (Sekarang pakai text-center + padding agar sejajar header) --}}
-            <td class="py-3 text-center">
-                <div style="display: flex; justify-content: center; padding-left: 20px;">
-                    @if ($s->stok == 0)
-                        <span class="badge rounded-pill px-3 py-2 shadow-sm" style="background-color: rgba(220, 53, 69, 0.1); color: #dc3545; font-size: 11px; min-width: 95px; border: 1px solid rgba(220, 53, 69, 0.2);">
-                            <i class="fas fa-times-circle me-1"></i> Habis
-                        </span>
-                    @elseif ($s->stok <= 10)
-                        <span class="badge rounded-pill px-3 py-2 shadow-sm" style="background-color: rgba(255, 193, 7, 0.1); color: #856404; font-size: 11px; min-width: 95px; border: 1px solid rgba(255, 193, 7, 0.2);">
-                            <i class="fas fa-exclamation-triangle me-1"></i> Tipis
-                        </span>
-                    @else
-                        <span class="badge rounded-pill px-3 py-2 shadow-sm" style="background-color: rgba(40, 167, 69, 0.1); color: #28a745; font-size: 11px; min-width: 95px; border: 1px solid rgba(40, 167, 69, 0.2);">
-                            <i class="fas fa-check-circle me-1"></i> Aman
-                        </span>
-                    @endif
-                </div>
-            </td>
-        </tr>
-        @endforeach
-    </tbody>
-</table>
+                    <table class="table table-hover mb-0 align-middle" style="width: 100%; table-layout: fixed; border-collapse: collapse;">
+                        <thead style="background-color: #f8faf9;">
+                            <tr>
+                                <th class="ps-3 py-3 border-0 text-muted small fw-bold" style="width: 40%;">Bahan</th>
+                                <th class="py-3 border-0 text-muted small fw-bold text-center" style="width: 25%;">Stok</th>
+                                <th class="py-3 border-0 text-muted small fw-bold text-center" style="width: 35%;">
+                                    <div style="padding-left: 20px;">Status</div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($stokOutlets as $s)
+                            <tr onclick="window.location='{{ route('user.stok-outlet.index') }}'" style="cursor: pointer; border-bottom: 1px solid #f8faf9;">
+                                <td class="ps-3 py-3">
+                                    <span class="fw-bold text-dark d-block text-truncate">{{ $s->bahan->nama_bahan ?? 'Unknown' }}</span>
+                                </td>
+                                <td class="py-3 text-center">
+                                    <span class="fw-bold text-secondary" style="font-size: 15px;">
+                                        {{ number_format($s->stok, 0, ',', '.') }}
+                                    </span>
+                                </td>
+                                <td class="py-3 text-center">
+                                    <div style="display: flex; justify-content: center; padding-left: 20px;">
+                                        @if ($s->stok == 0)
+                                            <span class="badge rounded-pill px-3 py-2 shadow-sm" style="background-color: rgba(220, 53, 69, 0.1); color: #dc3545; font-size: 11px; min-width: 95px; border: 1px solid rgba(220, 53, 69, 0.2);">
+                                                <i class="fas fa-times-circle me-1"></i> Habis
+                                            </span>
+                                        @elseif ($s->stok <= 10)
+                                            <span class="badge rounded-pill px-3 py-2 shadow-sm" style="background-color: rgba(255, 193, 7, 0.1); color: #856404; font-size: 11px; min-width: 95px; border: 1px solid rgba(255, 193, 7, 0.2);">
+                                                <i class="fas fa-exclamation-triangle me-1"></i> Tipis
+                                            </span>
+                                        @else
+                                            <span class="badge rounded-pill px-3 py-2 shadow-sm" style="background-color: rgba(40, 167, 69, 0.1); color: #28a745; font-size: 11px; min-width: 95px; border: 1px solid rgba(40, 167, 69, 0.2);">
+                                                <i class="fas fa-check-circle me-1"></i> Aman
+                                            </span>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
-         <div class="card-footer custom-card-footer border-0 py-3 text-center">
-    <small class="text-muted" style="font-size: 10px;">
-        <i class="fas fa-info-circle me-1"></i> Klik baris untuk manajemen stok
-    </small>
-</div>
+            <div class="card-footer custom-card-footer border-0 py-3 text-center">
+                <small class="text-muted" style="font-size: 10px;">
+                    <i class="fas fa-info-circle me-1"></i> Klik baris untuk manajemen stok
+                </small>
+            </div>
         </div>
     </div>
 
     {{-- Riwayat Pemakaian Terbaru (Kanan) --}}
     <div class="col-lg-7 mb-4">
         <div class="card shadow-sm border-0 h-100">
-           <div class="card-header bg-white border-0 py-3 d-flex align-items-center justify-content-between" style="display: flex !important; justify-content: space-between !important; width: 100%;">
+            <div class="card-header bg-white border-0 py-3 d-flex align-items-center justify-content-between" style="display: flex !important; justify-content: space-between !important; width: 100%;">
                 <h6 class="fw-bold mb-0 text-warning">
                     <i class="fas fa-history me-2"></i>Riwayat Pemakaian Terbaru
                 </h6>
-      <a href="{{ route('user.riwayat_pemakaian') }}" 
-   class="btn btn-sm btn-outline-warning rounded-pill px-3 shadow-sm" 
-   style="font-size: 11px; font-weight: 800; margin-left: auto; color: #ffc107 !important; border: 2px solid #ffc107 !important; background-color: transparent !important;">
-    Lihat Semua <i class="fas fa-arrow-right ms-1"></i>
-</a>
-     </div>
+                <a href="{{ route('user.riwayat_pemakaian') }}" 
+                   class="btn btn-sm btn-outline-warning rounded-pill px-3 shadow-sm" 
+                   style="font-size: 11px; font-weight: 800; margin-left: auto; color: #ffc107 !important; border: 2px solid #ffc107 !important; background-color: transparent !important;">
+                    Lihat Semua <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-hover mb-0 text-center align-middle">
@@ -294,7 +343,6 @@
                                 </td>
                                 <td class="py-3 text-muted" style="font-size: 12px;">{{ \Carbon\Carbon::parse($p->tanggal)->format('d M Y') }}</td>
                                 <td class="py-3">
-                                    {{-- REVISI LOGIKA STATUS WASTE --}}
                                     @if(isset($p->tipe) && $p->tipe == 'waste')
                                         <span class="badge rounded-pill px-2 py-1" style="background-color: rgba(220, 53, 69, 0.1); color: #dc3545; font-size: 10px;">
                                             <i class="fas fa-exclamation-triangle me-1"></i>Waste: {{ $p->keterangan ?? 'Rusak' }}
@@ -311,9 +359,10 @@
                     </table>
                 </div>
             </div>
-        </div>
-    </div>
+        </div>yt
+    </div>0-
 </div>
+
 @endsection
 
 @push('js')
