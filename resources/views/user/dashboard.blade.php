@@ -109,13 +109,13 @@
     </div>
     
 <div class="col-lg-4 mb-4">
-    <div class="card shadow-sm border-0 h-100 bg-white" style="border-radius: 12px;">
+    <div class="card shadow-sm border-0 h-100" style="border-radius: 12px;">
         <div class="card-header bg-transparent border-0 py-3 px-4">
             <h6 class="fw-bold mb-0 text-primary">
                 <i class="fas fa-bolt me-2"></i>Live Activity Feed
             </h6>
         </div>
-        <div class="card-body p-0"> {{-- P-0 biar scrollbar mepet ke pinggir kanan --}}
+        <div class="card-body p-0">
             <div class="timeline-simple px-4" style="max-height: 400px; overflow-y: auto; overflow-x: hidden;">
                 @forelse($activityFeeds as $feed)
                     @php
@@ -138,14 +138,12 @@
                         }
                     @endphp
                     
-                    {{-- Ditambah margin mb-4 dan padding-start supaya ikon tidak nempel tembok --}}
                     <div class="d-flex mb-4 position-relative">
                         <div class="me-3" style="min-width: 45px;">
                             <div class="position-relative">
                                 <span class="btn btn-sm {{ $bgClass }} rounded-circle d-flex align-items-center justify-content-center text-white shadow-sm" style="width:42px;height:42px; border: 2px solid rgba(255,255,255,0.2);">
                                     <i class="fas {{ $iconClass }} fa-sm"></i>
                                 </span>
-                                {{-- Badge panah --}}
                                 <span class="position-absolute bottom-0 end-0 badge rounded-circle {{ $feed->tipe_aktivitas == 'pemakaian' ? 'bg-danger' : 'bg-success' }} p-1" style="border: 2px solid white; transform: translate(25%, 25%);">
                                     <i class="fas {{ $feed->tipe_aktivitas == 'pemakaian' ? 'fa-arrow-down' : 'fa-arrow-up' }}" style="font-size: 8px;"></i>
                                 </span>
@@ -154,7 +152,8 @@
                         
                         <div class="w-100 border-bottom pb-3">
                             <div class="d-flex justify-content-between align-items-center mb-1">
-                                <strong class="small text-white-50" style="font-size: 13px; letter-spacing: 0.3px;">
+                                {{-- ✅ text-white-50 → text-adaptive --}}
+                                <strong class="small text-adaptive" style="font-size: 13px; letter-spacing: 0.3px;">
                                     {{ $feed->bahan->nama_bahan ?? 'Bahan' }}
                                 </strong>
                                 <small class="text-muted" style="font-size: 10px;">
@@ -165,8 +164,10 @@
                                 <span class="fw-bold {{ (isset($feed->tipe) && $feed->tipe == 'waste') ? 'text-danger' : ($feed->tipe_aktivitas == 'pemakaian' ? 'text-warning' : 'text-info') }}">
                                     {{ (isset($feed->tipe) && $feed->tipe == 'waste') ? 'Waste/Rusak' : ucfirst($feed->tipe_aktivitas) }}
                                 </span> 
-                                <span class="text-light">sebanyak</span> 
-                                <strong class="text-white">{{ $feed->jumlah }} unit</strong>
+                                {{-- ✅ text-light → text-muted --}}
+                                <span class="text-muted">sebanyak</span> 
+                                {{-- ✅ text-white → text-adaptive --}}
+                                <strong class="text-adaptive">{{ $feed->jumlah }} unit</strong>
                             </p>
                         </div>
                     </div>

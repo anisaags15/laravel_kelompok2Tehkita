@@ -11,97 +11,73 @@ body {
     object-fit: cover;
 }
 
-/* Transition agar perpindahan sidebar halus */
-.main-sidebar { 
-    transition: width 0.3s ease; 
-}
-
-.content-wrapper { 
-    transition: margin-left 0.3s ease; 
-}
-
-/* ======================================================
-    SIDEBAR STRUCTURE
-====================================================== */
 .main-sidebar {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
+    overflow-x: hidden !important;
 }
 
 .sidebar {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
     overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.content-wrapper {
+    transition: margin-left 0.3s ease;
 }
 
 /* ======================================================
     BRAND
 ====================================================== */
 .brand-link {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 15px 0;
-    min-height: 70px;
+    padding: 15px 0.8rem;
+    border-bottom: none !important; /* ✅ Fix garis yang nutup Admin Panel */
 }
 
 .brand-image {
-    width: 45px;
-    height: 45px;
-    border-radius: 50% !important;
-    object-fit: cover;
     border: 2px solid #198754;
+    margin-right: 8px !important; /* ✅ Fix jarak logo */
+    margin-left: 4px !important;
+    float: left !important;
 }
 
 .brand-text {
-    margin-left: 10px;
     font-weight: 700;
     color: #198754 !important;
+    line-height: 1 !important;
 }
 
 /* ======================================================
-    USER PANEL (HORIZONTAL FIX)
+    USER PANEL
 ====================================================== */
 .user-panel {
-    width: 100%;
-    display: flex;
-    align-items: center;  
-    justify-content: center;
-    gap: 12px;
-    padding: 18px 10px;
+    padding: 12px 10px;
+    border-bottom: 1px solid rgba(0,0,0,0.1); /* ✅ Fix menu turun */
+    margin-bottom: 0 !important;
 }
 
-.user-panel .image {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.user-panel img {
-    width: 55px;
-    height: 55px;
+.user-panel .image img {
+    border: 2px solid #198754;
     border-radius: 50% !important;
     object-fit: cover;
-    border: 3px solid #198754;
-}
-
-.user-panel .info {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    margin-right: 8px !important;
 }
 
 .user-panel .info a {
     font-weight: 600;
-    margin-bottom: 2px;
+    color: #198754 !important;
 }
 
 .user-panel .info small {
     font-size: 12px;
 }
 
+/* ======================================================
+    COLLAPSE MODE
+====================================================== */
+.sidebar-mini.sidebar-collapse .brand-text,
+.sidebar-mini.sidebar-collapse .user-panel,
+.sidebar-mini.sidebar-collapse .brand-link {
+    display: none !important;
+}
 /* ======================================================
     NAV MENU
 ====================================================== */
@@ -122,42 +98,10 @@ body {
     color: #ffffff !important;
 }
 
-/* Penyesuaian font Nav Header secara global */
 .main-sidebar .nav-header {
     font-weight: 700;
     letter-spacing: 0.5px;
     text-transform: uppercase;
-}
-
-/* ======================================================
-    COLLAPSE MODE (FIX SIDEBAR)
-====================================================== */
-.sidebar-mini.sidebar-collapse .brand-text {
-    display: none;
-}
-
-.sidebar-mini.sidebar-collapse .brand-link {
-    justify-content: center;
-}
-
-.sidebar-mini.sidebar-collapse .user-panel .info {
-    display: none !important;
-}
-
-.sidebar-mini.sidebar-collapse .user-panel img {
-    width: 38px;
-    height: 38px;
-}
-
-/* Mencegah sidebar melebar saat di-hover dalam kondisi collapse */
-.sidebar-mini.sidebar-collapse .main-sidebar:hover {
-    width: 4.6rem !important; 
-}
-
-.sidebar-mini.sidebar-collapse .main-sidebar:hover .nav-sidebar p,
-.sidebar-mini.sidebar-collapse .main-sidebar:hover .brand-text,
-.sidebar-mini.sidebar-collapse .main-sidebar:hover .user-panel .info {
-    display: none !important;
 }
 
 /* ======================================================
@@ -220,9 +164,9 @@ body {
     UTILITY COLORS
 ====================================================== */
 .bg-soft-success { background: rgba(25,135,84,.1); color:#198754; }
-.bg-soft-info { background: rgba(13,202,240,.1); color:#0dcaf0; }
-.bg-soft-warning { background: rgba(255,193,7,.1); color:#ffc107; }
-.bg-soft-danger { background: rgba(220,53,69,.1); color:#dc3545; }
+.bg-soft-info    { background: rgba(13,202,240,.1); color:#0dcaf0; }
+.bg-soft-warning { background: rgba(255,193,7,.1);  color:#ffc107; }
+.bg-soft-danger  { background: rgba(220,53,69,.1);  color:#dc3545; }
 
 /* ======================================================
     MESSAGE ITEM
@@ -248,30 +192,30 @@ body {
 }
 
 /* ======================================================
-    MODERN FORMS & SELECT2 (THE MAGIC FIX)
+    MODERN FORMS & SELECT2
 ====================================================== */
-.input-group-modern { 
-    display: flex !important; 
-    align-items: stretch !important; 
-    width: 100%; 
-    border-radius: 12px; 
+.input-group-modern {
+    display: flex !important;
+    align-items: stretch !important;
+    width: 100%;
+    border-radius: 12px;
     overflow: hidden;
     border: 1px solid #ced4da;
     background: #ffffff;
-    min-height: 50px; 
+    min-height: 50px;
 }
 
 .input-icon {
-    width: 50px; 
+    width: 50px;
     background: #f8f9fa;
     border-right: 1px solid #ced4da;
-    display: flex; 
-    align-items: center; 
+    display: flex;
+    align-items: center;
     justify-content: center;
     color: #4b5d53;
 }
 
-.form-control.input-modern, 
+.form-control.input-modern,
 .custom-select-modern {
     border: none !important;
     background: transparent !important;
@@ -280,7 +224,6 @@ body {
     flex: 1;
 }
 
-/* SELECT2 GLOBAL FIX */
 .select2-container--default .select2-selection--single {
     border: none !important;
     background: transparent !important;
@@ -299,24 +242,22 @@ body {
 }
 
 /* ======================================================
-    DARK MODE OVERRIDE - FULL PROFESSIONAL & ANTI FLASHBANG
+    DARK MODE
 ====================================================== */
-
-/* Menerapkan transisi halus */
-body, .content-wrapper, .main-sidebar, .card, .table, .nav-link, .main-footer, .main-header, .navbar, .dropdown-menu {
+body, .content-wrapper, .main-sidebar, .card, .table,
+.nav-link, .main-footer, .main-header, .navbar, .dropdown-menu {
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
-/* Base Body */
 .dark-mode {
     background-color: #121212 !important;
     color: #e0e0e0 !important;
 }
+
 .dark-mode .content-wrapper {
     background-color: #121212 !important;
 }
 
-/* Navbar Atas */
 .dark-mode .main-header,
 .dark-mode .navbar,
 .dark-mode .navbar-white,
@@ -325,63 +266,41 @@ body, .content-wrapper, .main-sidebar, .card, .table, .nav-link, .main-footer, .
     border-bottom: 1px solid #333 !important;
     color: #e0e0e0 !important;
 }
-.dark-mode .navbar-light .navbar-nav .nav-link {
-    color: #e0e0e0 !important;
-}
-.dark-mode .navbar-light .navbar-nav .nav-link:hover {
-    color: #ffffff !important;
-}
 
-/* Sidebar & Logo */
+.dark-mode .navbar-light .navbar-nav .nav-link { color: #e0e0e0 !important; }
+.dark-mode .navbar-light .navbar-nav .nav-link:hover { color: #ffffff !important; }
+
 .dark-mode .main-sidebar,
 .dark-mode .brand-link {
     background-color: #1a1a1a !important;
     border-right: 1px solid #333 !important;
     border-bottom: 1px solid #333 !important;
 }
-.dark-mode .nav-sidebar .nav-link {
-    color: #cbd5e0 !important;
-}
-.dark-mode .nav-sidebar .nav-link:hover {
-    background-color: rgba(255, 255, 255, 0.05) !important;
-}
-.dark-mode .user-panel .info a {
-    color: #e0e0e0 !important;
-}
 
-/* =========================================
-   SUNTIKAN FIX NAV HEADER DI DARK MODE
-   Biar MASTER DATA dll nggak amblas!
-========================================= */
+.dark-mode .nav-sidebar .nav-link { color: #cbd5e0 !important; }
+.dark-mode .nav-sidebar .nav-link:hover { background-color: rgba(255,255,255,0.05) !important; }
+.dark-mode .user-panel .info a { color: #e0e0e0 !important; }
+
 .dark-mode .main-sidebar .nav-header {
-    color: #28a745 !important; /* Warna Hijau Cerah agar menyala */
-    background-color: rgba(255, 255, 255, 0.05) !important; /* Efek highlight kotak tipis */
+    color: #28a745 !important;
+    background-color: rgba(255,255,255,0.05) !important;
     border-radius: 6px;
     margin: 10px 10px 5px 10px;
     padding: 8px 15px;
 }
 
-/* Dropdown Menu & Notifikasi */
 .dark-mode .dropdown-menu {
     background-color: #242424 !important;
     border: 1px solid #333 !important;
     color: #e0e0e0 !important;
 }
-.dark-mode .dropdown-item {
-    color: #e0e0e0 !important;
-}
-.dark-mode .dropdown-item:hover, 
-.dark-mode .dropdown-item:focus {
-    background-color: #333 !important;
-    color: #ffffff !important;
-}
-.dark-mode .dropdown-header, 
-.dark-mode .dropdown-footer {
-    color: #aaa !important;
-    border-color: #333 !important;
-}
 
-/* Card & Wrapper */
+.dark-mode .dropdown-item { color: #e0e0e0 !important; }
+.dark-mode .dropdown-item:hover,
+.dark-mode .dropdown-item:focus { background-color: #333 !important; color: #ffffff !important; }
+.dark-mode .dropdown-header,
+.dark-mode .dropdown-footer { color: #aaa !important; border-color: #333 !important; }
+
 .dark-mode .card,
 .dark-mode .dashboard-card,
 .dark-mode .info-box {
@@ -389,42 +308,36 @@ body, .content-wrapper, .main-sidebar, .card, .table, .nav-link, .main-footer, .
     color: #e0e0e0 !important;
     box-shadow: 0 4px 15px rgba(0,0,0,0.3) !important;
 }
+
 .dark-mode .card-header {
     border-bottom: 1px solid #333 !important;
     background-color: transparent !important;
 }
 
-/* Table Area */
 .dark-mode .table,
 .dark-mode .table > tbody > tr,
-.dark-mode .table td, 
+.dark-mode .table td,
 .dark-mode .table th {
     background-color: #1e1e1e !important;
     color: #e0e0e0 !important;
     border-color: #333 !important;
 }
+
 .dark-mode .table thead,
 .dark-mode .table thead tr {
     background-color: #2d3436 !important;
     color: #e0e0e0 !important;
 }
 
-/* Teks Spesifik */
-.dark-mode .text-dark {
-    color: #ffffff !important; 
-}
-.dark-mode .breadcrumb-item.active {
-    color: #aaaaaa !important;
-}
+.dark-mode .text-dark { color: #ffffff !important; }
+.dark-mode .breadcrumb-item.active { color: #aaaaaa !important; }
 
-/* Footer Bawah */
 .dark-mode .main-footer {
     background-color: #1a1a1a !important;
     border-top: 1px solid #333 !important;
     color: #aaaaaa !important;
 }
 
-/* --- FORMS & INPUT FIX ADMIN --- */
 .dark-mode .input-group-modern {
     background-color: #25282c !important;
     border: 1px solid #333 !important;
@@ -436,25 +349,21 @@ body, .content-wrapper, .main-sidebar, .card, .table, .nav-link, .main-footer, .
     color: #adb5bd !important;
 }
 
-/* PAKSA Input Text dan Number jadi gelap */
-.dark-mode .form-control, 
+.dark-mode .form-control,
 .dark-mode .input-modern,
-.dark-mode .form-control:focus, 
+.dark-mode .form-control:focus,
 .dark-mode .input-modern:focus {
-    background-color: #25282c !important; 
+    background-color: #25282c !important;
     color: #ffffff !important;
     box-shadow: none !important;
 }
 
-/* --- JINAKKAN DROPDOWN SELECT2 ADMIN --- */
 .dark-mode .select2-container--default .select2-dropdown {
     background-color: #25282c !important;
     border: 1px solid #333 !important;
 }
 
-.dark-mode .select2-search--dropdown {
-    background-color: #25282c !important;
-}
+.dark-mode .select2-search--dropdown { background-color: #25282c !important; }
 
 .dark-mode .select2-search__field {
     background-color: #1e1e1e !important;
@@ -475,7 +384,7 @@ body, .content-wrapper, .main-sidebar, .card, .table, .nav-link, .main-footer, .
 
 .dark-mode .select2-container--default .select2-results__option--highlighted[aria-selected],
 .dark-mode .select2-container--default .select2-results__option--highlighted[aria-selected]:hover {
-    background-color: #198754 !important; 
+    background-color: #198754 !important;
     color: #ffffff !important;
 }
 
@@ -484,146 +393,135 @@ body, .content-wrapper, .main-sidebar, .card, .table, .nav-link, .main-footer, .
     color: #adb5bd !important;
 }
 
-/* Date Picker & Placeholder */
-.dark-mode ::placeholder {
-    color: #8898aa !important;
-    opacity: 1;
-}
+.dark-mode ::placeholder { color: #8898aa !important; opacity: 1; }
 
 .dark-mode input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(1) brightness(100%);
     cursor: pointer;
 }
-/* ================================================================
-   7. CHAT & MESSAGING SYSTEM
-   ================================================================ */
-.hover-chat-item:hover { 
-    background-color: rgba(25, 135, 84, 0.03) !important; 
-    transform: translateX(8px); 
+
+/* ======================================================
+    CHAT & MESSAGING
+====================================================== */
+.hover-chat-item:hover {
+    background-color: rgba(25,135,84,0.03) !important;
+    transform: translateX(8px);
     transition: all 0.3s ease;
 }
 
-.bg-soft-primary { background-color: rgba(13, 110, 253, 0.1); }
-.bg-soft-info { background-color: rgba(13, 202, 240, 0.1); }
-.bg-soft-danger { background-color: rgba(220, 53, 69, 0.1); }
-.bg-soft-success { background-color: rgba(25, 135, 84, 0.1); }
+.bg-soft-primary { background-color: rgba(13,110,253,0.1); }
+.bg-soft-info    { background-color: rgba(13,202,240,0.1); }
+.bg-soft-danger  { background-color: rgba(220,53,69,0.1);  }
+.bg-soft-success { background-color: rgba(25,135,84,0.1);  }
 
-.pulse-red { 
-    animation: pulse-red-small 2s infinite; 
+.pulse-red {
+    animation: pulse-red-small 2s infinite;
     font-size: 0.7rem;
 }
 
 @keyframes pulse-red-small {
-    0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
-    70% { box-shadow: 0 0 0 6px rgba(220, 53, 69, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+    0%   { box-shadow: 0 0 0 0 rgba(220,53,69,0.7); }
+    70%  { box-shadow: 0 0 0 6px rgba(220,53,69,0); }
+    100% { box-shadow: 0 0 0 0 rgba(220,53,69,0);   }
 }
 
-/* Fix untuk dark mode di list chat */
-.dark-mode .hover-chat-item:hover {
-    background-color: rgba(255, 255, 255, 0.05) !important;
+.dark-mode .hover-chat-item:hover { background-color: rgba(255,255,255,0.05) !important; }
+.dark-mode .border-adaptive { border-color: rgba(255,255,255,0.1) !important; }
+
+.bg-gradient-danger  { background: linear-gradient(87deg, #f5365c 0, #f56036 100%) !important; }
+.bg-gradient-success { background: linear-gradient(87deg, #2dce89 0, #2dcebe 100%) !important; }
+
+.transition-all:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 1rem 3rem rgba(0,0,0,.1) !important;
+    transition: all 0.3s ease;
 }
 
-.dark-mode .border-adaptive {
-    border-color: rgba(255, 255, 255, 0.1) !important;
+.table td, .table th { vertical-align: middle; border-top: 1px solid #f8f9fa; }
+
+.foto-zoom {
+    transition: transform .2s;
+    border: 2px solid #fff;
 }
-    .bg-gradient-danger { background: linear-gradient(87deg, #f5365c 0, #f56036 100%) !important; }
-    .bg-gradient-success { background: linear-gradient(87deg, #2dce89 0, #2dcebe 100%) !important; }
-    .transition-all:hover { transform: translateY(-5px); box-shadow: 0 1rem 3rem rgba(0,0,0,.1) !important; transition: all 0.3s ease; }
-    .table td, .table th { vertical-align: middle; border-top: 1px solid #f8f9fa; }
-    
-    .foto-zoom {
-        transition: transform .2s;
-        border: 2px solid #fff;
-    }
-    .foto-zoom:hover {
-        transform: scale(1.1);
-        z-index: 10;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.2) !important;
-    }
 
-    /* Modal Backdrop Blur */
-    .modal {
-        backdrop-filter: blur(5px);
-    }
-    
-    .btn-primary {
-        background-color: #4e73df;
-        border-color: #4e73df;
-    }
+.foto-zoom:hover {
+    transform: scale(1.1);
+    z-index: 10;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2) !important;
+}
 
-        /* CSS Tambahan agar input tidak 'tenggelam' di mode terang */
-    .form-control {
-        border: 1px solid #ced4da;
-    }
-    
-    /* Biar tetap ganteng di Dark Mode tanpa merusak Light Mode */
-    [data-theme='dark'] .card, .dark-mode .card {
-        background-color: #1a1d21 !important;
-        color: white;
-    }
-    
-    [data-theme='dark'] .form-control, .dark-mode .form-control {
-        background-color: #24282d !important;
-        border: none;
-        color: white;
-    }
-    /* MODE TERANG */
-    .custom-card-theme { background-color: #ffffff; }
-    .heading-theme { color: #2d3436; }
-    .label-theme { color: #636e72; margin-bottom: 8px; }
-    
-    .input-custom { 
-        background-color: #f8f9fa !important; 
-        border: 1px solid #e9ecef !important; 
-        color: #2d3436 !important; 
-        border-radius: 0 12px 12px 0 !important; /* Melengkung di kanan saja */
-    }
+.modal { backdrop-filter: blur(5px); }
 
-    .custom-addon {
-        background-color: #f8f9fa !important;
-        border: 1px solid #e9ecef !important;
-        border-right: none !important;
-        border-radius: 12px 0 0 12px !important; /* Melengkung di kiri saja */
-        color: #636e72;
-        padding-left: 20px;
-        padding-right: 10px;
-    }
+.btn-primary { background-color: #4e73df; border-color: #4e73df; }
 
-    .btn-back-custom {
-        border-radius: 12px;
-        border: 1px solid #dee2e6;
-        color: #6c757d;
-        font-weight: 600;
-    }
+.form-control { border: 1px solid #ced4da; }
 
-    .btn-save-custom {
-        border-radius: 12px;
-        font-weight: 600;
-        background-color: #28a745;
-        border: none;
-    }
+[data-theme='dark'] .card, .dark-mode .card {
+    background-color: #1a1d21 !important;
+    color: white;
+}
 
-/* Container Utama: Clean & Professional */
+[data-theme='dark'] .form-control, .dark-mode .form-control {
+    background-color: #24282d !important;
+    border: none;
+    color: white;
+}
+
+.custom-card-theme { background-color: #ffffff; }
+.heading-theme     { color: #2d3436; }
+.label-theme       { color: #636e72; margin-bottom: 8px; }
+
+.input-custom {
+    background-color: #f8f9fa !important;
+    border: 1px solid #e9ecef !important;
+    color: #2d3436 !important;
+    border-radius: 0 12px 12px 0 !important;
+}
+
+.custom-addon {
+    background-color: #f8f9fa !important;
+    border: 1px solid #e9ecef !important;
+    border-right: none !important;
+    border-radius: 12px 0 0 12px !important;
+    color: #636e72;
+    padding-left: 20px;
+    padding-right: 10px;
+}
+
+.btn-back-custom {
+    border-radius: 12px;
+    border: 1px solid #dee2e6;
+    color: #6c757d;
+    font-weight: 600;
+}
+
+.btn-save-custom {
+    border-radius: 12px;
+    font-weight: 600;
+    background-color: #28a745;
+    border: none;
+}
+
+/* ======================================================
+    SMART PREDICTION ALERT
+====================================================== */
 .smart-prediction-alert {
-    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); /* Deep Navy Profesional */
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border: 1px solid rgba(255,255,255,0.1);
     border-radius: 16px;
     padding: 1.25rem;
     color: #f8fafc;
 }
 
-/* Light mode support (jika dashboard sedang mode terang) */
 body:not(.dark-mode) .smart-prediction-alert {
     background: white;
     color: #1e293b;
     border: 1px solid #e2e8f0;
 }
 
-/* Item Badge: Glassmorphism */
 .prediction-pill {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.1);
     border-radius: 50px;
     padding: 6px 14px;
     display: inline-flex;
@@ -639,9 +537,8 @@ body:not(.dark-mode) .prediction-pill {
     color: #334155;
 }
 
-/* Badge Saran: Highlighted */
 .saran-badge {
-    background: #ef4444; /* Soft Red */
+    background: #ef4444;
     color: white;
     padding: 2px 10px;
     border-radius: 50px;
@@ -649,95 +546,106 @@ body:not(.dark-mode) .prediction-pill {
     font-size: 0.75rem;
 }
 
-/* Animasi Icon Robot */
 .ai-icon-wrapper {
-    width: 48px;
-    height: 48px;
-    background: #3b82f6; /* Blue AI */
-    border-radius: 12px;
-    display: flex;
+    width: 44px !important;
+    height: 44px !important;
+    background: #3b82f6;
+    border-radius: 10px !important;
+    display: flex !important;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+    box-shadow: 0 0 15px rgba(59,130,246,0.4);
     animation: pulse-ai 2s infinite;
-}
-
-@keyframes pulse-ai {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-}
-/* --- Perbaikan Presisi Icon AI --- */
-
-/* 1. Atur Pembungkus Icon */
-.ai-icon-wrapper {
-    /* Set ukuran kotak agar proporsional */
-    width: 44px !important; 
-    height: 44px !important;
-    
-    /* Gunakan Flexbox untuk centering sempurna */
-    display: flex !important;
-    align-items: center; /* Centering Vertikal */
-    justify-content: center; /* Centering Horizontal */
-    
-    /* Atur Border Radius agar senada tombol (biasanya 8px - 10px) */
-    border-radius: 10px !important;
-    
-    /* Margin kanan sedikit saja agar pas dengan teks judul */
     margin-right: 15px !important;
-    
-    /* Pastikan tidak ada margin atas/bawah yang mengganggu */
     margin-top: 0 !important;
     margin-bottom: 0 !important;
 }
 
-/* 2. Atur Icon Robot di Dalamnya */
+@keyframes pulse-ai {
+    0%   { transform: scale(1);    }
+    50%  { transform: scale(1.05); }
+    100% { transform: scale(1);    }
+}
+
 .ai-icon-wrapper i.fa-robot {
-    /* Set ukuran icon agar pas di dalam kotak 44px */
     font-size: 1.3rem !important;
-    
-    /* Matikan semua margin/padding bawaan fontawesome */
     margin: 0 !important;
     padding: 0 !important;
-    
-    /* Pastikan line-height tidak merusak posisi */
     line-height: 1 !important;
 }
 
-/* 3. Atur Teks Judul agar Sejajar */
 .smart-prediction-alert h6.fw-bold {
-    /* Hilangkan margin bawah agar sejajar vertikal dengan icon */
-    margin-bottom: 0 !important; 
-    
-    /* Atur line-height agar teks deskripsi di bawahnya pas jaraknya */
-    line-height: 1.2 !important; 
+    margin-bottom: 0 !important;
+    line-height: 1.2 !important;
 }
-    /* Custom Scrollbar Premium */
-    #calendar-container::-webkit-scrollbar {
-        width: 5px;
-    }
-    #calendar-container::-webkit-scrollbar-track {
-        background: transparent;
-    }
-    #calendar-container::-webkit-scrollbar-thumb {
-        background: rgba(16, 185, 129, 0.2);
-        border-radius: 10px;
-    }
-    #calendar-container::-webkit-scrollbar-thumb:hover {
-        background: #10b981;
-    }
 
-    /* Styling FullCalendar agar serasi */
-    .fc .fc-toolbar-title { font-size: 1.1rem !important; font-weight: 700 !important; }
-    .fc .fc-button-primary { 
-        background-color: #10b981 !important; 
-        border-color: transparent !important; 
-        text-transform: capitalize !important;
-        border-radius: 8px !important;
-    }
-    .fc .fc-button-primary:hover { background-color: #059669 !important; }
-    .fc .fc-col-header-cell-cushion { font-size: 0.85rem; font-weight: 600; text-decoration: none !important; }
-    .fc .fc-daygrid-day-number { font-size: 0.85rem; text-decoration: none !important; padding: 8px !important; }
-    
-    /* Warna event teh kita */
-    .fc-event { border-radius: 4px !important; padding: 2px 5px !important; font-size: 0.75rem !important; border: none !important; }
+/* ======================================================
+    FULLCALENDAR
+====================================================== */
+#calendar-container::-webkit-scrollbar       { width: 5px; }
+#calendar-container::-webkit-scrollbar-track { background: transparent; }
+#calendar-container::-webkit-scrollbar-thumb {
+    background: rgba(16,185,129,0.2);
+    border-radius: 10px;
+}
+#calendar-container::-webkit-scrollbar-thumb:hover { background: #10b981; }
+
+.fc .fc-toolbar-title { font-size: 1.1rem !important; font-weight: 700 !important; }
+
+.fc .fc-button-primary {
+    background-color: #10b981 !important;
+    border-color: transparent !important;
+    text-transform: capitalize !important;
+    border-radius: 8px !important;
+}
+
+.fc .fc-button-primary:hover { background-color: #059669 !important; }
+.fc .fc-col-header-cell-cushion { font-size: 0.85rem; font-weight: 600; text-decoration: none !important; }
+.fc .fc-daygrid-day-number { font-size: 0.85rem; text-decoration: none !important; padding: 8px !important; }
+.fc-event { border-radius: 4px !important; padding: 2px 5px !important; font-size: 0.75rem !important; border: none !important; }
+
+/* ======================================================
+    NUCLEAR FIX SIDEBAR COLLAPSE
+====================================================== */
+.sidebar-mini.sidebar-collapse .main-sidebar:hover {
+    width: 4.6rem !important;
+}
+
+.sidebar-mini.sidebar-collapse .main-sidebar:hover .nav-sidebar .nav-link p,
+.sidebar-mini.sidebar-collapse .main-sidebar:hover .nav-sidebar .nav-link .right,
+.sidebar-mini.sidebar-collapse .main-sidebar:hover .brand-text,
+.sidebar-mini.sidebar-collapse .main-sidebar:hover .user-panel .info,
+.sidebar-mini.sidebar-collapse .main-sidebar:hover .nav-header {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    overflow: hidden !important;
+}
+
+/* ======================================================
+    COLLAPSED STATE - LOGO & USER PANEL
+====================================================== */
+.sidebar-mini.sidebar-collapse .user-panel {
+    display: none !important;
+}
+
+.sidebar-mini.sidebar-collapse .brand-link {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 13px 0 !important;
+    width: 4.6rem !important;
+     padding-left: 0.8rem !important;
+}
+
+.sidebar-mini.sidebar-collapse .brand-image {
+    float: none !important;
+    margin: 0 auto !important;
+    width: 33px !important;
+    height: 33px !important;
+}
+
+.sidebar-mini.sidebar-collapse .brand-text {
+    display: none !important;
+}

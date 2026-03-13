@@ -12,6 +12,22 @@
     
     <link rel="stylesheet" href="{{ asset('templates/dist/css/adminlte.min.css') }}">
     {{-- CSS Custom kamu tetap di sini --}}
+    <script>
+    $(document).ready(function () {
+        // Matiin hover AdminLTE setelah semua plugin load
+        setTimeout(function () {
+            $('.main-sidebar').off('mouseenter mouseleave');
+            $(document).off('mouseenter', '.main-sidebar');
+            $(document).off('mouseleave', '.main-sidebar');
+
+            // Override PushMenu hover bawaan AdminLTE
+            if ($.fn.PushMenu) {
+                $.fn.PushMenu.Constructor.prototype.expandOnHover = function () {};
+                $.fn.PushMenu.Constructor.prototype.collapseOnHover = function () {};
+            }
+        }, 500);
+    });
+</script>
     <link rel="stylesheet" href="{{ asset('templates/dist/css/custom-admin.css') }}">
     <link rel="stylesheet" href="{{ asset('templates/dist/css/custom-user.css') }}"> 
     <link rel="stylesheet" href="{{ asset('css/laporan-admin.css') }}">
@@ -53,9 +69,8 @@
     </style>
 </head>
 
-<body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed">
+<body class="hold-transition sidebar-mini sidebar-no-expand layout-fixed layout-navbar-fixed">
 
-{{-- Script pencegah 'flicker' putih saat refresh di mode gelap --}}
 <script>
     if (localStorage.getItem('theme') === 'dark') {
         document.body.classList.add('dark-mode');
@@ -112,6 +127,9 @@
 $(document).ready(function() {
     // 1. Lepas gembok transisi setelah page load
     setTimeout(() => $('#preload-transitions').remove(), 100);
+     $('.main-sidebar').off('mouseenter mouseleave');
+    $(document).off('mouseenter mouseleave', '.main-sidebar');
+
 
     // 2. Injeksi Tombol Dark Mode (Identik dengan AdminLTE style)
     if ($('.navbar-nav.ml-auto').length && !$('#dark-mode-toggle').length) {
