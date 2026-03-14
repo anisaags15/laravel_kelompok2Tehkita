@@ -1,5 +1,11 @@
 <x-guest-layout>
 
+@if ($errors->has('outlet_id'))
+<div class="bg-red-500 text-white p-3 rounded mb-4">
+{{ $errors->first('outlet_id') }}
+</div>
+@endif
+
 <form method="POST" action="{{ route('register') }}">
 @csrf
 
