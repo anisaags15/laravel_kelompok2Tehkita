@@ -69,6 +69,7 @@ Route::prefix('admin')
     
     // Resources Dasar
     Route::resource('outlet', OutletController::class);
+    Route::delete('outlet/{outlet}/destroy-user', [OutletController::class, 'destroyUser'])->name('outlet.destroy-user');
     Route::resource('bahan', BahanController::class);
     Route::resource('stok-masuk', StokMasukController::class);
     Route::resource('distribusi', DistribusiController::class);

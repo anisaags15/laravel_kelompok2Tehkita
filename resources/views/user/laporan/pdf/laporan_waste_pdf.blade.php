@@ -22,7 +22,8 @@
         <h2 style="color: #dc3545; margin:0;">LAPORAN KERUSAKAN BAHAN (WASTE)</h2>
         <p style="margin: 5px 0;">
             Outlet: <strong>{{ $outlet->nama_outlet }}</strong> | 
-            Periode: <strong>{{ \Carbon\Carbon::createFromDate(request('tahun'), request('bulan'), 1)->translatedFormat('F Y') }}</strong>
+            {{-- ✅ FIX: pakai $tahun dan $bulan dari controller, bukan request() --}}
+            Periode: <strong>{{ \Carbon\Carbon::createFromDate($tahun, $bulan, 1)->translatedFormat('F Y') }}</strong>
         </p>
     </div>
 
@@ -42,12 +43,11 @@
             @forelse($wasteData as $key => $w)
             <tr>
                 <td>{{ $key + 1 }}</td>
-                {{-- REVISI: Pakai kolom tanggal --}}
                 <td>{{ \Carbon\Carbon::parse($w->tanggal)->format('d/m/Y') }}</td>
-                {{-- REVISI: Langsung ke relasi bahan --}}
-                <td class="text-left"><strong>{{ $w->bahan->nama_bahan ?? 'Bahan Terhapus' }}</strong></td>
+                {{-- ✅ FIX: relasi Waste -> stokOutlet -> bahan --}}
+                <td class="text-left"><strong>{{ $w->stokOutlet->bahan->nama_bahan ?? 'Bahan Terhapus' }}</strong></td>
                 <td>{{ $w->jumlah }}</td>
-                <td>{{ $w->bahan->satuan ?? '-' }}</td>
+                <td>{{ $w->stokOutlet->bahan->satuan ?? '-' }}</td>
                 <td class="text-left" style="font-style: italic;">{{ $w->keterangan }}</td>
             </tr>
             @php $totalWaste += $w->jumlah; @endphp

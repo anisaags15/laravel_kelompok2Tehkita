@@ -14,7 +14,6 @@
                     <p class="mb-0 opacity-75">Rekapitulasi bahan baku rusak & kadaluwarsa: <strong>{{ auth()->user()->outlet->nama_outlet }}</strong></p>
                 </div>
                 <div class="text-end">
-                    {{-- Pastikan route ini sesuai di web.php --}}
                     <a href="{{ route('user.laporan.waste.pdf', ['bulan' => $bulan, 'tahun' => $tahun]) }}" class="btn btn-light shadow-sm px-4 text-danger fw-bold">
                         <i class="fas fa-file-pdf me-2"></i>Cetak Laporan PDF
                     </a>
@@ -28,10 +27,33 @@
                     </ol>
                 </nav>
                 <div class="text-muted small">
-                    {{-- Menampilkan periode berdasarkan filter --}}
                     Periode: <strong>{{ \Carbon\Carbon::createFromDate($tahun, $bulan, 1)->translatedFormat('F Y') }}</strong>
                 </div>
             </div>
+        </div>
+    </div>
+
+    {{-- ✅ FILTER BULAN & TAHUN --}}
+    <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px;">
+        <div class="card-body py-3 px-4">
+            <form method="GET" action="{{ route('user.laporan.waste') }}" class="d-flex align-items-center gap-3 flex-wrap">
+                <span class="fw-bold text-muted small"><i class="fas fa-filter me-1"></i> Filter Periode:</span>
+                <select name="bulan" class="form-select form-select-sm" style="width:auto;">
+                    @foreach(range(1,12) as $m)
+                        <option value="{{ $m }}" {{ $bulan == $m ? 'selected' : '' }}>
+                            {{ \Carbon\Carbon::create()->month($m)->translatedFormat('F') }}
+                        </option>
+                    @endforeach
+                </select>
+                <select name="tahun" class="form-select form-select-sm" style="width:auto;">
+                    @foreach(range(now()->year, now()->year - 3, -1) as $y)
+                        <option value="{{ $y }}" {{ $tahun == $y ? 'selected' : '' }}>{{ $y }}</option>
+                    @endforeach
+                </select>
+                <button type="submit" class="btn btn-danger btn-sm px-4">
+                    <i class="fas fa-search me-1"></i> Tampilkan
+                </button>
+            </form>
         </div>
     </div>
 
@@ -86,16 +108,14 @@
                         @forelse($wasteData as $key => $item)
                         <tr>
                             <td class="ps-4">{{ $key+1 }}</td>
-                            {{-- Gunakan kolom 'tanggal' karena di PemakaianController kamu simpan ke kolom tanggal --}}
                             <td>{{ \Carbon\Carbon::parse($item->tanggal)->format('d M Y') }}</td>
                             <td>
-                                {{-- REVISI: Langsung ke relasi bahan, tambahkan null safe operator ?? untuk jaga-jaga --}}
-                                <div class="fw-bold text-dark">{{ $item->bahan->nama_bahan ?? 'Bahan Tidak Ditemukan' }}</div>
+                                <div class="fw-bold text-dark">{{ $item->stokOutlet->bahan->nama_bahan ?? ($item->bahan->nama_bahan ?? 'Bahan Tidak Ditemukan') }}</div>
                                 <small class="text-muted">ID: #WST-{{ $item->id }}</small>
                             </td>
                             <td class="text-center">
-                                <span class="fw-bold text-danger">{{ $item->jumlah }}</span> 
-                                <small class="text-muted">{{ $item->bahan->satuan ?? '' }}</small>
+                                <span class="fw-bold text-danger">{{ $item->jumlah }}</span>
+                                <small class="text-muted">{{ $item->stokOutlet->bahan->satuan ?? ($item->bahan->satuan ?? '') }}</small>
                             </td>
                             <td>
                                 <span class="text-muted small italic">"{{ $item->keterangan ?? '-' }}"</span>

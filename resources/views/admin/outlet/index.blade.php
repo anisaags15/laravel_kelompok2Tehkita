@@ -131,6 +131,20 @@
                                        title="Edit Data">
                                         <i class="fas fa-pencil-alt"></i>
                                     </a>
+                                    @if($outlet->user)
+<form id="delete-user-{{ $outlet->id }}"
+      action="{{ route('admin.outlet.destroy-user', $outlet->id) }}"
+      method="POST"
+      class="d-inline mr-2">
+    @csrf
+    @method('DELETE')
+    <button type="button"
+            class="btn btn-sm btn-light text-info border action-btn"
+onclick="Swal.fire({title:'Hapus Akun Admin?',text:'Outlet tetap aktif, hanya akunnya yang dihapus.',icon:'warning',showCancelButton:true,confirmButtonColor:'#0d6efd',cancelButtonColor:'#6c757d',confirmButtonText:'Ya, Hapus!',cancelButtonText:'Batal'}).then((r)=>{if(r.isConfirmed)document.getElementById('delete-user-{{ $outlet->id }}').submit()})"            title="Hapus Akun Admin Outlet">
+        <i class="fas fa-user-times"></i>
+    </button>
+</form>
+@endif
 
                                     <form id="delete-outlet-{{ $outlet->id }}"
                                           action="{{ route('admin.outlet.destroy',$outlet->id) }}"
