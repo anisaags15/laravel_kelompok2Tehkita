@@ -1,0 +1,141 @@
+/* TEH KITA - DARK LEAF & RIGID FORM */
+:root {
+    --bg-matcha: #f0f7f4;
+    --dark-green: #1b4332; /* Hijau Gelap Utama */
+    --leaf-dark: #0b251a;  /* Hijau Daun Sangat Gelap */
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: var(--bg-matcha) !important;
+    margin: 0; 
+    min-height: 100vh;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    overflow-x: hidden; 
+    position: relative;
+    padding: 15px 0;
+}
+
+/* --- Efek Hujan Daun Hijau Gelap --- */
+.leaf {
+    position: absolute; 
+    color: var(--leaf-dark) !important; 
+    font-size: 1.3rem; 
+    opacity: 0; 
+    top: -10%;
+    animation: leaf-rain linear infinite; 
+    z-index: 1;
+    pointer-events: none;
+}
+
+@keyframes leaf-rain {
+    0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+    15% { opacity: 0.4; }
+    90% { opacity: 0.4; }
+    100% { transform: translateY(115vh) rotate(360deg); opacity: 0; }
+}
+
+/* Mengatur posisi daun sesuai jumlah <i> di guest layout mu */
+.leaf:nth-child(1) { left: 10%; animation-duration: 7s; }
+.leaf:nth-child(2) { left: 30%; animation-duration: 10s; animation-delay: 2s; }
+.leaf:nth-child(3) { left: 55%; animation-duration: 8s; animation-delay: 4s; }
+.leaf:nth-child(4) { left: 75%; animation-duration: 12s; animation-delay: 1s; }
+.leaf:nth-child(5) { left: 90%; animation-duration: 9s; animation-delay: 3s; }
+
+/* --- Card - DIJAMIN PAKU MATI (Tidak Goyang) --- */
+.auth-card {
+    background: white !important;
+    padding: 25px 35px; 
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    z-index: 10; 
+    text-align: center;
+    width: 380px; /* Ramping dan pas */
+    box-sizing: border-box !important;
+    /* Matikan semua transisi agar tidak goyang saat elemen dalam berubah */
+    transition: none !important; 
+    transform: none !important;
+}
+
+.brand-logo {
+    background: var(--dark-green);
+    width: 45px; height: 45px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 8px; color: white; font-size: 20px;
+}
+
+.brand-wordmark { 
+    color: var(--dark-green); 
+    font-weight: 800; 
+    font-size: 20px; 
+    display: block;
+}
+
+/* --- Form Spacing Rapat (Agar Register Tidak Kepanjangan) --- */
+.input-group-custom { margin-bottom: 10px !important; text-align: left; }
+
+.input-label-custom {
+    color: var(--dark-green); 
+    font-size: 10px; 
+    font-weight: 800;
+    text-transform: uppercase; 
+    margin-bottom: 4px; 
+    display: block;
+}
+
+.input-wrapper { 
+    position: relative; 
+    display: flex; 
+    align-items: center; 
+}
+
+.input-wrapper i { 
+    position: absolute; 
+    left: 15px; 
+    color: var(--dark-green); 
+    font-size: 14px; 
+    z-index: 5;
+    opacity: 0.7;
+}
+
+.input-box-custom {
+    width: 100% !important; 
+    padding: 10px 15px 10px 45px !important;
+    border-radius: 10px !important; 
+    border: 2px solid #f0f0f0 !important; 
+    background: #fafafa !important; 
+    font-size: 13px !important;
+    box-sizing: border-box !important;
+    transition: none !important; /* Kunci biar gak goyang */
+}
+
+.input-box-custom:focus { 
+    border-color: var(--dark-green) !important; 
+    background: #ffffff !important;
+    outline: none !important;
+    box-shadow: none !important; /* Hapus shadow yang bikin getar */
+}
+
+/* --- Button Hijau Gelap --- */
+.btn-tea-primary {
+    width: 100%; 
+    background: var(--dark-green); 
+    color: white;
+    padding: 13px; 
+    border-radius: 10px; 
+    border: none;
+    font-weight: 700; 
+    text-transform: uppercase; 
+    cursor: pointer;
+    margin-top: 10px;
+    font-size: 13px;
+}
+
+.btn-tea-primary:hover { 
+    background: #081c15; 
+}
+
+.auth-footer { margin-top: 12px; font-size: 12px; color: #6b7280; }
+.auth-link { color: var(--dark-green); font-weight: 800; text-decoration: none; }

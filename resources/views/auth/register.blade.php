@@ -1,125 +1,72 @@
 <x-guest-layout>
+    <form method="POST" action="{{ route('register') }}">
+        @csrf
+        
+        <div class="input-group-custom">
+            <label class="input-label-custom">Nama Lengkap</label>
+            <div class="input-wrapper">
+                <i class="bi bi-person-fill"></i>
+                <input type="text" name="name" class="input-box-custom" placeholder="Nama" required>
+            </div>
+        </div>
 
-@if ($errors->has('outlet_id'))
-<div class="bg-red-500 text-white p-3 rounded mb-4">
-{{ $errors->first('outlet_id') }}
-</div>
-@endif
+        <div class="input-group-custom">
+            <label class="input-label-custom">Username</label>
+            <div class="input-wrapper">
+                <i class="bi bi-at"></i>
+                <input type="text" name="username" class="input-box-custom" placeholder="Username" required>
+            </div>
+        </div>
 
-<form method="POST" action="{{ route('register') }}">
-@csrf
+        <div class="input-group-custom">
+            <label class="input-label-custom">Email</label>
+            <div class="input-wrapper">
+                <i class="bi bi-envelope-at-fill"></i>
+                <input type="email" name="email" class="input-box-custom" placeholder="email@tehkita.com" required>
+            </div>
+        </div>
 
+        <div class="input-group-custom">
+            <label class="input-label-custom">No. HP</label>
+            <div class="input-wrapper">
+                <i class="bi bi-telephone-fill"></i>
+                <input type="text" name="no_hp" class="input-box-custom" placeholder="08..." required>
+            </div>
+        </div>
 
-<!-- Nama -->
-<div class="mt-4">
-<x-input-label value="Nama" />
-<x-text-input name="name"
-type="text"
-:value="old('name')"
-required
-class="block mt-1 w-full"/>
-<x-input-error :messages="$errors->get('name')" />
-</div>
+        <div class="input-group-custom">
+            <label class="input-label-custom">Pilih Outlet</label>
+            <div class="input-wrapper">
+                <i class="bi bi-shop"></i>
+                <select name="outlet_id" class="input-box-custom" style="padding-left: 38px;">
+                    <option value="">-- Outlet --</option>
+                    @foreach($outlets as $outlet)
+                        <option value="{{ $outlet->id }}">{{ $outlet->nama_outlet }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
 
+        <div class="input-group-custom">
+            <label class="input-label-custom">Password</label>
+            <div class="input-wrapper">
+                <i class="bi bi-lock-fill"></i>
+                <input type="password" name="password" class="input-box-custom" placeholder="••••" required>
+            </div>
+        </div>
 
-<!-- Email -->
-<div class="mt-4">
-<x-input-label value="Email" />
-<x-text-input name="email"
-type="email"
-:value="old('email')"
-required
-class="block mt-1 w-full"/>
-<x-input-error :messages="$errors->get('email')" />
-</div>
+        <div class="input-group-custom">
+            <label class="input-label-custom">Konfirmasi</label>
+            <div class="input-wrapper">
+                <i class="bi bi-check-circle-fill"></i>
+                <input type="password" name="password_confirmation" class="input-box-custom" placeholder="••••" required>
+            </div>
+        </div>
 
+        <button type="submit" class="btn-tea-primary">Daftar Akun</button>
 
-<!-- Username -->
-<div class="mt-4">
-<x-input-label value="Username" />
-<x-text-input name="username"
-type="text"
-:value="old('username')"
-required
-class="block mt-1 w-full"/>
-<x-input-error :messages="$errors->get('username')" />
-</div>
-
-
-<!-- No HP -->
-<div class="mt-4">
-<x-input-label value="No HP" />
-<x-text-input name="no_hp"
-type="text"
-:value="old('no_hp')"
-required
-class="block mt-1 w-full"/>
-<x-input-error :messages="$errors->get('no_hp')" />
-</div>
-
-
-<!-- Outlet Dropdown -->
-<div class="mt-4">
-
-<x-input-label value="Pilih Outlet" />
-
-<select name="outlet_id"
-class="block mt-1 w-full border-gray-300 rounded">
-
-<option value="">-- Pilih Outlet --</option>
-
-@foreach($outlets as $outlet)
-
-<option value="{{ $outlet->id }}">
-
-{{ $outlet->nama_outlet }}
-
-</option>
-
-@endforeach
-
-</select>
-
-<x-input-error :messages="$errors->get('outlet_id')" />
-
-</div>
-
-
-<!-- Password -->
-<div class="mt-4">
-<x-input-label value="Password" />
-<x-text-input name="password"
-type="password"
-required
-class="block mt-1 w-full"/>
-<x-input-error :messages="$errors->get('password')" />
-</div>
-
-
-<!-- Confirm -->
-<div class="mt-4">
-<x-input-label value="Confirm Password" />
-<x-text-input name="password_confirmation"
-type="password"
-required
-class="block mt-1 w-full"/>
-</div>
-
-
-<div class="flex items-center justify-end mt-4">
-
-<a href="{{ route('login') }}">
-Sudah punya akun?
-</a>
-
-
-<x-primary-button class="ml-4">
-Register
-</x-primary-button>
-
-</div>
-
-
-</form>
-
+        <div class="auth-footer">
+            Sudah ada akun? <a href="{{ route('login') }}" class="auth-link">Login</a>
+        </div>
+    </form>
 </x-guest-layout>
