@@ -6,24 +6,39 @@ use App\Http\Controllers\Controller;
 use App\Models\StokOutlet; 
 use App\Models\Outlet;
 use Illuminate\Http\Request;
+use DB;
 
 class StokKritisController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // 1. Ambil data stok yang kritis (DIREVISI: Hapus .kategori)
-        $stokKritis = StokOutlet::with(['outlet', 'bahan'])
-                        ->where('stok', '<=', 10) 
-                        ->orderBy('stok', 'asc')
-                        ->get();
+        // 1. Ambil Summary per Outlet (Berapa banyak bahan kritis di tiap outlet)
+        $laporanOutlet = StokOutlet::select('outlet_id', DB::raw('count(*) as total_item_kritis'))
+            ->with('outlet')
+            ->where('stok', '<=', 10) // Sesuai kodinganmu sebelumnya
+            ->when($request->outlet_id, function($query) use ($request) {
+                return $query->where('outlet_id', $request->outlet_id);
+            })
+            ->groupBy('outlet_id')
+            ->get();
 
-        // 2. Ambil data outlet (untuk keperluan filter jika ada)
+        // 2. Data pendukung untuk filter dan dashboard
         $outlets = Outlet::all();
+        $totalKritisGlobal = StokOutlet::where('stok', '<=', 10)->count();
 
-        // 3. Ambil stok kritis count untuk cadangan (opsional jika view composer bermasalah)
-        $stokKritisCount = $stokKritis->count();
+        return view('admin.laporan.stok-kritis.index', compact('laporanOutlet', 'outlets', 'totalKritisGlobal'));
+    }
 
-        // 4. Lempar ke view
-return view('admin.stok-kritis.index', compact('stokKritis', 'outlets', 'stokKritisCount'));
+    public function detail($id)
+    {
+        $outlet = Outlet::findOrFail($id);
+        
+        // Ambil detail bahan apa saja yang kritis di outlet ini
+        $detailStok = StokOutlet::with('bahan')
+            ->where('outlet_id', $id)
+            ->where('stok', '<=', 10)
+            ->get();
+
+        return view('admin.laporan.stok-kritis.detail', compact('outlet', 'detailStok'));
     }
 }

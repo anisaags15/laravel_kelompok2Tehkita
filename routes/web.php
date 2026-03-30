@@ -87,7 +87,7 @@ Route::prefix('admin')
         Route::delete('/{id}', [JadwalDistribusiController::class, 'destroy'])->name('destroy');
     });
 
-    // 2. AREA LAPORAN (Khusus Rekapitulasi & Cetak PDF)
+// 2. AREA LAPORAN (Khusus Rekapitulasi & Cetak PDF)
     Route::prefix('laporan')->name('laporan.')->group(function () {
         Route::get('/', [LaporanController::class, 'index'])->name('index');
         Route::get('/cetak-ringkasan', [LaporanController::class, 'cetakIndex'])->name('cetak');
@@ -96,19 +96,22 @@ Route::prefix('admin')
         Route::get('/stok-kritis', [LaporanController::class, 'stokKritis'])->name('stok-kritis');
         Route::get('/stok-kritis/cetak', [LaporanController::class, 'cetakStokKritis'])->name('stok-kritis.cetak'); 
         
+        // --- TAMBAHAN ROUTE UNTUK TOMBOL DETAIL DI STOK KRITIS ---
+        Route::get('/stok-kritis/detail/{outlet}', [LaporanController::class, 'detailStokOutlet'])->name('stok-kritis.detail');
+        // -------------------------------------------------------
+
         // Fitur Laporan Stok Outlet
         Route::get('/stok-outlet', [LaporanController::class, 'stokOutlet'])->name('stok-outlet');
-        // PENTING: cetak-semua harus di atas {outlet} agar tidak dianggap sebagai ID
         Route::get('/stok-outlet/cetak-semua', [LaporanController::class, 'cetakStokSemua'])->name('stok-outlet.cetak-semua');
         Route::get('/stok-outlet/{outlet}', [LaporanController::class, 'detailStokOutlet'])->name('stok-outlet.detail');
         Route::get('/stok-outlet/{outlet}/cetak', [LaporanController::class, 'cetakStokOutlet'])->name('stok-outlet.cetak');
         
-        // Fitur Laporan Distribusi (Grouping 3 Parameter)
+        // Fitur Laporan Distribusi
         Route::get('/distribusi', [LaporanController::class, 'distribusi'])->name('distribusi');
         Route::get('/distribusi/detail/{outlet_id}/{bulan}/{tahun}', [LaporanController::class, 'detailDistribusi'])->name('distribusi.detail');
         Route::get('/distribusi/cetak/{outlet_id}/{bulan}/{tahun}', [LaporanController::class, 'cetakDistribusi'])->name('distribusi.cetak');
     });
-
+    
     // Profile Admin
     Route::prefix('profile')->name('profile.')->group(function () {
         Route::get('/edit', [ProfileController::class, 'edit'])->name('edit');

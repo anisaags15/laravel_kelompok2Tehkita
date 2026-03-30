@@ -36,7 +36,7 @@
             <div class="alert alert-success border-0 shadow-sm alert-dismissible fade show" style="border-radius: 12px;">
                 <div class="d-flex align-items-center">
                     <div class="bg-white rounded-circle mr-3 d-flex align-items-center justify-content-center" style="width:30px; height:30px;">
-                        <i class="fas fa-check text-success"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#28a745" viewBox="0 0 16 16"><path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/></svg>
                     </div>
                     <strong>Berhasil!</strong> {{ session('success') }}
                 </div>
@@ -85,7 +85,10 @@
                     <div class="card-body p-4 text-center d-flex align-items-center justify-content-center border-left border-primary" style="border-width: 6px !important;">
                         <div class="w-100">
                              <p class="small font-weight-bold text-muted text-uppercase mb-1">Status Gudang</p>
-                             <h5 class="font-weight-bold text-success mb-0"><i class="fas fa-check-double mr-2"></i>Terintegrasi</h5>
+                             <h5 class="font-weight-bold text-success mb-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="mr-2" viewBox="0 0 16 16"><path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/></svg>
+                                Terintegrasi
+                             </h5>
                         </div>
                     </div>
                 </div>
@@ -122,8 +125,8 @@
                                 <th class="py-3">Bahan Baku</th>
                                 <th class="py-3 text-center">Bukti Foto</th>
                                 <th class="py-3 text-center">Jumlah</th>
-                                <th class="py-3">Status Laporan</th>
-                                <th class="pr-4 py-3 text-right">Aksi Manajemen</th>
+                                <th class="py-3 text-center">Status Laporan</th>
+                                <th class="pr-4 py-3 text-center" style="width: 1%; white-space: nowrap;">Aksi Manajemen</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -159,35 +162,45 @@
                                         -{{ $w->jumlah }} {{ $w->bahan->satuan }}
                                     </span>
                                 </td>
-                                <td class="py-3">
+                                <td class="py-3 text-center">
                                     @if($w->status == 'pending')
-                                        <span class="badge badge-warning text-white px-3 py-2 shadow-sm" style="border-radius: 8px;">
-                                            <i class="fas fa-spinner fa-spin mr-1 small"></i> Menunggu
+                                        <span class="badge badge-warning text-white px-3 py-2 shadow-sm d-inline-flex align-items-center" style="border-radius: 8px;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="mr-1" viewBox="0 0 16 16"><path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/></svg>
+                                            Menunggu
                                         </span>
                                     @elseif($w->status == 'verified')
-                                        <span class="badge badge-success px-3 py-2 shadow-sm" style="border-radius: 8px;">
-                                            <i class="fas fa-check-circle mr-1"></i> Selesai
+                                        <span class="badge badge-success px-3 py-2 shadow-sm d-inline-flex align-items-center" style="border-radius: 8px;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="mr-1" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg>
+                                            Selesai
                                         </span>
                                     @else
-                                        <span class="badge badge-secondary px-3 py-2 shadow-sm" style="border-radius: 8px;">
-                                            <i class="fas fa-ban mr-1"></i> Ditolak
+                                        <span class="badge badge-secondary px-3 py-2 shadow-sm d-inline-flex align-items-center" style="border-radius: 8px;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="mr-1" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/></svg>
+                                            Ditolak
                                         </span>
                                     @endif
                                 </td>
-                                <td class="py-3 pr-4 text-right">
+                                <td class="py-3 pr-4 text-center" style="white-space: nowrap;">
                                     @if($w->status == 'pending')
-                                        <button class="btn btn-sm btn-primary rounded-pill px-4 shadow-sm font-weight-bold transition-all" data-toggle="modal" data-target="#modalVerif{{ $w->id }}">
-                                            Review <i class="fas fa-chevron-right ml-1 small"></i>
+                                        <button class="btn btn-sm btn-primary rounded-pill px-4 shadow-sm font-weight-bold transition-all d-inline-flex align-items-center" data-toggle="modal" data-target="#modalVerif{{ $w->id }}">
+                                            Review 
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="ml-2" viewBox="0 0 16 16">
+                                                <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+                                                <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
+                                            </svg>
                                         </button>
                                     @else
-                                        <button class="btn btn-sm btn-light rounded-pill px-3 disabled border text-muted">
-                                            <i class="fas fa-lock small mr-1"></i> Terarsip
+                                        <button class="btn btn-sm btn-light rounded-pill px-3 disabled border text-muted d-inline-flex align-items-center" style="cursor: not-allowed; opacity: 0.8;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="mr-2" viewBox="0 0 16 16">
+                                                <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+                                            </svg>
+                                            Terarsip
                                         </button>
                                     @endif
                                 </td>
                             </tr>
 
-                            {{-- Modal Foto Tetap Sama Namun Perbaiki UI Cardnya --}}
+                            {{-- Modal Foto --}}
                             @if($w->foto)
                             <div class="modal fade" id="modalFoto{{ $w->id }}" tabindex="-1" role="dialog">
                                 <div class="modal-dialog modal-dialog-centered" role="document">
@@ -205,7 +218,7 @@
                             </div>
                             @endif
 
-                            {{-- Modal Verifikasi Terupdate --}}
+                            {{-- Modal Verifikasi --}}
                             <div class="modal fade" id="modalVerif{{ $w->id }}" tabindex="-1" role="dialog">
                                 <div class="modal-dialog modal-dialog-centered" role="document">
                                     <div class="modal-content border-0 shadow-lg" style="border-radius: 24px;">

@@ -67,21 +67,44 @@ class LaporanController extends Controller
     }
 
     /**
-     * Halaman List Stok Kritis
+     * Halaman List Stok Kritis (DIPERBARUI UNTUK STANDARDISASI)
      */
     public function stokKritis(Request $request)
     {
+        // --- LOGIC ASLI KAMU (JANGAN DIHAPUS) ---
         $query = StokOutlet::with(['outlet', 'bahan'])->where('stok', '<=', 5);
         if ($request->has('outlet_id') && $request->outlet_id != '') {
             $query->where('outlet_id', $request->outlet_id);
         }
         $stokKritis = $query->orderBy('stok', 'asc')->get();
         $outlets = Outlet::all();
-        return view('admin.laporan.stok_kritis', compact('stokKritis', 'outlets'));
+        // --- END LOGIC ASLI ---
+
+        // --- TAMBAHAN UNTUK STANDARDISASI TAMPILAN ---
+        
+        // 1. Total Item Kritis Global (Tetap ada)
+        $totalKritisGlobal = $stokKritis->count();
+
+        // 2. Ringkasan per Outlet (Agar tampilan tabel 1 baris = 1 Outlet)
+        // Dikelompokkan dari hasil query asli kamu agar filter tetap bekerja
+        $laporanOutlet = $stokKritis->groupBy('outlet_id')->map(function ($items) {
+            return (object) [
+                'outlet_id' => $items->first()->outlet_id,
+                'outlet' => $items->first()->outlet,
+                'total_item_kritis' => $items->count()
+            ];
+        });
+
+        return view('admin.laporan.stok_kritis', compact(
+            'stokKritis', 
+            'outlets', 
+            'totalKritisGlobal', 
+            'laporanOutlet'
+        ));
     }
 
     /**
-     * Cetak PDF Stok Kritis
+     * Cetak PDF Stok Kritis (Rekap Wilayah)
      */
     public function cetakStokKritis(Request $request)
     {
@@ -100,26 +123,23 @@ class LaporanController extends Controller
      */
     public function stokOutlet() 
     { 
-        // Menggunakan nama relasi yang umum 'stokOutlet' sesuai model kamu
         $outlets = Outlet::with('stokOutlet')->get(); 
         return view('admin.laporan.stok_outlet', compact('outlets')); 
     }
 
     /**
-     * Cetak SEMUA Stok Outlet (Solusi Error Undefined Method)
+     * Cetak SEMUA Stok Outlet
      */
     public function cetakStokSemua()
     {
         $outlets = Outlet::with(['stokOutlet.bahan'])->get();
-        
         $pdf = Pdf::loadView('admin.laporan.pdf.stok_outlet_semua', compact('outlets'))
                   ->setPaper('a4', 'portrait');
-                  
         return $pdf->download('Laporan_Stok_Semua_Outlet_'.date('d-m-Y').'.pdf');
     }
 
     /**
-     * Detail Stok satu Outlet
+     * Detail Stok satu Outlet (Digunakan juga oleh Detail Stok Kritis)
      */
     public function detailStokOutlet(Outlet $outlet) 
     { 

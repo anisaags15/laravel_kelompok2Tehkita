@@ -117,7 +117,7 @@
     </div>
 </div>
 
-{{-- ✅ 3. CARD JADWAL DISTRIBUSI BERIKUTNYA --}}
+{{-- 3. CARD JADWAL DISTRIBUSI BERIKUTNYA --}}
 <div class="row mb-4">
     <div class="col-12">
         <div class="card shadow-sm border-0" style="border-radius: 14px; border-left: 4px solid #28a745 !important; overflow: hidden;">
