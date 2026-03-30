@@ -1,31 +1,104 @@
-.profile-card {
-    border-radius: 12px;
+:root {
+    --primary-admin: #059669;
+    --primary-dark: #064e3b;
+    --soft-bg: #f8fafc;
 }
 
-.profile-avatar {
-    width: 130px;
-    height: 130px;
+.user-card-luxury {
+    border: none;
+    border-radius: 35px;
+    background: #ffffff;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.05);
+}
+
+.profile-sidebar {
+    border-right: 1px solid #f1f5f9;
+    padding: 40px;
+    background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+}
+
+.avatar-wrapper {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 25px;
+}
+
+.user-avatar-circle {
+    width: 100%;
+    height: 100%;
     border-radius: 50%;
-    object-fit: cover;
-    border: 4px solid #28a745;
+    border: 6px solid #fff;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    overflow: hidden;
 }
 
-.profile-upload-btn {
-    margin-top: 10px;
+.camera-trigger {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    width: 40px;
+    height: 40px;
+    background: var(--primary-admin);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    border: 3px solid #fff;
+    cursor: pointer;
+    box-shadow: 0 8px 15px rgba(5, 150, 105, 0.3);
 }
 
-.profile-section-title {
+/* Form Vertical Styling */
+.premium-input {
+    background: #f1f5f9 !important;
+    border: 2px solid transparent !important;
+    border-radius: 15px !important;
+    padding: 15px 20px !important;
     font-weight: 600;
-    margin-bottom: 15px;
-    color: #28a745;
+    width: 100%;
+    margin-bottom: 5px;
 }
 
-.profile-right-card {
+.premium-input:focus {
+    background: #fff !important;
+    border-color: var(--primary-admin) !important;
+}
+
+.form-group-custom {
+    margin-bottom: 25px; /* Jarak antar field ke bawah */
+}
+
+.nav-link-custom {
+    display: flex;
+    align-items: center;
+    padding: 14px 20px;
     border-radius: 12px;
+    color: #64748b;
+    font-weight: 700;
+    margin-bottom: 8px;
+    text-decoration: none !important;
 }
 
-.profile-right-card .nav-tabs .nav-link.active {
-    border-bottom: 3px solid #28a745;
-    color: #28a745;
-    font-weight: 600;
+.nav-link-custom.active { background: #ecfdf5; color: var(--primary-admin); }
+.nav-link-custom i { margin-right: 12px; }
+
+.btn-premium-save {
+    background: var(--primary-admin);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    padding: 15px 40px;
+    font-weight: 700;
+    box-shadow: 0 10px 20px rgba(5, 150, 105, 0.2);
+    transition: 0.3s;
+}
+
+.info-card-small {
+    padding: 15px;
+    border-radius: 15px;
+    background: #fff;
+    border: 1px solid #f1f5f9;
+    margin-bottom: 10px;
 }

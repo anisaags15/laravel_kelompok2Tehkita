@@ -1,48 +1,104 @@
-/* Container Utama Kartu */
-.profile-card, .profile-right-card {
-    border-radius: 12px !important;
-    border: none !important;
-    background-color: #fff !important;
+:root {
+    --primary-user: #10b981; 
+    --primary-dark: #059669;
+    --soft-bg: #f8fafc;
 }
 
-/* KANDANG PENGUNCI (Sangat Penting) */
-.profile-avatar-container {
-    width: 150px !important;
-    height: 150px !important;
-    max-width: 150px !important;
-    max-height: 150px !important;
-    margin: 0 auto 15px auto !important;
-    border-radius: 50% !important;
-    border: 4px solid #28a745 !important;
-    overflow: hidden !important; /* Memotong gambar raksasa */
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    background-color: #f8f9fa !important;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
+.user-card-luxury {
+    border: none;
+    border-radius: 35px;
+    background: #ffffff;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.05);
 }
 
-/* FOTO (Harus Nurut Kandang) */
-.profile-avatar {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important; /* Biar wajah tetap proporsional */
-    display: block !important;
+.profile-sidebar {
+    border-right: 1px solid #f1f5f9;
+    padding: 40px;
+    background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
 }
 
-/* Judul Section */
-.profile-section-title {
-    font-weight: 600 !important;
-    margin-bottom: 20px !important;
-    color: #28a745 !important;
-    border-bottom: 1px solid #eee !important;
-    padding-bottom: 10px !important;
+.avatar-wrapper {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 25px;
 }
 
-/* Navigasi Tab */
-.nav-tabs .nav-link.active {
-    border: none !important;
-    border-bottom: 3px solid #28a745 !important;
-    color: #28a745 !important;
-    font-weight: 600 !important;
+.user-avatar-circle {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 6px solid #fff;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    overflow: hidden;
+    background: #fff;
+}
+
+.camera-trigger {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    width: 40px;
+    height: 40px;
+    background: var(--primary-user);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    border: 3px solid #fff;
+    cursor: pointer;
+    box-shadow: 0 8px 15px rgba(16, 185, 129, 0.3);
+}
+
+.camera-trigger:hover { transform: scale(1.1); background: var(--primary-dark); }
+
+.premium-input {
+    background: #f1f5f9 !important;
+    border: 2px solid transparent !important;
+    border-radius: 15px !important;
+    padding: 15px 20px !important;
+    font-weight: 600;
+    width: 100%;
+}
+
+.premium-input:focus {
+    background: #fff !important;
+    border-color: var(--primary-user) !important;
+}
+
+.form-group-custom { margin-bottom: 25px; }
+
+.nav-link-custom {
+    display: flex;
+    align-items: center;
+    padding: 14px 20px;
+    border-radius: 12px;
+    color: #64748b;
+    font-weight: 700;
+    margin-bottom: 8px;
+    text-decoration: none !important;
+    transition: 0.3s;
+}
+
+.nav-link-custom.active { background: #ecfdf5; color: var(--primary-user); }
+.nav-link-custom i { margin-right: 12px; }
+
+.btn-premium-save {
+    background: var(--primary-user);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    padding: 15px 40px;
+    font-weight: 700;
+    box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2);
+    transition: 0.3s;
+}
+
+.info-card-small {
+    padding: 15px;
+    border-radius: 15px;
+    background: #fff;
+    border: 1px solid #f1f5f9;
+    margin-bottom: 10px;
 }

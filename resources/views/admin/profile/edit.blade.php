@@ -4,115 +4,135 @@
 <link rel="stylesheet" href="{{ asset('templates/dist/css/profile.css') }}">
 @endpush
 
-@section('page', 'Profile Admin Pusat')
-
 @section('content')
-<div class="row">
-
-    {{-- LEFT --}}
-    <div class="col-md-4">
-        <div class="card profile-card shadow-sm">
-            <div class="card-body text-center">
-                @if($user->photo)
-                    <img src="{{ asset('uploads/profile/'.$user->photo) }}" class="profile-avatar">
-                @else
-                    <img src="https://ui-avatars.com/api/?name={{ $user->name }}" class="profile-avatar">
-                @endif
-
-                <h4 class="mt-3">{{ $user->name }}</h4>
-                <p class="text-muted">{{ ucfirst($user->role) }}</p>
-
-                <hr>
-
-                <p><strong>Email:</strong><br>{{ $user->email }}</p>
-                <p><strong>No HP:</strong><br>{{ $user->no_hp }}</p>
-            </div>
-        </div>
-    </div>
-
-    {{-- RIGHT --}}
-    <div class="col-md-8">
-        <div class="card profile-right-card shadow-sm">
-            <div class="card-header bg-white">
-                <ul class="nav nav-tabs">
-                    <li class="nav-item">
-                        <a class="nav-link active" data-toggle="tab" href="#account">Account Settings</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#password">Change Password</a>
-                    </li>
-                </ul>
-            </div>
-
-            <div class="card-body">
-                <div class="tab-content">
-
-                    {{-- ACCOUNT --}}
-                    <div class="tab-pane fade show active" id="account">
-                        @if(session('success'))
-                            <div class="alert alert-success">{{ session('success') }}</div>
+<div class="container-fluid py-4 px-md-5">
+    <div class="user-card-luxury overflow-hidden">
+        <div class="row no-gutters">
+            
+            {{-- SIDEBAR KIRI --}}
+            <div class="col-lg-4 profile-sidebar text-center">
+                <div class="avatar-wrapper">
+                    <div class="user-avatar-circle">
+                        @if($user->photo)
+                            <img src="{{ asset('uploads/profile/'.$user->photo) }}" class="w-100 h-100 object-fit-cover" id="previewImg">
+                        @else
+                            <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-white">
+                                <i class="fas fa-user-shield fa-4x text-success"></i>
+                            </div>
                         @endif
+                    </div>
+                    <label for="uploadFoto" class="camera-trigger">
+                        <i class="fas fa-camera"></i>
+                    </label>
+                </div>
+                
+                <h3 class="font-weight-bold text-dark mb-1">{{ $user->name }}</h3>
+                <div class="badge badge-pill px-4 py-2 bg-dark text-white font-weight-bold mb-4">
+                    <i class="fas fa-shield-alt mr-1 text-warning"></i> ADMINISTRATOR PUSAT
+                </div>
+
+                <div class="nav flex-column mb-5 text-left">
+                    <a href="#info" class="nav-link-custom active" data-toggle="tab">
+                        <i class="fas fa-user-cog"></i> Pengaturan Profil
+                    </a>
+                    <a href="#keamanan" class="nav-link-custom" data-toggle="tab">
+                        <i class="fas fa-key"></i> Keamanan Sandi
+                    </a>
+                    <a href="#" class="nav-link-custom text-danger" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                        <i class="fas fa-sign-out-alt"></i> Keluar Sistem
+                    </a>
+                </div>
+
+                <div class="info-grid text-left">
+                    <div class="info-card-small shadow-sm">
+                        <small class="text-muted d-block font-weight-bold small">ID LOGIN</small>
+                        <span class="text-dark font-weight-bold">{{ $user->username }}</span>
+                    </div>
+                    <div class="info-card-small shadow-sm">
+                        <small class="text-muted d-block font-weight-bold small">KONTAK ADMIN</small>
+                        <span class="text-dark font-weight-bold">{{ $user->no_hp ?? 'Internal Only' }}</span>
+                    </div>
+                </div>
+            </div>
+
+            {{-- KONTEN KANAN (FORM SATU KOLOM) --}}
+            <div class="col-lg-8 p-4 p-md-5">
+                <div class="tab-content">
+                    
+                    {{-- Tab: Data Profil --}}
+                    <div class="tab-pane fade show active" id="info">
+                        <div class="mb-5">
+                            <h2 class="font-weight-bold text-dark mb-1">Data Master Admin</h2>
+                            <p class="text-muted">Kelola identitas utama administrator pusat di sini.</p>
+                        </div>
 
                         <form action="{{ route('admin.profile.update') }}" method="POST" enctype="multipart/form-data">
-                            @csrf
-                            @method('PUT')
-
-                            <div class="profile-section-title">Informasi Akun</div>
-
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label>Nama</label>
-                                    <input type="text" name="name" class="form-control" value="{{ old('name', $user->name) }}">
-                                </div>
-
-                                <div class="col-md-6 mb-3">
-                                    <label>Username</label>
-                                    <input type="text" name="username" class="form-control" value="{{ old('username', $user->username) }}">
-                                </div>
-
-                                <div class="col-md-6 mb-3">
-                                    <label>Email</label>
-                                    <input type="email" name="email" class="form-control" value="{{ old('email', $user->email) }}">
-                                </div>
-
-                                <div class="col-md-6 mb-3">
-                                    <label>No HP</label>
-                                    <input type="text" name="no_hp" class="form-control" value="{{ old('no_hp', $user->no_hp) }}">
-                                </div>
-
-                                <div class="col-md-12 mb-3">
-                                    <label>Foto Profile</label>
-                                    <input type="file" name="photo" class="form-control">
-                                </div>
+                            @csrf @method('PUT')
+                            <input type="file" name="photo" id="uploadFoto" class="d-none" onchange="previewImage(this)">
+                            
+                            {{-- Form Ke Bawah --}}
+                            <div class="form-group-custom">
+                                <label class="small font-weight-bold ml-2">NAMA LENGKAP</label>
+                                <input type="text" name="name" class="form-control premium-input" value="{{ $user->name }}" placeholder="Masukkan Nama Lengkap">
                             </div>
 
-                            <button class="btn btn-success">Update Profile</button>
+                            <div class="form-group-custom">
+                                <label class="small font-weight-bold ml-2">USERNAME SISTEM</label>
+                                <input type="text" name="username" class="form-control premium-input" value="{{ $user->username }}" placeholder="Username">
+                            </div>
+
+                            <div class="form-group-custom">
+                                <label class="small font-weight-bold ml-2">EMAIL OFFICIAL</label>
+                                <input type="email" name="email" class="form-control premium-input" value="{{ $user->email }}" placeholder="email@tehkita.com">
+                            </div>
+
+                            <div class="form-group-custom mb-5">
+                                <label class="small font-weight-bold ml-2">NOMOR WHATSAPP</label>
+                                <input type="text" name="no_hp" class="form-control premium-input" value="{{ $user->no_hp }}" placeholder="0812xxxx">
+                            </div>
+                            
+                            <div class="text-right">
+                                <button type="submit" class="btn-premium-save shadow">Update Profile Admin</button>
+                            </div>
                         </form>
                     </div>
 
-                    {{-- PASSWORD --}}
-                    <div class="tab-pane fade" id="password">
+                    {{-- Tab: Keamanan --}}
+                    <div class="tab-pane fade" id="keamanan">
+                        <div class="mb-5">
+                            <h2 class="font-weight-bold text-dark mb-1">Sistem Keamanan</h2>
+                            <p class="text-muted">Ganti kata sandi akses administrator Anda secara berkala.</p>
+                        </div>
                         <form action="{{ route('admin.profile.update-password') }}" method="POST">
                             @csrf
-
-                            <div class="mb-3">
-                                <label>Password Baru</label>
-                                <input type="password" name="password" class="form-control">
+                            <div class="form-group-custom">
+                                <label class="small font-weight-bold ml-2">KATA SANDI BARU</label>
+                                <input type="password" name="password" class="form-control premium-input" placeholder="Masukan Kata Sandi Baru">
                             </div>
-
-                            <div class="mb-3">
-                                <label>Konfirmasi Password</label>
-                                <input type="password" name="password_confirmation" class="form-control">
+                            <div class="form-group-custom mb-5">
+                                <label class="small font-weight-bold ml-2">ULANGI KATA SANDI</label>
+                                <input type="password" name="password_confirmation" class="form-control premium-input" placeholder="Pastikan kata sandi sama">
                             </div>
-
-                            <button class="btn btn-warning">Update Password</button>
+                            <button type="submit" class="btn-premium-save w-100 shadow">Ganti Kata Sandi</button>
                         </form>
                     </div>
 
                 </div>
             </div>
+
         </div>
     </div>
-
 </div>
+
+<script>
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('previewImg').src = e.target.result;
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
 @endsection
