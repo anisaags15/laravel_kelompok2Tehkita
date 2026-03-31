@@ -11,7 +11,7 @@
                 <a href="{{ route('admin.distribusi.index') }}" class="btn btn-white btn-sm rounded-circle shadow-sm mr-3" style="width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border: 1px solid #e3e6f0;">
                     <i class="fas fa-chevron-left text-success"></i>
                 </a>
-                <h3 class="font-weight-bold text-dark mb-0">Form Pengiriman Massal</h3>
+                <h3 class="font-weight-bold text-dark mb-0">Form Pengiriman </h3>
             </div>
         </div>
     </div>
