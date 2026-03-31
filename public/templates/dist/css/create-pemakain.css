@@ -1,0 +1,70 @@
+/* Custom CSS untuk Form Pemakaian Massal */
+
+.item-row.selected-bg {
+    background-color: rgba(25, 135, 111, 0.08) !important;
+    transition: background-color 0.3s ease;
+}
+
+.input-group-modern {
+    display: flex;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.input-group-prepend-custom {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-right: none;
+    border-radius: 10px 0 0 10px;
+    padding: 0 15px;
+    display: flex;
+    align-items: center;
+}
+
+.input-custom-modern {
+    border-radius: 0 10px 10px 0 !important;
+    height: 45px;
+    border: 1px solid #dee2e6;
+}
+
+.btn-simpan-custom {
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.btn-simpan-custom:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.table thead th {
+    background-color: #f8f9fa;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 1px;
+    border: none;
+    padding: 15px;
+}
+
+.item-jumlah:disabled {
+    background-color: #f1f3f5;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.item-jumlah:focus {
+    border-color: #28a745;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+.card-tips {
+    border-radius: 15px;
+}
+
+.card-security {
+    border-radius: 15px; 
+    background: linear-gradient(135deg, #198754 0%, #115c3a 100%) !important; 
+    color: white;
+}

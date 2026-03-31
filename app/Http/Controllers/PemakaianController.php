@@ -44,6 +44,7 @@ class PemakaianController extends Controller
     public function create()
     {
         $user = Auth::user();
+        // Ambil stok outlet yang lebih dari 0
         $stokOutlets = StokOutlet::with('bahan')
             ->where('outlet_id', $user->outlet_id)
             ->where('stok', '>', 0)
@@ -67,48 +68,78 @@ class PemakaianController extends Controller
         return view('user.pemakaian.create_waste', compact('stokOutlets', 'wasteBulanIni'));
     }
 
+    /**
+     * REVISI: Store mendukung banyak bahan sekaligus (Massal/Checklist)
+     */
     public function store(Request $request)
     {
+        // 1. Validasi awal (Tanggal wajib, items harus array)
         $request->validate([
-            'bahan_id' => 'required|exists:bahans,id',
-            'jumlah'   => 'required|numeric|min:0.01',
-            'tanggal'  => 'required|date',
+            'tanggal' => 'required|date',
+            'items'   => 'required|array|min:1',
+            'items.*.bahan_id' => 'required|exists:bahans,id',
+            'items.*.jumlah'   => 'nullable|numeric|min:0.01',
         ]);
 
         $user = Auth::user();
 
         try {
             DB::beginTransaction();
+            $processedCount = 0;
 
-            $stokOutlet = StokOutlet::with(['bahan', 'outlet'])
-                ->where('outlet_id', $user->outlet_id)
-                ->where('bahan_id', $request->bahan_id)
-                ->lockForUpdate()
-                ->first();
+            foreach ($request->items as $item) {
+                // Hanya proses baris yang dicentang (checked == 1)
+                if (isset($item['checked']) && $item['checked'] == '1') {
+                    
+                    // Pastikan jumlah diisi jika dicentang
+                    if (empty($item['jumlah']) || $item['jumlah'] <= 0) {
+                        $namaBahan = Bahan::find($item['bahan_id'])->nama_bahan;
+                        throw new \Exception("Jumlah untuk bahan {$namaBahan} harus diisi dengan benar.");
+                    }
 
-            if (!$stokOutlet || $stokOutlet->stok < $request->jumlah) {
-                return redirect()->back()->with('error', 'Maaf, stok bahan tidak mencukupi.');
+                    // Lock record stok outlet untuk menghindari race condition
+                    $stokOutlet = StokOutlet::with(['bahan', 'outlet'])
+                        ->where('outlet_id', $user->outlet_id)
+                        ->where('bahan_id', $item['bahan_id'])
+                        ->lockForUpdate()
+                        ->first();
+
+                    // Cek ketersediaan stok
+                    if (!$stokOutlet || $stokOutlet->stok < $item['jumlah']) {
+                        $namaBahan = $stokOutlet ? $stokOutlet->bahan->nama_bahan : 'Bahan';
+                        throw new \Exception("Maaf, stok bahan {$namaBahan} tidak mencukupi.");
+                    }
+
+                    // Buat data pemakaian
+                    Pemakaian::create([
+                        'bahan_id'  => $item['bahan_id'],
+                        'outlet_id' => $user->outlet_id,
+                        'jumlah'    => $item['jumlah'],
+                        'tanggal'   => $request->tanggal,
+                        'tipe'      => 'rutin',
+                    ]);
+
+                    // Kurangi stok outlet
+                    $stokOutlet->decrement('stok', $item['jumlah']);
+                    $stokOutlet->refresh();
+
+                    // Jalankan notifikasi bot jika stok menjadi kritis
+                    $this->handleBotNotifications($user, $stokOutlet, $item['jumlah'], $request->tanggal);
+
+                    $processedCount++;
+                }
             }
 
-            Pemakaian::create([
-                'bahan_id'  => $request->bahan_id,
-                'outlet_id' => $user->outlet_id,
-                'jumlah'    => $request->jumlah,
-                'tanggal'   => $request->tanggal,
-                'tipe'      => 'rutin',
-            ]);
-
-            $stokOutlet->decrement('stok', $request->jumlah);
-            $stokOutlet->refresh();
-
-            $this->handleBotNotifications($user, $stokOutlet, $request->jumlah, $request->tanggal);
+            if ($processedCount === 0) {
+                throw new \Exception('Silakan pilih minimal satu bahan yang digunakan!');
+            }
 
             DB::commit();
-            return redirect()->route('user.riwayat_pemakaian')->with('success', 'Data pemakaian berhasil dicatat.');
+            return redirect()->route('user.riwayat_pemakaian')->with('success', 'Berhasil mencatat ' . $processedCount . ' data pemakaian.');
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Gagal: ' . $e->getMessage());
+            return redirect()->back()->with('error', $e->getMessage())->withInput();
         }
     }
 
@@ -119,7 +150,6 @@ class PemakaianController extends Controller
             'jumlah'         => 'required|numeric|min:0.01',
             'keterangan'     => 'required|string',
             'foto'           => 'required|image|mimes:jpg,jpeg,png|max:2048',
-            
         ]);
 
         $user       = Auth::user();
@@ -138,22 +168,21 @@ class PemakaianController extends Controller
                 $fotoPath = $request->file('foto')->storeAs('waste_photos', $namaFile, 'public');
             }
 
-        $waste = Waste::create([
-            'outlet_id'      => $user->outlet_id,
-            'stok_outlet_id' => $request->stok_outlet_id,
-            'jumlah'         => $request->jumlah,
-            'keterangan'     => $request->keterangan,
-            'foto'           => $fotoPath,
-            'tanggal'        => now(),      
-            'status'         => 'pending',  
-        ]);
+            $waste = Waste::create([
+                'outlet_id'      => $user->outlet_id,
+                'stok_outlet_id' => $request->stok_outlet_id,
+                'jumlah'         => $request->jumlah,
+                'keterangan'     => $request->keterangan,
+                'foto'           => $fotoPath,
+                'tanggal'        => now(),      
+                'status'         => 'pending',  
+            ]);
 
             $stokOutlet->decrement('stok', $request->jumlah);
             $stokOutlet->refresh();
 
             $adminPusat = User::where('role', 'admin')->first();
             if ($adminPusat) {
-
                 Message::create([
                     'sender_id'   => $user->id,
                     'receiver_id' => $adminPusat->id,
@@ -189,55 +218,52 @@ class PemakaianController extends Controller
             ->latest()
             ->paginate(15);
 
-        $totalPending = Waste::count(); // ✅ FIX
-        $totalWaste   = Waste::whereMonth('created_at', now()->month)->sum('jumlah'); // ✅ FIX
+        $totalPending = Waste::where('status', 'pending')->count();
+        $totalWaste   = Waste::whereMonth('created_at', now()->month)->sum('jumlah');
 
         return view('admin.waste.index', compact('allWastes', 'totalPending', 'totalWaste'));
     }
 
-public function verifyWaste(Request $request, $id)
-{
-    $waste = Waste::findOrFail($id);
-    
-    $status = $request->input('status');
+    public function verifyWaste(Request $request, $id)
+    {
+        $waste = Waste::findOrFail($id);
+        $status = $request->input('status');
 
-    try {
-        DB::beginTransaction();
+        try {
+            DB::beginTransaction();
 
-        if ($status === 'rejected') {
-            $stokOutlet = StokOutlet::find($waste->stok_outlet_id);
-            if ($stokOutlet) {
-                $stokOutlet->increment('stok', $waste->jumlah);
+            if ($status === 'rejected') {
+                $stokOutlet = StokOutlet::find($waste->stok_outlet_id);
+                if ($stokOutlet) {
+                    $stokOutlet->increment('stok', $waste->jumlah);
+                }
+                $pesan = 'Laporan waste ditolak dan stok telah dikembalikan ke outlet.';
+            } else {
+                $pesan = 'Laporan waste berhasil disetujui (Verified).';
             }
-            $pesan = 'Laporan waste ditolak dan stok telah dikembalikan ke outlet.';
-        } else {
-            $pesan = 'Laporan waste berhasil disetujui (Verified).';
+
+            $waste->update(['status' => $status]);
+
+            DB::commit();
+            return redirect()->back()->with('success', $pesan);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
-
-        $waste->update([
-            'status' => $status
-        ]);
-
-        DB::commit();
-        return redirect()->back()->with('success', $pesan);
-
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
     }
-}
-// TARUH INI DI PALING BAWAH SEBELUM TUTUP KURUNG CLASS
+
     private function handleBotNotifications($user, $stokOutlet, $jumlah, $tanggal)
     {
         $stokSekarang = $stokOutlet->stok;
         
-        // Cek stok kritis (misal di bawah 5)
+        // Threshold stok kritis: 5
         if ($stokSekarang <= 5) {
             $status = ($stokSekarang <= 0) ? "🚨 STOK HABIS" : "⚠️ STOK KRITIS";
             $adminPusat = User::where('role', 'admin')->first();
 
             if ($adminPusat) {
-                // 1. Kirim pesan ke tabel Message (Chat Internal)
+                // 1. Pesan Internal Chat
                 Message::create([
                     'sender_id'   => $user->id,
                     'receiver_id' => $adminPusat->id,
@@ -246,7 +272,7 @@ public function verifyWaste(Request $request, $id)
                     'is_read'     => 0
                 ]);
 
-                // 2. Kirim Notifikasi Laravel (Toast/Bell)
+                // 2. Laravel Notification
                 $admins = User::where('role', 'admin')->get();
                 foreach ($admins as $admin) {
                     $admin->notify(new StokKritisNotification($stokOutlet));

@@ -17,9 +17,9 @@ class Pemakaian extends Model
     'outlet_id',
     'jumlah',
     'tanggal',
-    'tipe',       // TAMBAHKAN INI
-    'status',     // TAMBAHKAN INI
-    'keterangan', // TAMBAHKAN INI
+    'tipe',       
+    'status',     
+    'keterangan', 
 ];
 
     protected $casts = [
