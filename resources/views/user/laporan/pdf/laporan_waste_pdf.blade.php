@@ -1,18 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <style>
-        body { font-family: sans-serif; font-size: 11px; line-height: 1.4; color: #333; }
-        .header { text-align: center; border-bottom: 2px solid #dc3545; padding-bottom: 10px; margin-bottom: 20px; }
-        .logo { max-width: 150px; margin-bottom: 10px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { background: #dc3545; color: white; padding: 10px 8px; border: 1px solid #ddd; text-transform: uppercase; }
-        td { padding: 8px; border: 1px solid #ddd; text-align: center; }
-        .text-left { text-align: left; }
-        .footer { margin-top: 40px; width: 100%; }
-        .signature-box { float: right; width: 200px; text-align: center; }
-        .watermark { color: #f8d7da; font-size: 8px; text-align: center; margin-top: 20px; }
-    </style>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    {{-- Memanggil file CSS eksternal menggunakan public_path --}}
+    <link rel="stylesheet" href="{{ public_path('templates/dist/css/pdf-laporan-waste.css') }}">
 </head>
 <body>
     <div class="header">
@@ -22,7 +13,6 @@
         <h2 style="color: #dc3545; margin:0;">LAPORAN KERUSAKAN BAHAN (WASTE)</h2>
         <p style="margin: 5px 0;">
             Outlet: <strong>{{ $outlet->nama_outlet }}</strong> | 
-            {{-- ✅ FIX: pakai $tahun dan $bulan dari controller, bukan request() --}}
             Periode: <strong>{{ \Carbon\Carbon::createFromDate($tahun, $bulan, 1)->translatedFormat('F Y') }}</strong>
         </p>
     </div>
@@ -31,11 +21,12 @@
         <thead>
             <tr>
                 <th width="5%">No</th>
-                <th width="15%">Tanggal</th>
-                <th width="30%">Bahan Baku</th>
+                <th width="12%">Tanggal</th>
+                <th width="20%">Bahan Baku</th>
+                <th width="15%">Bukti Foto</th>
                 <th width="10%">Jumlah</th>
                 <th width="10%">Satuan</th>
-                <th width="30%">Alasan / Keterangan</th>
+                <th width="28%">Alasan / Keterangan</th>
             </tr>
         </thead>
         <tbody>
@@ -44,8 +35,14 @@
             <tr>
                 <td>{{ $key + 1 }}</td>
                 <td>{{ \Carbon\Carbon::parse($w->tanggal)->format('d/m/Y') }}</td>
-                {{-- ✅ FIX: relasi Waste -> stokOutlet -> bahan --}}
                 <td class="text-left"><strong>{{ $w->stokOutlet->bahan->nama_bahan ?? 'Bahan Terhapus' }}</strong></td>
+                <td>
+                    @if($w->foto && file_exists(public_path('storage/' . $w->foto)))
+                        <img src="{{ public_path('storage/' . $w->foto) }}" class="img-waste">
+                    @else
+                        <span style="color: #999; font-size: 8px;">No Photo</span>
+                    @endif
+                </td>
                 <td>{{ $w->jumlah }}</td>
                 <td>{{ $w->stokOutlet->bahan->satuan ?? '-' }}</td>
                 <td class="text-left" style="font-style: italic;">{{ $w->keterangan }}</td>
@@ -53,14 +50,14 @@
             @php $totalWaste += $w->jumlah; @endphp
             @empty
             <tr>
-                <td colspan="6" style="padding: 30px; color: #999;">Tidak ada data laporan waste pada periode ini.</td>
+                <td colspan="7" style="padding: 30px; color: #999;">Tidak ada data laporan waste pada periode ini.</td>
             </tr>
             @endforelse
         </tbody>
         @if($wasteData->count() > 0)
         <tfoot>
-            <tr style="background: #f8f9fa; font-weight: bold;">
-                <td colspan="3" class="text-left">TOTAL ITEM WASTE</td>
+            <tr>
+                <td colspan="4" class="text-left">TOTAL ITEM WASTE</td>
                 <td>{{ $totalWaste }}</td>
                 <td colspan="2"></td>
             </tr>

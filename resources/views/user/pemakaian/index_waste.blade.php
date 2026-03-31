@@ -3,6 +3,10 @@
 @section('title', 'Riwayat Waste')
 @section('page', 'Operasional Outlet')
 
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('templates/dist/css/index-waste.css') }}">
+@endpush
+
 @section('content')
 <div class="container-fluid py-4">
     {{-- HEADER SECTION --}}
@@ -28,12 +32,13 @@
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0 text-adaptive">
                     <thead>
-                        <tr class="table-header-adaptive">
+                        <tr class="table-header-adaptive border-bottom">
                             <th class="py-4 text-center font-weight-bold text-uppercase small" width="80">No</th>
                             <th class="py-4 font-weight-bold text-uppercase small">Detail Bahan</th>
+                            <th class="py-4 text-center font-weight-bold text-uppercase small">Bukti Foto</th>
                             <th class="py-4 text-center font-weight-bold text-uppercase small">Waktu Lapor</th>
                             <th class="py-4 text-center font-weight-bold text-uppercase small">Jumlah Waste</th>
-                            <th class="py-4 font-weight-bold text-uppercase small" width="25%">Keterangan</th>
+                            <th class="py-4 font-weight-bold text-uppercase small" width="20%">Keterangan</th>
                             <th class="py-4 text-center font-weight-bold text-uppercase small">Status</th>
                         </tr>
                     </thead>
@@ -61,6 +66,19 @@
                             </td>
 
                             <td class="text-center">
+                                @if($w->foto)
+                                    <img src="{{ asset('storage/' . $w->foto) }}" 
+                                         class="img-thumbnail rounded shadow-sm foto-zoom-user" 
+                                         style="width: 50px; height: 50px; object-fit: cover; cursor: pointer; border-radius: 10px; border: 2px solid #f8f9fa;"
+                                         data-toggle="modal" data-target="#modalFotoUser{{ $w->id }}">
+                                @else
+                                    <div class="text-muted small opacity-50">
+                                        <i class="fas fa-image-slash fa-lg"></i>
+                                    </div>
+                                @endif
+                            </td>
+
+                            <td class="text-center">
                                 <div class="font-weight-bold text-adaptive mb-0" style="font-size: 0.9rem;">
                                     {{ \Carbon\Carbon::parse($w->tanggal)->translatedFormat('d M Y') }}
                                 </div>
@@ -78,7 +96,7 @@
                             </td>
 
                             <td>
-                                <div class="keterangan-box-adaptive">
+                                <div class="keterangan-box-adaptive" title="{{ $w->keterangan }}">
                                     "{{ $w->keterangan ?? 'Tanpa alasan spesifik' }}"
                                 </div>
                             </td>
@@ -88,6 +106,10 @@
                                     <span class="badge-pill-custom bg-soft-success text-success">
                                         <i class="fas fa-check-circle mr-1"></i> VERIFIED
                                     </span>
+                                @elseif($w->status == 'rejected')
+                                    <span class="badge-pill-custom bg-soft-danger text-danger">
+                                        <i class="fas fa-times-circle mr-1"></i> REJECTED
+                                    </span>
                                 @else
                                     <span class="badge-pill-custom bg-soft-warning text-warning">
                                         <i class="fas fa-clock mr-1 pulse"></i> PENDING
@@ -95,9 +117,30 @@
                                 @endif
                             </td>
                         </tr>
+
+                        {{-- MODAL ZOOM FOTO --}}
+                        @if($w->foto)
+                        <div class="modal fade" id="modalFotoUser{{ $w->id }}" tabindex="-1" role="dialog" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+                                    <div class="modal-header border-0 pb-0">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body p-4 pt-0 text-center">
+                                        <img src="{{ asset('storage/' . $w->foto) }}" class="img-fluid rounded shadow-sm mb-3" style="max-height: 450px; width: 100%; object-fit: contain;">
+                                        <h5 class="font-weight-bold mb-1 text-adaptive">{{ $w->bahan->nama_bahan }}</h5>
+                                        <p class="text-muted small mb-0">Laporan pada {{ \Carbon\Carbon::parse($w->created_at)->translatedFormat('d F Y, H:i') }} WIB</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
+
                         @empty
                         <tr>
-                            <td colspan="6" class="py-5 text-center">
+                            <td colspan="7" class="py-5 text-center">
                                 <div class="opacity-25 mb-3">
                                     <i class="fas fa-clipboard-list fa-4x text-muted"></i>
                                 </div>
@@ -125,43 +168,4 @@
         @endif
     </div>
 </div>
-
-<style>
-    /* CSS Utility Tambahan untuk Table & Waste */
-    .bg-soft-danger { background-color: rgba(231, 74, 59, 0.1); }
-    .bg-soft-success { background-color: rgba(28, 200, 138, 0.1); }
-    .bg-soft-warning { background-color: rgba(246, 194, 62, 0.1); }
-    
-    .avatar-icon {
-        width: 40px; height: 40px;
-        display: flex; align-items: center; justify-content: center;
-        border-radius: 10px; font-size: 1rem;
-    }
-
-    .badge-pill-custom {
-        padding: 6px 14px;
-        border-radius: 20px;
-        font-size: 0.7rem;
-        font-weight: 700;
-        display: inline-block;
-    }
-
-    .pulse { animation: pulse-animation 2s infinite; }
-    @keyframes pulse-animation {
-        0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; }
-    }
-
-    /* Override Pagination */
-    .pagination-modern .pagination { margin-bottom: 0; gap: 5px; }
-    .pagination-modern .page-item .page-link {
-        border: none; background: #f8f9fc; color: #198754;
-        border-radius: 8px !important; font-weight: 600;
-    }
-    .dark-mode .pagination-modern .page-item .page-link {
-        background: #2c3136; color: #adb5bd;
-    }
-    .pagination-modern .page-item.active .page-link {
-        background: #198754 !important; color: white !important;
-    }
-</style>
 @endsection

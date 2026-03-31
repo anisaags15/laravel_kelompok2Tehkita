@@ -61,7 +61,7 @@ class PemakaianController extends Controller
             ->get();
 
         $wasteBulanIni = Waste::where('outlet_id', $user->outlet_id)
-            ->whereMonth('created_at', now()->month) // ✅ FIX
+            ->whereMonth('created_at', now()->month) 
             ->count();
 
         return view('user.pemakaian.create_waste', compact('stokOutlets', 'wasteBulanIni'));
@@ -119,6 +119,7 @@ class PemakaianController extends Controller
             'jumlah'         => 'required|numeric|min:0.01',
             'keterangan'     => 'required|string',
             'foto'           => 'required|image|mimes:jpg,jpeg,png|max:2048',
+            
         ]);
 
         $user       = Auth::user();
@@ -137,13 +138,15 @@ class PemakaianController extends Controller
                 $fotoPath = $request->file('foto')->storeAs('waste_photos', $namaFile, 'public');
             }
 
-            $waste = Waste::create([
-                'outlet_id'      => $user->outlet_id,
-                'stok_outlet_id' => $request->stok_outlet_id,
-                'jumlah'         => $request->jumlah,
-                'keterangan'     => $request->keterangan,
-                'foto'           => $fotoPath,
-            ]);
+        $waste = Waste::create([
+            'outlet_id'      => $user->outlet_id,
+            'stok_outlet_id' => $request->stok_outlet_id,
+            'jumlah'         => $request->jumlah,
+            'keterangan'     => $request->keterangan,
+            'foto'           => $fotoPath,
+            'tanggal'        => now(),      
+            'status'         => 'pending',  
+        ]);
 
             $stokOutlet->decrement('stok', $request->jumlah);
             $stokOutlet->refresh();
@@ -192,32 +195,62 @@ class PemakaianController extends Controller
         return view('admin.waste.index', compact('allWastes', 'totalPending', 'totalWaste'));
     }
 
-    public function verifyWaste($id)
-    {
-        return redirect()->back()->with('success', 'Laporan waste berhasil diverifikasi.');
-    }
+public function verifyWaste(Request $request, $id)
+{
+    $waste = Waste::findOrFail($id);
+    
+    $status = $request->input('status');
 
+    try {
+        DB::beginTransaction();
+
+        if ($status === 'rejected') {
+            $stokOutlet = StokOutlet::find($waste->stok_outlet_id);
+            if ($stokOutlet) {
+                $stokOutlet->increment('stok', $waste->jumlah);
+            }
+            $pesan = 'Laporan waste ditolak dan stok telah dikembalikan ke outlet.';
+        } else {
+            $pesan = 'Laporan waste berhasil disetujui (Verified).';
+        }
+
+        $waste->update([
+            'status' => $status
+        ]);
+
+        DB::commit();
+        return redirect()->back()->with('success', $pesan);
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+    }
+}
+// TARUH INI DI PALING BAWAH SEBELUM TUTUP KURUNG CLASS
     private function handleBotNotifications($user, $stokOutlet, $jumlah, $tanggal)
     {
         $stokSekarang = $stokOutlet->stok;
-        $adminPusat   = User::where('role', 'admin')->first();
-
-        if (!$adminPusat) return;
-
+        
+        // Cek stok kritis (misal di bawah 5)
         if ($stokSekarang <= 5) {
             $status = ($stokSekarang <= 0) ? "🚨 STOK HABIS" : "⚠️ STOK KRITIS";
+            $adminPusat = User::where('role', 'admin')->first();
 
-            Message::create([
-                'sender_id'   => $user->id,
-                'receiver_id' => $adminPusat->id,
-                'subject'     => 'NOTIFIKASI SISTEM',
-                'message'     => "[SISTEM]\n{$status}\nOutlet: {$user->outlet->nama_outlet}\nBahan: {$stokOutlet->bahan->nama_bahan}\nSisa: {$stokSekarang}",
-                'is_read'     => 0
-            ]);
+            if ($adminPusat) {
+                // 1. Kirim pesan ke tabel Message (Chat Internal)
+                Message::create([
+                    'sender_id'   => $user->id,
+                    'receiver_id' => $adminPusat->id,
+                    'subject'     => 'NOTIFIKASI SISTEM',
+                    'message'     => "[SISTEM]\n{$status}\nOutlet: " . ($user->outlet->nama_outlet ?? 'Outlet') . "\nBahan: {$stokOutlet->bahan->nama_bahan}\nSisa: {$stokSekarang} {$stokOutlet->bahan->satuan}",
+                    'is_read'     => 0
+                ]);
 
-            $admins = User::where('role', 'admin')->get();
-            foreach ($admins as $admin) {
-                $admin->notify(new StokKritisNotification($stokOutlet));
+                // 2. Kirim Notifikasi Laravel (Toast/Bell)
+                $admins = User::where('role', 'admin')->get();
+                foreach ($admins as $admin) {
+                    $admin->notify(new StokKritisNotification($stokOutlet));
+                }
             }
         }
     }

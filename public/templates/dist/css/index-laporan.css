@@ -1,0 +1,74 @@
+/* public/templates/dist/css/index-laporan.css */
+
+/* CSS KUSTOM UNTUK TAMPILAN PREMIUM */
+.laporan-card {
+    border-radius: 15px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: #ffffff;
+    height: 100%;
+}
+
+.icon-box {
+    width: 65px;
+    height: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    transition: transform 0.3s ease;
+}
+
+.laporan-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important;
+}
+
+.laporan-card:hover .icon-box {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.transition-icon {
+    transition: transform 0.3s ease;
+}
+
+.laporan-card:hover .transition-icon {
+    transform: translateX(5px);
+}
+
+/* Color Variations */
+.bg-success-subtle { background-color: #e8f5e9; }
+.bg-primary-subtle { background-color: #e3f2fd; }
+.bg-warning-subtle { background-color: #fff8e1; }
+.bg-danger-subtle { background-color: #ffebee; }
+
+/* Hover Effects for Titles */
+.group-card:hover h5 {
+    color: #28a745 !important;
+}
+
+/* Specific Hover for Monthly & Waste */
+.group-card[href*="ringkasan"]:hover h5 {
+    color: #ffc107 !important;
+}
+
+.group-card[href*="waste"]:hover h5 {
+    color: #dc3545 !important;
+}
+
+.group-card[href*="distribusi"]:hover h5 {
+    color: #007bff !important;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .icon-box { 
+        width: 50px; 
+        height: 50px; 
+    }
+    .icon-box i { 
+        font-size: 1.5rem; 
+    }
+    .laporan-card {
+        margin-bottom: 10px;
+    }
+}

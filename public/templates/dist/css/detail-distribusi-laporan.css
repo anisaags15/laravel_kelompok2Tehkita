@@ -1,0 +1,187 @@
+/* public/templates/dist/css/detail-laporan-distribusi.css */
+
+/* FORMAL & CLEAN THEME - TEH KITA */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+.tk-laporan-wrapper { 
+    font-family: 'Inter', sans-serif !important; 
+    background-color: #f8fafc; 
+    min-height: 100vh; 
+    padding: 2.5rem 0;
+}
+
+/* Navigasi Formal */
+.tk-breadcrumb { 
+    font-size: 12px; 
+    font-weight: 600; 
+    text-transform: uppercase; 
+    letter-spacing: 0.5px; 
+    color: #64748b; 
+    margin-bottom: 8px; 
+}
+
+.tk-judul { 
+    font-weight: 800; 
+    letter-spacing: -1px; 
+    color: #0f172a; 
+    margin-bottom: 4px; 
+}
+
+/* Tombol Kembali Formal (Outline Style) */
+.btn-kembali-formal {
+    background: #ffffff;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-weight: 600;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.2s ease;
+    text-decoration: none !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.btn-kembali-formal i { 
+    font-size: 12px; 
+    margin-right: 8px; 
+    color: #10b981; 
+}
+
+.btn-kembali-formal:hover { 
+    background: #f1f5f9; 
+    border-color: #94a3b8;
+    color: #0f172a;
+    transform: translateY(-1px);
+}
+
+/* Card & Tabel */
+.tk-card {
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.tk-card-header {
+    padding: 20px 24px;
+    background: #ffffff;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.custom-table-formal thead th {
+    background: #f8fafc;
+    padding: 16px 24px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    border-bottom: 1px solid #e2e8f0;
+    letter-spacing: 0.5px;
+}
+
+.custom-table-formal tbody td { 
+    padding: 18px 24px; 
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f5f9;
+    color: #334155;
+    font-size: 14px;
+}
+
+/* Kalender Minimalis */
+.tgl-tile {
+    width: 46px; 
+    height: 46px; 
+    border-radius: 8px;
+    border: 1px solid #e2e8f0; 
+    overflow: hidden; 
+    text-align: center;
+    background: #fff;
+}
+
+.tgl-tile .bln { 
+    background: #059669; 
+    color: white; 
+    font-size: 9px; 
+    font-weight: 800; 
+    padding: 2px 0; 
+}
+
+.tgl-tile .tgl { 
+    font-size: 16px; 
+    font-weight: 700; 
+    color: #1e293b; 
+    padding-top: 1px; 
+}
+
+/* Inisial Outlet Bulat */
+.outlet-icon {
+    width: 34px; 
+    height: 34px; 
+    border-radius: 50%;
+    background: #ecfdf5; 
+    color: #059669;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    font-weight: 700; 
+    border: 1px solid #d1fae5;
+}
+
+/* Kolom Jumlah */
+.jumlah-box { 
+    font-weight: 700; 
+    font-size: 15px; 
+    color: #0f172a; 
+}
+
+/* Status Bahasa Indonesia */
+.status-terima {
+    background: #f0fdf4; 
+    border: 1px solid #dcfce7; 
+    border-radius: 6px;
+    padding: 4px 12px; 
+    display: inline-block; 
+    text-align: right;
+}
+
+.status-proses {
+    background: #fffbeb; 
+    border: 1px solid #fef3c7; 
+    border-radius: 6px;
+    padding: 4px 12px; 
+    display: inline-flex; 
+    align-items: center; 
+    color: #d97706;
+}
+
+.dot-animasi {
+    width: 6px; 
+    height: 6px; 
+    background: #fbbf24; 
+    border-radius: 50%;
+    margin-right: 8px; 
+    position: relative;
+}
+
+.dot-animasi::after {
+    content: ''; 
+    position: absolute; 
+    width: 100%; 
+    height: 100%; 
+    top: 0; 
+    left: 0;
+    background: #fbbf24; 
+    border-radius: 50%; 
+    animation: pulse-ring 1.5s infinite;
+}
+
+@keyframes pulse-ring { 
+    0% { transform: scale(1); opacity: 1; } 
+    100% { transform: scale(3); opacity: 0; } 
+}

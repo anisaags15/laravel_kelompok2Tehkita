@@ -97,10 +97,11 @@
                     <thead class="bg-light">
                         <tr>
                             <th class="ps-4" width="5%">No</th>
-                            <th width="15%">Tanggal</th>
-                            <th width="25%">Bahan Baku</th>
-                            <th width="15%" class="text-center">Jumlah</th>
-                            <th width="25%">Alasan / Keterangan</th>
+                            <th width="12%">Tanggal</th>
+                            <th width="20%">Bahan Baku</th>
+                            <th width="15%" class="text-center">Bukti Foto</th>
+                            <th width="12%" class="text-center">Jumlah</th>
+                            <th width="20%">Alasan / Keterangan</th>
                             <th class="text-end pe-4">Status</th>
                         </tr>
                     </thead>
@@ -112,6 +113,24 @@
                             <td>
                                 <div class="fw-bold text-dark">{{ $item->stokOutlet->bahan->nama_bahan ?? ($item->bahan->nama_bahan ?? 'Bahan Tidak Ditemukan') }}</div>
                                 <small class="text-muted">ID: #WST-{{ $item->id }}</small>
+                            </td>
+                            <td class="text-center">
+                                @if($item->foto)
+                                    <img src="{{ asset('storage/' . $item->foto) }}" alt="Foto Waste" class="rounded shadow-sm" style="width: 60px; height: 60px; object-fit: cover; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#modalFoto{{ $item->id }}">
+                                    
+                                    <div class="modal fade" id="modalFoto{{ $item->id }}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content border-0 bg-transparent">
+                                                <div class="modal-body p-0 text-center">
+                                                    <img src="{{ asset('storage/' . $item->foto) }}" class="img-fluid rounded shadow-lg">
+                                                    <button type="button" class="btn btn-light btn-sm mt-3" data-bs-dismiss="modal">Tutup</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @else
+                                    <span class="text-muted small italic">Tidak ada foto</span>
+                                @endif
                             </td>
                             <td class="text-center">
                                 <span class="fw-bold text-danger">{{ $item->jumlah }}</span>
@@ -134,7 +153,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" class="text-center py-5">
+                            <td colspan="7" class="text-center py-5">
                                 <i class="fas fa-box-open fa-3x text-light mb-3"></i>
                                 <p class="text-muted mb-0">Tidak ada laporan waste untuk periode ini.</p>
                             </td>
@@ -154,12 +173,6 @@
     .bg-danger-subtle { background-color: #fceaea; }
     .bg-success-subtle { background-color: #e8fadf; }
     .bg-warning-subtle { background-color: #fff9e6; }
-    .badge-dot {
-        background: transparent;
-        color: #666;
-        font-weight: 500;
-        font-size: 0.8rem;
-    }
     table th {
         font-size: 0.85rem;
         letter-spacing: 0.5px;
