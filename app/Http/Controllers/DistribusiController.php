@@ -9,83 +9,103 @@ use App\Models\StokOutlet;
 use App\Models\User;
 use App\Notifications\PengirimanDiterimaNotification;
 use App\Notifications\InfoPengirimanNotification;
-use App\Notifications\StokKritisNotification; // ← TAMBAH INI
+use App\Notifications\StokKritisNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class DistribusiController extends Controller
 {
-
     // =================== ADMIN ===================
 
     public function index()
     {
         $distribusis = Distribusi::with(['bahan', 'outlet'])
-            ->orderBy('id', 'asc')
+            ->orderBy('id', 'desc') // Biasanya yang terbaru di atas lebih enak dilihat
             ->get();
 
         return view('admin.distribusi.index', compact('distribusis'));
     }
 
-
     public function create()
     {
+        // Ambil bahan yang stoknya lebih dari 0
         $bahans  = Bahan::where('stok_awal', '>', 0)->get();
         $outlets = Outlet::all();
 
         return view('admin.distribusi.create', compact('bahans', 'outlets'));
     }
 
-
+    /**
+     * REVISI: Store mendukung banyak bahan sekaligus (Massal)
+     */
     public function store(Request $request)
     {
+        // 1. Validasi awal
         $request->validate([
-            'bahan_id'  => 'required|exists:bahans,id',
             'outlet_id' => 'required|exists:outlets,id',
-            'jumlah'    => 'required|integer|min:1',
             'tanggal'   => 'required|date',
+            'items'     => 'required|array|min:1', 
+            'items.*.bahan_id' => 'required|exists:bahans,id',
+            'items.*.jumlah'   => 'nullable|integer|min:1',
         ]);
 
         try {
-
             DB::transaction(function () use ($request) {
+                $processedCount = 0;
 
-                $bahan = Bahan::findOrFail($request->bahan_id);
+                foreach ($request->items as $item) {
+                    // Hanya proses item yang dicentang (checked == 1)
+                    if (isset($item['checked']) && $item['checked'] == '1') {
+                        
+                        if (empty($item['jumlah']) || $item['jumlah'] < 1) {
+                            $bahanNama = Bahan::find($item['bahan_id'])->nama_bahan;
+                            throw new \Exception("Jumlah untuk bahan {$bahanNama} harus diisi.");
+                        }
 
-                if ($bahan->stok_awal < $request->jumlah) {
-                    throw new \Exception('Stok gudang tidak mencukupi!');
+                        $bahan = Bahan::findOrFail($item['bahan_id']);
+
+                        // 2. Cek Stok Gudang
+                        if ($bahan->stok_awal < $item['jumlah']) {
+                            throw new \Exception("Stok {$bahan->nama_bahan} tidak mencukupi! (Tersedia: {$bahan->stok_awal})");
+                        }
+
+                        // 3. Potong Stok Gudang Utama
+                        $bahan->stok_awal -= $item['jumlah'];
+                        $bahan->save();
+
+                        // 4. Buat Record Distribusi
+                        $distribusi = Distribusi::create([
+                            'bahan_id'  => $item['bahan_id'],
+                            'outlet_id' => $request->outlet_id,
+                            'jumlah'    => $item['jumlah'],
+                            'tanggal'   => $request->tanggal . ' ' . now()->format('H:i:s'),
+                            'status'    => 'dikirim',
+                            'tanggal_diterima' => null,
+                        ]);
+
+                        // 5. Kirim Notifikasi ke User Outlet
+                        $usersOutlet = User::where('outlet_id', $request->outlet_id)->get();
+                        foreach ($usersOutlet as $user) {
+                            $user->notify(new InfoPengirimanNotification($distribusi));
+                        }
+
+                        $processedCount++;
+                    }
                 }
 
-                $bahan->stok_awal -= $request->jumlah;
-                $bahan->save();
-
-                $distribusi = Distribusi::create([
-                    'bahan_id'  => $request->bahan_id,
-                    'outlet_id' => $request->outlet_id,
-                    'jumlah'    => $request->jumlah,
-                    'tanggal'   => $request->tanggal . ' ' . now()->format('H:i:s'),
-                    'status'    => 'dikirim',
-                    'tanggal_diterima' => null,
-                ]);
-
-                $usersOutlet = User::where('outlet_id', $request->outlet_id)->get();
-
-                foreach ($usersOutlet as $user) {
-                    $user->notify(new InfoPengirimanNotification($distribusi));
+                if ($processedCount === 0) {
+                    throw new \Exception('Pilih minimal satu bahan untuk dikirim!');
                 }
-
             });
 
             return redirect()->route('admin.distribusi.index')
-                ->with('success', 'Barang berhasil dikirim!');
+                ->with('success', 'Barang-barang berhasil dikirim ke outlet!');
 
         } catch (\Exception $e) {
-
-            return back()->with('error', $e->getMessage());
+            return back()->with('error', $e->getMessage())->withInput();
         }
     }
-
 
     public function edit($id)
     {
@@ -102,7 +122,6 @@ class DistribusiController extends Controller
         return view('admin.distribusi.edit', compact('distribusi', 'bahans', 'outlets'));
     }
 
-
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -113,17 +132,16 @@ class DistribusiController extends Controller
         ]);
 
         try {
-
             DB::transaction(function () use ($request, $id) {
-
                 $distribusi = Distribusi::findOrFail($id);
 
+                // Kembalikan stok lama
                 $bahanLama = Bahan::find($distribusi->bahan_id);
                 $bahanLama->stok_awal += $distribusi->jumlah;
                 $bahanLama->save();
 
+                // Cek stok baru
                 $bahanBaru = Bahan::find($request->bahan_id);
-
                 if ($bahanBaru->stok_awal < $request->jumlah) {
                     throw new \Exception('Stok gudang tidak cukup!');
                 }
@@ -137,25 +155,20 @@ class DistribusiController extends Controller
                     'jumlah'    => $request->jumlah,
                     'tanggal'   => $request->tanggal . ' ' . now()->format('H:i:s'),
                 ]);
-
             });
 
             return redirect()->route('admin.distribusi.index')
                 ->with('success', 'Data distribusi diperbarui.');
 
         } catch (\Exception $e) {
-
             return back()->with('error', $e->getMessage());
         }
     }
 
-
     public function destroy($id)
     {
         try {
-
             DB::transaction(function () use ($id) {
-
                 $distribusi = Distribusi::findOrFail($id);
 
                 if ($distribusi->status === 'diterima') {
@@ -163,26 +176,21 @@ class DistribusiController extends Controller
                 }
 
                 $bahan = Bahan::find($distribusi->bahan_id);
-
                 $bahan->stok_awal += $distribusi->jumlah;
                 $bahan->save();
 
                 $distribusi->delete();
-
             });
 
             return redirect()->route('admin.distribusi.index')
                 ->with('success', 'Distribusi dibatalkan.');
 
         } catch (\Exception $e) {
-
             return back()->with('error', $e->getMessage());
         }
     }
 
-
     // =================== USER ===================
-
 
     public function indexUser()
     {
@@ -194,11 +202,9 @@ class DistribusiController extends Controller
         return view('user.distribusi.index', compact('distribusis'));
     }
 
-
     public function terima($id)
     {
         try {
-
             $distribusi = Distribusi::findOrFail($id);
 
             if ($distribusi->status === 'diterima') {
@@ -206,57 +212,44 @@ class DistribusiController extends Controller
             }
 
             DB::transaction(function () use ($distribusi) {
-
                 $distribusi->update([
                     'status' => 'diterima',
                     'tanggal_diterima' => now(),
                 ]);
 
                 $stokOutlet = StokOutlet::firstOrCreate(
-                    [
-                        'outlet_id' => $distribusi->outlet_id,
-                        'bahan_id'  => $distribusi->bahan_id
-                    ],
-                    [
-                        'stok' => 0
-                    ]
+                    ['outlet_id' => $distribusi->outlet_id, 'bahan_id' => $distribusi->bahan_id],
+                    ['stok' => 0]
                 );
 
                 $stokOutlet->stok += $distribusi->jumlah;
                 $stokOutlet->save();
 
-                // ✅ Cek stok kritis SETELAH stok diupdate
-                // Threshold: stok <= 5 dianggap kritis
+                // Cek stok kritis
                 $STOK_KRITIS = 5;
                 if ($stokOutlet->stok <= $STOK_KRITIS) {
-                    // Load relasi yang dibutuhkan Notification agar tidak error
                     $stokOutlet->load(['bahan', 'outlet']);
-
                     $admins = User::where('role', 'admin')->get();
                     foreach ($admins as $admin) {
                         $admin->notify(new StokKritisNotification($stokOutlet));
                     }
                 }
 
-                // Kirim notifikasi ke admin bahwa pengiriman diterima
+                // Notify admin
                 $admins = User::where('role', 'admin')->get();
                 foreach ($admins as $admin) {
                     $admin->notify(new PengirimanDiterimaNotification($distribusi));
                 }
-
             });
 
             return back()->with('success', 'Barang berhasil diterima!');
 
         } catch (\Exception $e) {
-
             return back()->with('error', $e->getMessage());
         }
     }
 
-
     // =================== LAPORAN ===================
-
 
     public function detail($periode)
     {
@@ -271,7 +264,6 @@ class DistribusiController extends Controller
         return view('user.laporan.detail', compact('distribusi', 'periode'));
     }
 
-
     public function cetakDetail($periode)
     {
         $distribusi = Distribusi::with(['bahan', 'outlet'])
@@ -280,15 +272,11 @@ class DistribusiController extends Controller
             ->orderBy('tanggal', 'asc')
             ->get()
             ->map(function ($item) {
-
                 $item->bahan_nama  = $item->bahan->nama_bahan ?? 'Tidak ada bahan';
                 $item->outlet_nama = $item->outlet->nama_outlet ?? 'Tidak ada outlet';
-
+                
                 $item->tanggal_format = $item->tanggal
-                    ? \Carbon\Carbon::parse($item->tanggal)->format('d M Y')
-                    . '<br><span style="color:#2563eb;font-size:11px;">'
-                    . \Carbon\Carbon::parse($item->tanggal)->format('H:i')
-                    . ' WIB</span>'
+                    ? \Carbon\Carbon::parse($item->tanggal)->format('d M Y H:i') . ' WIB'
                     : '-';
 
                 $item->tanggal_diterima_format = $item->tanggal_diterima
