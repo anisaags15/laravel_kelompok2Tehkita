@@ -37,26 +37,34 @@
 
                 <li class="nav-item">
                     <a href="{{ route('admin.outlet.index') }}"
-                       class="nav-link {{ request()->routeIs('admin.outlet.*') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-store"></i>
-                        <p>Data Outlet</p>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="{{ route('admin.bahan.index') }}"
-                       class="nav-link {{ request()->routeIs('admin.bahan.*') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-box"></i>
-                        <p>
-                            Data Bahan Baku
-                            @php $sidePusat = \App\Models\Bahan::where('stok_awal', '<=', 50)->count(); @endphp
-                            @if($sidePusat > 0)
-                                <span class="right badge badge-danger" style="width:10px;height:10px;padding:0;border-radius:50%;margin-top:5px;">&nbsp;</span>
-                            @endif
-                        </p>
-                    </a>
-                </li>
-
+                    class="nav-link {{ request()->routeIs('admin.outlet.*') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-store"></i>
+                    <p>Data Outlet</p>
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a href="{{ route('admin.bahan.index') }}"
+                class="nav-link {{ request()->routeIs('admin.bahan.*') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-box"></i>
+                <p>
+                    Data Bahan Baku
+                    @php $sidePusat = \App\Models\Bahan::where('stok_awal', '<=', 50)->count(); @endphp
+                    @if($sidePusat > 0)
+                    <span class="right badge badge-danger" style="width:10px;height:10px;padding:0;border-radius:50%;margin-top:5px;">&nbsp;</span>
+                    @endif
+                </p>
+            </a>
+        </li>
+        
+        {{-- JADWAL DISTRIBUSI --}}
+        <li class="nav-item">
+            <a href="{{ route('admin.jadwal-distribusi.index') }}"
+               class="nav-link {{ request()->routeIs('admin.jadwal-distribusi.*') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-calendar-alt"></i>
+                <p>Jadwal Distribusi</p>
+            </a>
+        </li>
                 <li class="nav-header">TRANSAKSI</li>
 
                 <li class="nav-item">
@@ -75,14 +83,6 @@
                     </a>
                 </li>
 
-{{-- ✅ JADWAL DISTRIBUSI --}}
-<li class="nav-item">
-    <a href="{{ route('admin.jadwal-distribusi.index') }}"
-       class="nav-link {{ request()->routeIs('admin.jadwal-distribusi.*') ? 'active' : '' }}">
-        <i class="nav-icon fas fa-calendar-alt"></i>
-        <p>Jadwal Distribusi</p>
-    </a>
-</li>
 
 <li class="nav-item">
     <a href="{{ route('admin.waste.index') }}"
