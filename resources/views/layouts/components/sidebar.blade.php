@@ -90,8 +90,7 @@
         <i class="nav-icon fas fa-dumpster text-danger"></i>
         <p>
             Monitoring Waste
-            @php $pendingWaste = \App\Models\Waste::where('status', 'pending')->count(); @endphp
-            @if($pendingWaste > 0)
+@php $pendingWaste = \App\Models\Waste::count(); @endphp            @if($pendingWaste > 0)
                 <span class="badge badge-danger right">{{ $pendingWaste }}</span>
             @endif
         </p>

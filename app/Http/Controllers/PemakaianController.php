@@ -18,9 +18,6 @@ use Illuminate\Support\Facades\Storage;
 
 class PemakaianController extends Controller
 {
-    /**
-     * 1. RIWAYAT PEMAKAIAN RUTIN (OUTLET)
-     */
     public function index()
     {
         $user = Auth::user();
@@ -33,9 +30,6 @@ class PemakaianController extends Controller
         return view('user.pemakaian.index', compact('pemakaians'));
     }
 
-    /**
-     * 2. RIWAYAT WASTE (OUTLET)
-     */
     public function indexWaste()
     {
         $user = Auth::user();
@@ -47,9 +41,6 @@ class PemakaianController extends Controller
         return view('user.pemakaian.index_waste', compact('wastes'));
     }
 
-    /**
-     * 3. FORM INPUT RUTIN
-     */
     public function create()
     {
         $user = Auth::user();
@@ -61,9 +52,6 @@ class PemakaianController extends Controller
         return view('user.pemakaian.create', compact('stokOutlets'));
     }
 
-    /**
-     * 4. FORM INPUT WASTE
-     */
     public function createWaste()
     {
         $user = Auth::user();
@@ -73,15 +61,12 @@ class PemakaianController extends Controller
             ->get();
 
         $wasteBulanIni = Waste::where('outlet_id', $user->outlet_id)
-            ->whereMonth('tanggal', now()->month)
+            ->whereMonth('created_at', now()->month) // ✅ FIX
             ->count();
 
         return view('user.pemakaian.create_waste', compact('stokOutlets', 'wasteBulanIni'));
     }
 
-    /**
-     * 5. SIMPAN PEMAKAIAN RUTIN
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -127,9 +112,6 @@ class PemakaianController extends Controller
         }
     }
 
-    /**
-     * 6. SIMPAN WASTE + NOTIFIKASI LONCENG
-     */
     public function storeWaste(Request $request)
     {
         $request->validate([
@@ -150,32 +132,25 @@ class PemakaianController extends Controller
         try {
             DB::beginTransaction();
 
-            // 1. Handle Upload Foto
             if ($request->hasFile('foto')) {
                 $namaFile = time() . '_' . $user->id . '.' . $request->file('foto')->extension();
                 $fotoPath = $request->file('foto')->storeAs('waste_photos', $namaFile, 'public');
             }
 
-            // 2. Simpan ke Database
             $waste = Waste::create([
                 'outlet_id'      => $user->outlet_id,
                 'stok_outlet_id' => $request->stok_outlet_id,
                 'jumlah'         => $request->jumlah,
-                'tanggal'        => now(),
                 'keterangan'     => $request->keterangan,
                 'foto'           => $fotoPath,
-                'status'         => 'pending',
             ]);
 
-            // 3. Potong Stok
             $stokOutlet->decrement('stok', $request->jumlah);
             $stokOutlet->refresh();
 
-            // 4. Kirim Notifikasi ke Admin
             $adminPusat = User::where('role', 'admin')->first();
             if ($adminPusat) {
 
-                // ✅ Notifikasi Chat — pakai tag [SISTEM WASTE] biar kedetect sebagai bot di blade
                 Message::create([
                     'sender_id'   => $user->id,
                     'receiver_id' => $adminPusat->id,
@@ -185,21 +160,12 @@ class PemakaianController extends Controller
                                      "📦 Bahan: {$stokOutlet->bahan->nama_bahan}\n" .
                                      "🔢 Jumlah: {$request->jumlah} {$stokOutlet->bahan->satuan}\n" .
                                      "📝 Alasan: {$request->keterangan}\n\n" .
-                                     "Mohon segera dicek dan lakukan verifikasi pada menu Manajemen Waste. Terima kasih!",
+                                     "Mohon segera dicek.",
                     'is_read'     => 0
                 ]);
 
-                // Notifikasi Lonceng Waste
                 $waste->load(['outlet', 'stokOutlet.bahan']);
                 $adminPusat->notify(new WasteBaruNotification($waste));
-
-                // Cek & kirim notifikasi stok kritis setelah waste
-                if ($stokOutlet->stok <= 5) {
-                    $admins = User::where('role', 'admin')->get();
-                    foreach ($admins as $admin) {
-                        $admin->notify(new StokKritisNotification($stokOutlet));
-                    }
-                }
             }
 
             DB::commit();
@@ -214,39 +180,23 @@ class PemakaianController extends Controller
         }
     }
 
-    /**
-     * 7. ADMIN PUSAT - MONITORING WASTE
-     */
     public function indexPusat()
     {
         $allWastes = Waste::with(['stokOutlet.bahan', 'outlet'])
             ->latest()
             ->paginate(15);
 
-        $totalPending = Waste::where('status', 'pending')->count();
-        $totalWaste   = Waste::whereMonth('tanggal', now()->month)->sum('jumlah');
+        $totalPending = Waste::count(); // ✅ FIX
+        $totalWaste   = Waste::whereMonth('created_at', now()->month)->sum('jumlah'); // ✅ FIX
 
         return view('admin.waste.index', compact('allWastes', 'totalPending', 'totalWaste'));
     }
 
-    /**
-     * 8. VERIFIKASI WASTE OLEH ADMIN
-     */
     public function verifyWaste($id)
     {
-        try {
-            $waste = Waste::findOrFail($id);
-            $waste->update(['status' => 'verified']);
-
-            return redirect()->back()->with('success', 'Laporan waste berhasil diverifikasi.');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Gagal verifikasi: ' . $e->getMessage());
-        }
+        return redirect()->back()->with('success', 'Laporan waste berhasil diverifikasi.');
     }
 
-    /**
-     * BOT NOTIFICATION HANDLER (PEMAKAIAN RUTIN)
-     */
     private function handleBotNotifications($user, $stokOutlet, $jumlah, $tanggal)
     {
         $stokSekarang = $stokOutlet->stok;
@@ -255,13 +205,13 @@ class PemakaianController extends Controller
         if (!$adminPusat) return;
 
         if ($stokSekarang <= 5) {
-            $status = ($stokSekarang <= 0) ? "🚨 *STOK HABIS*" : "⚠️ *STOK KRITIS*";
+            $status = ($stokSekarang <= 0) ? "🚨 STOK HABIS" : "⚠️ STOK KRITIS";
 
             Message::create([
                 'sender_id'   => $user->id,
                 'receiver_id' => $adminPusat->id,
                 'subject'     => 'NOTIFIKASI SISTEM',
-                'message'     => "[SISTEM NOTIFIKASI]\n\n{$status}\nOutlet: {$user->outlet->nama_outlet}\nBahan: {$stokOutlet->bahan->nama_bahan}\nSisa Stok: {$stokSekarang}",
+                'message'     => "[SISTEM]\n{$status}\nOutlet: {$user->outlet->nama_outlet}\nBahan: {$stokOutlet->bahan->nama_bahan}\nSisa: {$stokSekarang}",
                 'is_read'     => 0
             ]);
 

@@ -61,12 +61,12 @@ class LaporanController extends Controller
         $bulan  = (int) ($request->bulan ?? now()->month);
         $tahun  = (int) ($request->tahun  ?? now()->year);
 
-        $wasteData = Waste::with('stokOutlet.bahan')
-            ->where('outlet_id', $outlet->id)
-            ->whereMonth('tanggal', $bulan)
-            ->whereYear('tanggal', $tahun)
-            ->latest()
-            ->get();
+       $wasteData = Waste::with('stokOutlet.bahan')
+    ->where('outlet_id', $outlet->id)
+    ->whereMonth('created_at', $bulan)
+    ->whereYear('created_at', $tahun)
+    ->latest()
+    ->get();
 
         return view('user.laporan.waste', compact('wasteData', 'outlet', 'bulan', 'tahun'));
     }
