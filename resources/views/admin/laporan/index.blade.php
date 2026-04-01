@@ -148,11 +148,6 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-5 text-md-right mt-4 mt-md-0 no-print">
-                <button onclick="window.print()" class="btn shadow-sm px-4 py-2" style="border-radius: 10px; font-weight: 700; color: #1a7a4a; background: white; border: none;">
-                    <i class="fas fa-print mr-2"></i> Cetak Laporan
-                </button>
-            </div>
         </div>
     </div>
 
