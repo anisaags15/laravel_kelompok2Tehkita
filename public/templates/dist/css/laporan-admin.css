@@ -550,3 +550,91 @@ body {
 }
 
 .bg-soft-green { background-color: #ecfdf5; color: #065f46; }
+/* --- FIX DARK MODE UNTUK STOK KRITIS --- */
+.dark-mode .container-fluid {
+    background: #121417 !important; /* Latar halaman lebih deep */
+}
+
+/* Fix Card Utama agar menyatu dengan Dark Mode */
+.dark-mode .main-report-card {
+    background-color: #1e2227 !important;
+    border: 1px solid #2d3238 !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+}
+
+/* Fix Card Header agar tidak putih "ngejreng" */
+.dark-mode .card-header {
+    background-color: #252a30 !important;
+    border-bottom: 1px solid #2d3238 !important;
+}
+
+.dark-mode .card-header h5, 
+.dark-mode .card-header p {
+    color: #ffffff !important;
+}
+
+/* Fix Bagian Filter & Search agar Rapi */
+.dark-mode .search-wrapper-custom {
+    background: #2d3238 !important;
+    border-radius: 12px;
+    border: 1px solid #3e444a !important;
+}
+
+.dark-mode .search-wrapper-custom input,
+.dark-mode .search-wrapper-custom select {
+    background-color: transparent !important;
+    color: #ffffff !important; /* Teks jadi Putih */
+}
+
+.dark-mode .search-wrapper-custom i {
+    color: #aab2bd !important;
+}
+
+/* Fix Tabel Body */
+.dark-mode .table-luxury td {
+    background-color: #1e2227 !important;
+    color: #d1d1d1 !important;
+    border-bottom: 1px solid #2d3238 !important;
+}
+
+/* Fix Identitas Outlet (Nama Toko) */
+.dark-mode .text-dark.font-weight-bold {
+    color: #ffffff !important;
+}
+
+/* Fix Badge & Detail Button */
+.dark-mode .badge-light {
+    background-color: #2d3238 !important;
+    color: #ffffff !important;
+    border: 1px solid #3e444a !important;
+}
+
+.dark-mode .card-footer {
+    background-color: #252a30 !important;
+    border-top: 1px solid #2d3238 !important;
+}
+
+/* Tambahan: Hover effect pada baris tabel di dark mode */
+.dark-mode .table-luxury tbody tr:hover td {
+    background-color: #252a30 !important;
+}
+@media print {
+    /* Paksa background header jadi gelap atau teks jadi hitam supaya kelihatan */
+    .executive-header {
+        background-color: #1a7a4a !important; /* Warna hijau seperti di screenshot */
+        -webkit-print-color-adjust: exact; /* Biar warnanya tetap keluar di printer */
+        padding: 20px !important;
+        border-radius: 10px;
+    }
+    
+    .executive-header h1, 
+    .executive-header p, 
+    .executive-header strong {
+        color: white !important;
+    }
+
+    /* Hilangkan elemen yang nggak penting saat diprint */
+    .no-print, .btn, .sidebar, .navbar {
+        display: none !important;
+    }
+}

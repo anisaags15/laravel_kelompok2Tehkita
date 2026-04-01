@@ -81,36 +81,45 @@
         </div>
     </div>
 
-    {{-- SECTION 3: FILTER & MAIN REPORT --}}
-    <div class="main-report-card mx-1">
-        <div class="card-header bg-white py-4 border-0 px-4">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
-                <div class="mb-3 mb-md-0">
-                    <h5 class="font-weight-bold text-dark mb-1">Daftar Outlet Terdampak</h5>
-                    <p class="text-muted small mb-0">Klik "Lihat Detail" untuk melihat daftar bahan spesifik yang menipis.</p>
-                </div>
-                
+{{-- SECTION 3: FILTER & MAIN REPORT --}}
+<div class="main-report-card mx-1">
+    {{-- bg-white dihapus agar mengikuti dark mode, py & px disesuaikan --}}
+    <div class="card-header py-4 border-0 px-4" style="background: transparent;">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center">
+            
+            {{-- Judul & Deskripsi --}}
+            <div class="mb-3 mb-lg-0">
+                <h5 class="font-weight-bold mb-1" style="color: inherit;">Daftar Outlet Terdampak</h5>
+                <p class="text-muted small mb-0">Klik "Lihat Detail" untuk melihat daftar bahan spesifik yang menipis.</p>
+            </div>
+            
+            {{-- Bagian Kanan: Filter & Search --}}
+            <div class="d-flex align-items-center">
                 {{-- FORM FILTER --}}
-                <div class="d-flex">
-                    <form action="{{ route('admin.laporan.stok-kritis') }}" method="GET" class="d-flex align-items-center">
-                        <div class="search-wrapper-custom mr-2">
-                            <i class="fas fa-filter"></i>
-                            <select name="outlet_id" class="form-control border-0 shadow-none" onchange="this.form.submit()" style="cursor: pointer; width: 200px;">
-                                <option value="">Semua Lokasi</option>
-                                @foreach($outlets as $o)
-                                    <option value="{{ $o->id }}" {{ request('outlet_id') == $o->id ? 'selected' : '' }}>{{ $o->nama_outlet }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </form>
+                <form action="{{ route('admin.laporan.stok-kritis') }}" method="GET" class="mr-2">
                     <div class="search-wrapper-custom">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="searchInput" class="form-control border-0 shadow-none" placeholder="Cari outlet...">
+                        {{-- Icon filter dihapus agar tidak menabrak teks --}}
+                        <select name="outlet_id" class="form-control border-0 shadow-none custom-select-clean" onchange="this.form.submit()" style="cursor: pointer; width: 180px;">
+                            <option value="">Semua Lokasi</option>
+                            @foreach($outlets as $o)
+                                <option value="{{ $o->id }}" {{ request('outlet_id') == $o->id ? 'selected' : '' }}>
+                                    {{ $o->nama_outlet }}
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
+                </form>
+
+                {{-- FORM SEARCH --}}
+                <div class="search-wrapper-custom">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" class="form-control border-0 shadow-none" placeholder="Cari outlet..." style="width: 200px;">
                 </div>
             </div>
-        </div>
 
+        </div>
+    </div>
+</div>
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-luxury mb-0" id="outletTable">
