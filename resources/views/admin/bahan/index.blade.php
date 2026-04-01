@@ -1,16 +1,17 @@
 @extends('layouts.main')
 
 @section('title', 'Data Bahan')
-@section('page', 'Master Data Bahan Baku')
-
 @section('content')
 <div class="container-fluid">
     <div class="card border-0 shadow-sm" style="border-radius: 12px; overflow: hidden;">
         <div class="card-header bg-white py-4 border-0">
             <div class="d-flex justify-content-between align-items-center">
-                <div>
+              <div>
                     <h4 class="font-weight-bold text-dark mb-1">Stok Bahan Baku</h4>
-                    <p class="text-muted small mb-0">Pantau dan kelola ketersediaan bahan utama operasional.</p>
+                    <p class="text-muted small mb-0">
+                        <i class="fas fa-info-circle mr-1"></i> 
+                        Pastikan input benar. Data hanya bisa dihapus jika belum memiliki stok dan belum terhubung ke distribusi.
+                    </p>
                 </div>
                 <a href="{{ route('admin.bahan.create') }}" class="btn btn-success px-4" style="border-radius: 8px; font-weight: 600;">
                     <i class="fas fa-plus-circle mr-2"></i> Tambah Bahan
