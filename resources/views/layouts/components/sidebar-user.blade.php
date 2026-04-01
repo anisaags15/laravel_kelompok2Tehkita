@@ -36,6 +36,15 @@
                 </li>
 
                 <li class="nav-header">OPERASIONAL OUTLET</li>
+                
+                  {{-- ✅ JADWAL DISTRIBUSI --}}
+                <li class="nav-item">
+                    <a href="{{ route('user.jadwal-distribusi.index') }}"
+                       class="nav-link {{ request()->routeIs('user.jadwal-distribusi.*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-calendar-alt"></i>
+                        <p>Jadwal Distribusi</p>
+                    </a>
+                </li>
 
                 {{-- STOK --}}
                 <li class="nav-item">
@@ -61,15 +70,6 @@
                        class="nav-link {{ request()->routeIs('user.waste.create') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-trash-alt"></i>
                         <p>Lapor Bahan Rusak</p>
-                    </a>
-                </li>
-
-                {{-- ✅ JADWAL DISTRIBUSI --}}
-                <li class="nav-item">
-                    <a href="{{ route('user.jadwal-distribusi.index') }}"
-                       class="nav-link {{ request()->routeIs('user.jadwal-distribusi.*') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-calendar-alt"></i>
-                        <p>Jadwal Distribusi</p>
                     </a>
                 </li>
 

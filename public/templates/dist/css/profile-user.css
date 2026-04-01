@@ -102,3 +102,52 @@
     border: 1px solid #f1f5f9;
     margin-bottom: 10px;
 }
+/* Patch Khusus Dark Mode - Tanpa mengubah CSS asli di atas */
+.dark-mode .user-card-luxury {
+    background: #1e1e2d !important;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.3);
+}
+
+.dark-mode .profile-sidebar {
+    border-right: 1px solid #323248;
+    background: #1a1a27; /* Menghilangkan gradient putih agar tidak nyampur */
+}
+
+.dark-mode .user-avatar-circle {
+    border-color: #1e1e2d;
+    background: #1e1e2d;
+}
+
+.dark-mode .camera-trigger {
+    border-color: #1e1e2d;
+}
+
+.dark-mode .premium-input {
+    background: #2b2b40 !important;
+    color: #ffffff !important;
+}
+
+.dark-mode .premium-input:focus {
+    background: #1e1e2d !important;
+}
+
+.dark-mode .nav-link-custom {
+    color: #a2a2c2;
+}
+
+.dark-mode .nav-link-custom.active {
+    background: rgba(16, 185, 129, 0.15) !important;
+}
+
+.dark-mode .info-card-small {
+    background: #2b2b40;
+    border-color: #323248;
+    color: #ffffff;
+}
+
+.dark-mode .text-dark, 
+.dark-mode h2, 
+.dark-mode h4, 
+.dark-mode h5 {
+    color: #ffffff !important;
+}
