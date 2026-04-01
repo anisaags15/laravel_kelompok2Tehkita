@@ -10,13 +10,21 @@ use Illuminate\Support\Facades\DB;
 class StokMasukController extends Controller
 {
     /**
-     * Menampilkan daftar stok masuk
+     * Menampilkan daftar stok masuk dengan fitur Search dan Pagination
      */
-    public function index()
+    public function index(Request $request)
     {
+        $search = $request->get('search');
+
         $stokMasuks = StokMasuk::with('bahan')
+            ->when($search, function($query) use ($search) {
+                $query->whereHas('bahan', function($q) use ($search) {
+                    $q->where('nama_bahan', 'like', "%{$search}%");
+                });
+            })
             ->orderBy('tanggal', 'desc')
-            ->get();
+            ->orderBy('id', 'desc')
+            ->paginate(10); // REVISI: Sekarang hanya 10 data per halaman
 
         return view('admin.stok-masuk.index', compact('stokMasuks'));
     }
@@ -42,7 +50,6 @@ class StokMasukController extends Controller
         ]);
 
         DB::transaction(function () use ($request) {
-
             StokMasuk::create([
                 'bahan_id' => $request->bahan_id,
                 'jumlah'   => $request->jumlah,
@@ -80,8 +87,7 @@ class StokMasukController extends Controller
         ]);
 
         DB::transaction(function () use ($request, $stok_masuk) {
-
-            // Kurangi stok lama dulu
+            // Kurangi stok lama dulu dari bahan yang lama
             $bahanLama = $stok_masuk->bahan;
             $bahanLama->stok_awal -= $stok_masuk->jumlah;
             $bahanLama->save();
@@ -93,7 +99,7 @@ class StokMasukController extends Controller
                 'tanggal'  => $request->tanggal,
             ]);
 
-            // Tambahkan stok baru
+            // Tambahkan stok baru ke bahan yang (mungkin baru) dipilih
             $bahanBaru = Bahan::findOrFail($request->bahan_id);
             $bahanBaru->stok_awal += $request->jumlah;
             $bahanBaru->save();
@@ -110,7 +116,6 @@ class StokMasukController extends Controller
     public function destroy(StokMasuk $stok_masuk)
     {
         DB::transaction(function () use ($stok_masuk) {
-
             $bahan = $stok_masuk->bahan;
             $bahan->stok_awal -= $stok_masuk->jumlah;
             $bahan->save();

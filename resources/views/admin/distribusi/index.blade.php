@@ -1,8 +1,6 @@
 @extends('layouts.main')
 
 @section('title', 'Distribusi Barang')
-@section('page', 'Monitoring Distribusi')
-
 @section('content')
 <div class="container-fluid py-4">
     <div class="row mb-4 align-items-center">
@@ -14,6 +12,21 @@
             <a href="{{ route('admin.distribusi.create') }}" class="btn btn-success px-4 shadow-sm" style="border-radius: 10px; font-weight: 600; background-color: #10b981; border: none;">
                 <i class="fas fa-plus-circle mr-2"></i> Tambah Pengiriman
             </a>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <form action="{{ route('admin.distribusi.index') }}" method="GET">
+                <div class="input-group shadow-sm" style="border-radius: 10px; overflow: hidden;">
+                    <input type="text" name="search" class="form-control border-0" placeholder="Cari bahan atau outlet..." value="{{ request('search') }}" style="height: 45px;">
+                    <div class="input-group-append">
+                        <button class="btn btn-primary border-0" type="submit" style="background-color: #10b981; width: 50px;">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -33,9 +46,10 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($distribusis as $item)
+                        @forelse($distribusis as $index => $item)
                         <tr style="transition: all 0.2s ease; border-bottom: 1px solid #f1f5f9;">
-                            <td class="text-center text-muted font-weight-bold">{{ $loop->iteration }}</td>
+                            {{-- Rumus agar nomor di halaman 2 jadi 11, 12, dst --}}
+                            <td class="text-center text-muted font-weight-bold">{{ $distribusis->firstItem() + $index }}</td>
                             <td class="py-3">
                                 <div class="d-flex align-items-center">
                                     <div class="bg-light text-success p-2 rounded-lg mr-3 d-flex align-items-center justify-content-center" 
@@ -108,9 +122,9 @@
                         <tr>
                             <td colspan="7" class="text-center py-5">
                                 <div class="opacity-50 mb-3">
-                                    <i class="fas fa-truck-loading fa-4x text-muted"></i>
+                                    <i class="fas fa-search fa-4x text-muted"></i>
                                 </div>
-                                <p class="text-muted font-italic">Belum ada data distribusi yang tercatat hari ini.</p>
+                                <p class="text-muted font-italic">Data tidak ditemukan.</p>
                             </td>
                         </tr>
                         @endforelse
@@ -119,7 +133,18 @@
             </div>
         </div>
     </div>
+
+    <div class="d-flex justify-content-between align-items-center mt-4 px-2">
+        <div class="text-muted small">
+            Menampilkan <strong>{{ $distribusis->firstItem() ?? 0 }}</strong> sampai <strong>{{ $distribusis->lastItem() ?? 0 }}</strong> dari <strong>{{ $distribusis->total() }}</strong> data
+        </div>
+        <div>
+            {{-- appends(request()->query()) berguna agar pencarian tidak hilang saat klik halaman berikutnya --}}
+            {{ $distribusis->appends(request()->query())->links('pagination::bootstrap-4') }}
+        </div>
+    </div>
 </div>
+
 <script>
     function confirmDelete(formId) {
         if(confirm('Apakah Anda yakin ingin menghapus data distribusi ini?')) {
@@ -127,4 +152,20 @@
         }
     }
 </script>
+
+<style>
+    /* Tambahan agar pagination terlihat rapi */
+    .pagination {
+        margin-bottom: 0;
+    }
+    .page-item.active .page-link {
+        background-color: #10b981;
+        border-color: #10b981;
+    }
+    .page-link {
+        color: #10b981;
+        border-radius: 8px !important;
+        margin: 0 2px;
+    }
+</style>
 @endsection

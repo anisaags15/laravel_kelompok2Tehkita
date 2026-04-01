@@ -18,11 +18,28 @@ class DistribusiController extends Controller
 {
     // =================== ADMIN ===================
 
-    public function index()
+    /**
+     * REVISI: Menambahkan Fitur Search & Pagination 10 Data
+     */
+    public function index(Request $request)
     {
+        $search = $request->get('search');
+
         $distribusis = Distribusi::with(['bahan', 'outlet'])
-            ->orderBy('id', 'desc') // Biasanya yang terbaru di atas lebih enak dilihat
-            ->get();
+            ->when($search, function($query) use ($search) {
+                // Mencari berdasarkan nama bahan
+                $query->whereHas('bahan', function($q) use ($search) {
+                    $q->where('nama_bahan', 'like', "%{$search}%");
+                })
+                // Atau berdasarkan nama outlet
+                ->orWhereHas('outlet', function($q) use ($search) {
+                    $q->where('nama_outlet', 'like', "%{$search}%");
+                })
+                // Atau berdasarkan ID distribusi (opsional)
+                ->orWhere('id', 'like', "%{$search}%");
+            })
+            ->orderBy('id', 'desc') 
+            ->paginate(10); // Membatasi 10 data per halaman
 
         return view('admin.distribusi.index', compact('distribusis'));
     }
@@ -36,12 +53,8 @@ class DistribusiController extends Controller
         return view('admin.distribusi.create', compact('bahans', 'outlets'));
     }
 
-    /**
-     * REVISI: Store mendukung banyak bahan sekaligus (Massal)
-     */
     public function store(Request $request)
     {
-        // 1. Validasi awal
         $request->validate([
             'outlet_id' => 'required|exists:outlets,id',
             'tanggal'   => 'required|date',
@@ -55,7 +68,6 @@ class DistribusiController extends Controller
                 $processedCount = 0;
 
                 foreach ($request->items as $item) {
-                    // Hanya proses item yang dicentang (checked == 1)
                     if (isset($item['checked']) && $item['checked'] == '1') {
                         
                         if (empty($item['jumlah']) || $item['jumlah'] < 1) {
@@ -65,16 +77,13 @@ class DistribusiController extends Controller
 
                         $bahan = Bahan::findOrFail($item['bahan_id']);
 
-                        // 2. Cek Stok Gudang
                         if ($bahan->stok_awal < $item['jumlah']) {
                             throw new \Exception("Stok {$bahan->nama_bahan} tidak mencukupi! (Tersedia: {$bahan->stok_awal})");
                         }
 
-                        // 3. Potong Stok Gudang Utama
                         $bahan->stok_awal -= $item['jumlah'];
                         $bahan->save();
 
-                        // 4. Buat Record Distribusi
                         $distribusi = Distribusi::create([
                             'bahan_id'  => $item['bahan_id'],
                             'outlet_id' => $request->outlet_id,
@@ -84,7 +93,6 @@ class DistribusiController extends Controller
                             'tanggal_diterima' => null,
                         ]);
 
-                        // 5. Kirim Notifikasi ke User Outlet
                         $usersOutlet = User::where('outlet_id', $request->outlet_id)->get();
                         foreach ($usersOutlet as $user) {
                             $user->notify(new InfoPengirimanNotification($distribusi));
@@ -135,12 +143,10 @@ class DistribusiController extends Controller
             DB::transaction(function () use ($request, $id) {
                 $distribusi = Distribusi::findOrFail($id);
 
-                // Kembalikan stok lama
                 $bahanLama = Bahan::find($distribusi->bahan_id);
                 $bahanLama->stok_awal += $distribusi->jumlah;
                 $bahanLama->save();
 
-                // Cek stok baru
                 $bahanBaru = Bahan::find($request->bahan_id);
                 if ($bahanBaru->stok_awal < $request->jumlah) {
                     throw new \Exception('Stok gudang tidak cukup!');
@@ -194,10 +200,11 @@ class DistribusiController extends Controller
 
     public function indexUser()
     {
+        // Untuk user (outlet), kita gunakan pagination juga agar seragam
         $distribusis = Distribusi::with('bahan')
             ->where('outlet_id', auth()->user()->outlet_id)
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(10);
 
         return view('user.distribusi.index', compact('distribusis'));
     }
@@ -225,7 +232,6 @@ class DistribusiController extends Controller
                 $stokOutlet->stok += $distribusi->jumlah;
                 $stokOutlet->save();
 
-                // Cek stok kritis
                 $STOK_KRITIS = 5;
                 if ($stokOutlet->stok <= $STOK_KRITIS) {
                     $stokOutlet->load(['bahan', 'outlet']);
@@ -235,7 +241,6 @@ class DistribusiController extends Controller
                     }
                 }
 
-                // Notify admin
                 $admins = User::where('role', 'admin')->get();
                 foreach ($admins as $admin) {
                     $admin->notify(new PengirimanDiterimaNotification($distribusi));
