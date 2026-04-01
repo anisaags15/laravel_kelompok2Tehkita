@@ -37,21 +37,22 @@
         </div>
     @endif
 
-    {{-- Filter Tabs --}}
-    @php $activeType = request('type', 'semua'); @endphp
-    <div class="mb-3 d-flex flex-wrap gap-2" style="gap: 8px;">
-        @foreach([
-            'semua' => ['label' => 'Semua', 'icon' => 'fa-th-list',  'color' => 'secondary'],
-            'waste' => ['label' => 'Waste', 'icon' => 'fa-trash-alt','color' => 'warning'],
-            'info'  => ['label' => 'Info',  'icon' => 'fa-info-circle','color' => 'info'],
-        ] as $key => $tab)
-            <a href="{{ route('admin.notifikasi.index', ['type' => $key]) }}"
-               class="btn btn-sm rounded-pill px-3 font-weight-bold mr-1 mb-2
-                       {{ $activeType === $key ? 'btn-' . $tab['color'] : 'btn-outline-' . $tab['color'] }}">
-                <i class="fas {{ $tab['icon'] }} mr-1"></i> {{ $tab['label'] }}
-            </a>
-        @endforeach
-    </div>
+{{-- Filter Tabs --}}
+@php $activeType = request('type', 'semua'); @endphp
+<div class="mb-3 d-flex flex-wrap gap-2" style="gap: 8px;">
+    @foreach([
+        'semua'      => ['label' => 'Semua',       'icon' => 'fa-th-list',            'color' => 'secondary'],
+        'waste'      => ['label' => 'Waste',       'icon' => 'fa-trash-alt',          'color' => 'warning'],
+        'stok_kritis' => ['label' => 'Stok Kritis', 'icon' => 'fa-exclamation-triangle', 'color' => 'danger'],
+        'info'       => ['label' => 'Info',        'icon' => 'fa-info-circle',        'color' => 'info'],
+    ] as $key => $tab)
+        <a href="{{ route('admin.notifikasi.index', ['type' => $key]) }}"
+           class="btn btn-sm rounded-pill px-3 font-weight-bold mr-1 mb-2
+                   {{ $activeType === $key ? 'btn-' . $tab['color'] : 'btn-outline-' . $tab['color'] }}">
+            <i class="fas {{ $tab['icon'] }} mr-1"></i> {{ $tab['label'] }}
+        </a>
+    @endforeach
+</div>
 
     {{-- List Notifikasi --}}
     <div class="row">
@@ -109,14 +110,13 @@
                                             <span class="badge badge-pill badge-{{ $config['color'] }} px-2 mr-2" style="font-size: 0.6rem; letter-spacing: 0.5px;">
                                                 {{ $config['label'] }}
                                             </span>
-                                            {{-- Timestamp dengan tooltip tanggal lengkap saat hover --}}
                                             <small class="text-muted font-weight-bold" 
                                                    title="{{ $n->created_at->format('d M Y, H:i') }}"
                                                    style="cursor: default;">
                                                 <i class="far fa-clock mr-1"></i>{{ $n->created_at->diffForHumans() }}
                                             </small>
                                             @if($isUnread)
-                                                <span class="ml-2 badge badge-danger badge-pill" style="padding: 4px; height: 8px; width: 8px;"></span>
+                                                <span class="ml-2 badge badge-danger badge-pill animate-pulse" style="padding: 4px; height: 8px; width: 8px;"></span>
                                             @endif
                                         </div>
                                         <h6 class="mb-1 font-weight-bold">{{ $n->data['title'] }}</h6>
@@ -127,8 +127,6 @@
 
                                     {{-- Kolom 3: Aksi --}}
                                     <div class="col-auto d-flex align-items-center mt-3 mt-md-0">
-
-                                        {{-- Tandai Dibaca per item (hanya muncul kalau belum dibaca) --}}
                                         @if($isUnread)
                                         <a href="{{ route('admin.notifikasi.markOneRead', $n->id) }}"
                                            class="btn btn-sm btn-outline-success rounded-pill px-2 font-weight-bold shadow-none mr-1"
@@ -137,24 +135,22 @@
                                         </a>
                                         @endif
 
-                                        {{-- Tindak Lanjut — otomatis mark as read via controller --}}
                                         <a href="{{ route('admin.notifikasi.markOneRead', $n->id) }}" 
                                            class="btn btn-sm rounded-pill px-3 font-weight-bold btn-action shadow-sm mr-2">
                                             Tindak Lanjut
                                         </a>
                                         
-                                        {{-- Hapus --}}
-                                        <form action="{{ route('admin.notifikasi.destroy', $n->id) }}" method="POST" onsubmit="return confirm('Hapus notifikasi ini?')">
+                                        {{-- Hapus dengan Class form-delete --}}
+                                        <form action="{{ route('admin.notifikasi.destroy', $n->id) }}" method="POST" class="form-delete">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-link text-danger p-2 shadow-none hover-scale">
+                                            <button type="button" class="btn btn-link text-danger p-2 shadow-none hover-scale btn-delete-notif">
                                                 <i class="fas fa-trash-alt"></i>
                                             </button>
                                         </form>
                                     </div>
                                 </div>
 
-                                {{-- Mobile Message --}}
                                 <div class="d-block d-md-none mt-2">
                                     <p class="mb-0 text-muted small">{{ $n->data['message'] }}</p>
                                 </div>
@@ -173,12 +169,9 @@
                     </div>
                 </div>
 
-                {{-- Pagination --}}
                 @if($notifications->hasPages())
-                <div class="card-footer border-top py-4 bg-transparent">
-                    <div class="d-flex justify-content-center">
-                        {{ $notifications->links('pagination::bootstrap-4') }}
-                    </div>
+                <div class="card-footer border-top py-4 bg-transparent d-flex justify-content-center">
+                    {{ $notifications->links('pagination::bootstrap-4') }}
                 </div>
                 @endif
             </div>
@@ -186,62 +179,54 @@
     </div>
 </div>
 
+{{-- SweetAlert2 JS --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    document.querySelectorAll('.btn-delete-notif').forEach(button => {
+        button.addEventListener('click', function(e) {
+            const form = this.closest('.form-delete');
+            
+            Swal.fire({
+                title: 'Hapus Log?',
+                text: "Notifikasi ini akan dihapus permanen dari sistem pusat.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+</script>
+
 <style>
-    /* Status Belum Dibaca */
-    .bg-unread { 
-        background-color: rgba(0, 123, 255, 0.05) !important; 
-        border-left: 4px solid #007bff !important; 
-    }
-    
-    .list-group-item {
-        transition: all 0.2s ease;
-        border-left: 4px solid transparent;
-        background-color: transparent;
-    }
-
-    .list-group-item:hover {
-        background-color: rgba(0,0,0,0.02);
-        transform: translateX(5px);
-    }
-
-    .dark-mode .list-group-item:hover {
-        background-color: rgba(255,255,255,0.02) !important;
-    }
-
-    /* Tombol Tindak Lanjut */
-    .btn-action {
-        background: #f8f9fa;
-        color: #007bff;
-        border: 1px solid #dee2e6;
-    }
-
-    .dark-mode .btn-action {
-        background: #2d2d2d;
-        color: #3b9bff;
-        border-color: #444;
-    }
-
+    .bg-unread { background-color: rgba(0, 123, 255, 0.05) !important; border-left: 4px solid #007bff !important; }
+    .list-group-item { transition: all 0.2s ease; border-left: 4px solid transparent; background-color: transparent; }
+    .list-group-item:hover { background-color: rgba(0,0,0,0.02); transform: translateX(5px); }
+    .btn-action { background: #f8f9fa; color: #007bff; border: 1px solid #dee2e6; }
+    .btn-action:hover { background: #007bff; color: white; }
     .hover-scale:hover { transform: scale(1.2); }
 
-    .dark-mode .list-group-item {
-        border-color: #333 !important;
+    /* Animasi Notif Baru */
+    .animate-pulse { animation: pulse-red 2s infinite; }
+    @keyframes pulse-red {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+        70% { transform: scale(1); box-shadow: 0 0 0 5px rgba(220, 53, 69, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
     }
 
-    .dark-mode .bg-unread {
-        background-color: rgba(0, 123, 255, 0.1) !important;
-    }
-
-    /* Pagination */
-    .page-link {
-        border-radius: 8px !important;
-        margin: 0 3px;
-        background-color: transparent;
-        border-color: #dee2e6;
-        color: #198754;
-    }
-    .dark-mode .page-link {
-        border-color: #444;
-        color: #e0e0e0;
-    }
+    /* Dark Mode Support (Opsional) */
+    .dark-mode .list-group-item:hover { background-color: rgba(255,255,255,0.02) !important; }
+    .dark-mode .btn-action { background: #2d2d2d; color: #3b9bff; border-color: #444; }
+    
+    /* Custom Swal */
+    .swal2-popup { border-radius: 15px !important; }
 </style>
 @endsection

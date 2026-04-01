@@ -55,13 +55,18 @@ class AppServiceProvider extends ServiceProvider
             }
         });
 
-        // 2. View composer untuk SIDEBAR (Counter Stok Kritis) - TAMBAHKAN INI BUDDY
-        View::composer('layouts.components.sidebar', function ($view) {
-            // Kita ambil jumlah stok yang <= 5 dari seluruh outlet (untuk admin)
-            $stokKritisCount = StokOutlet::where('stok', '<=', 5)->count();
-            
-            // Share ke sidebar
-            $view->with('stokKritisCount', $stokKritisCount);
-        });
+      // Di dalam function boot()
+View::composer('layouts.components.sidebar', function ($view) {
+    $stokKritisCount = StokOutlet::where('stok', '<=', 10)
+        ->whereNotExists(function ($query) {
+            $query->select(\DB::raw(1))
+                ->from('distribusis')
+                ->whereRaw('distribusis.outlet_id = stok_outlets.outlet_id')
+                ->whereRaw('distribusis.bahan_id = stok_outlets.bahan_id')
+                ->where('status', 'dikirim'); // HARUS SAMA: 'dikirim'
+        })->count();
+    
+    $view->with('stokKritisCount', $stokKritisCount);
+});
     }
 }

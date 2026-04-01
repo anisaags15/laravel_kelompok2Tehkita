@@ -426,15 +426,19 @@
                                                 <i class="far fa-calendar-alt text-success me-1"></i>
                                                 {{ $jadwal->tanggal_rencana->format('d M Y') }}
                                             </div>
-                                            @if($jadwal->tanggal_rencana->isPast() && $jadwal->status == 'upcoming')
-                                                <small class="text-danger">
-                                                    <i class="fas fa-exclamation-circle me-1"></i>Sudah lewat!
-                                                </small>
-                                            @elseif($jadwal->status == 'upcoming')
-                                                <small class="text-muted">
-                                                    {{ $jadwal->tanggal_rencana->diffForHumans() }}
-                                                </small>
-                                            @endif
+                                          @if($jadwal->tanggal_rencana->isPast() && !$jadwal->tanggal_rencana->isToday() && $jadwal->status == 'upcoming')
+    <small class="text-danger">
+        <i class="fas fa-exclamation-circle me-1"></i>Sudah lewat!
+    </small>
+@elseif($jadwal->tanggal_rencana->isToday() && $jadwal->status == 'upcoming')
+    <small class="text-primary fw-bold">
+        <i class="fas fa-truck me-1"></i>Hari ini!
+    </small>
+@elseif($jadwal->status == 'upcoming')
+    <small class="text-muted">
+        {{ $jadwal->tanggal_rencana->diffForHumans() }}
+    </small>
+@endif
                                         </td>
                                         <td style="max-width:200px;">
                                             <small class="text-muted">{{ $jadwal->catatan ?? '-' }}</small>
