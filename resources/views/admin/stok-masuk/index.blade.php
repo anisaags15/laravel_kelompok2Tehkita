@@ -1,8 +1,6 @@
 @extends('layouts.main')
 
 @section('title', 'Stok Masuk')
-@section('page', 'Data Stok Masuk')
-
 @section('content')
 <div class="container-fluid py-4">
     <div class="row mb-4 align-items-center">

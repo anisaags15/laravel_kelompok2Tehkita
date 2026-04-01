@@ -24,7 +24,7 @@ class StokMasukController extends Controller
             })
             ->orderBy('tanggal', 'desc')
             ->orderBy('id', 'desc')
-            ->paginate(10); // REVISI: Sekarang hanya 10 data per halaman
+            ->paginate(10); 
 
         return view('admin.stok-masuk.index', compact('stokMasuks'));
     }
@@ -110,21 +110,12 @@ class StokMasukController extends Controller
             ->with('success', 'Data stok masuk berhasil diperbarui');
     }
 
-    /**
-     * Hapus stok masuk
-     */
     public function destroy(StokMasuk $stok_masuk)
     {
-        DB::transaction(function () use ($stok_masuk) {
-            $bahan = $stok_masuk->bahan;
-            $bahan->stok_awal -= $stok_masuk->jumlah;
-            $bahan->save();
-
-            $stok_masuk->delete();
-        });
+        $stok_masuk->delete();
 
         return redirect()
             ->route('admin.stok-masuk.index')
-            ->with('success', 'Data stok masuk berhasil dihapus');
+            ->with('success', 'Data stok masuk berhasil dihapus dari riwayat');
     }
 }
